@@ -1,11 +1,11 @@
 import React from 'react'
 
-const test = () => {
+const HaNoi = () => {
   return (
     <div>
-      
+      Hà Nội
     </div>
   )
 }
 
-export default test
+export default HaNoi

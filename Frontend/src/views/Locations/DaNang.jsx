@@ -1,11 +1,11 @@
 import React from 'react'
 
-const test = () => {
+const DaNang = () => {
   return (
     <div>
-      
+      Đà Nẵng
     </div>
   )
 }
 
-export default test
+export default DaNang

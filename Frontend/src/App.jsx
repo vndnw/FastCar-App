@@ -1,33 +1,32 @@
-import { useReducer } from 'react'
-import './App.css'
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Home from './views/Home/Home';
+import Navbar from './components/Navbar/Navbar';
+import Contact from './views/Contact/Contact';
+import About from './views/About/About';
+import City from './views/Locations/City';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
+import Footer from './components/Footer/Footer';
 
 function App() {
-  const reducer = (state, action) => {
-    switch (action) {
-      case 'UP':
-        return state + 1
-      case 'DOWN':
-        return state - 1
-      default:
-        throw new Error('Unknown action: ' + action)
-    }
-
-  }
-
-  const UP = 'UP'
-  const DOWN = 'DOWN'
-
-  const [count, dispatch] = useReducer(reducer, 0)
-
   return (
     <>
-      <div>
-        <h1>{count}</h1>
-        <button onClick={() => dispatch(UP)}>Up</button>
-        <button onClick={() => dispatch(DOWN)}>Down</button>
+      <div className="app">
+        <Navbar />
+        <div style={{ height: '120px' }} />
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/:cityName" element={<City />} />
+          </Routes>
+        </div>
       </div>
+      <Footer />
+      <ScrollToTop />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
