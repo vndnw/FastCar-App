@@ -54,10 +54,10 @@ public class SecurityConfig {
     );
 
     private String[] URL_PUBLIC  = {
-            "/api/v1/auth/login",
-            "/api/v1/auth/register",
-            "/api/v1/auth/confirm",
-            "/api/v1/test/email"
+            "/auth/login",
+            "/auth/register",
+            "/auth/confirm",
+            "/test/email"
     };
 
     @Bean

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/test/email")
+@RequestMapping("/test/email")
 public class TestEmailController {
     // This is a placeholder for the actual email sending logic
     // In a real application, you would inject an email service and use it here
