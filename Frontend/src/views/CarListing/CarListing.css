@@ -1,0 +1,206 @@
+/* CarListing.css */
+
+.car-listing-page {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* Search Section - Dark Background */
+.search-section-dark {
+    background: #2c3e50;
+    padding: 24px 0;
+    margin-bottom: 0;
+}
+
+.search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.search-title {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.search-input-white {
+    background: white;
+    border-radius: 8px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    border: 1px solid #e8e8e8;
+    transition: all 0.3s ease;
+    height: 48px;
+}
+
+.search-input-white:hover {
+    border-color: #52c41a;
+    box-shadow: 0 2px 8px rgba(82, 196, 26, 0.15);
+}
+
+.search-button {
+    background: #52c41a !important;
+    border-color: #52c41a !important;
+    height: 48px;
+    width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.search-button:hover {
+    background: #389e0d !important;
+    border-color: #389e0d !important;
+}
+
+/* Filter Section - New Style */
+.filter-section-new {
+    background: white;
+    padding: 24px 0;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 30px;
+}
+
+.filter-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Filter Tags - Outlined Style with Icons and Better Colors */
+.filter-tag-outlined {
+    background: #fafafa;
+    border: 1px solid #d9d9d9;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #666;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    font-weight: 400;
+}
+
+.filter-tag-outlined:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-tag-outlined.active {
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-icon {
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.sort-select {
+    border-radius: 6px;
+}
+
+.sort-select .ant-select-selector {
+    height: 40px !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Cars Grid Section */
+.cars-grid-section {
+    padding: 0 0 60px 0;
+}
+
+.cars-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .search-title {
+        font-size: 18px;
+    }
+
+    .search-input-white {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .search-container,
+    .filter-container,
+    .cars-container {
+        padding: 0 16px;
+    }
+
+    .search-section-dark {
+        padding: 20px 0;
+    }
+
+    .search-title {
+        font-size: 16px;
+        margin-bottom: 16px;
+    }
+
+    .search-input-white {
+        margin-bottom: 12px;
+    }
+
+    .search-button {
+        margin-top: 12px;
+    }
+
+    .section-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .filter-tag-outlined {
+        padding: 8px 16px;
+        font-size: 13px;
+        min-height: 36px;
+        gap: 6px;
+    }
+
+    .filter-icon {
+        font-size: 14px;
+    }
+
+    /* Mobile: Stack search elements */
+    .search-container .ant-row {
+        flex-direction: column;
+    }
+
+    .search-container .ant-col {
+        width: 100% !important;
+        flex: none !important;
+        margin-bottom: 12px;
+    }
+
+    .search-container .ant-col:last-child {
+        margin-bottom: 0;
+    }
+}

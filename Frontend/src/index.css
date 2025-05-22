@@ -8,7 +8,8 @@
   scroll-behavior: smooth;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   line-height: 1.5;
@@ -17,12 +18,19 @@ html, body {
   min-height: 100vh;
 }
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
 
@@ -31,7 +39,8 @@ a {
   color: inherit;
 }
 
-ul, ol {
+ul,
+ol {
   list-style: none;
 }
 
