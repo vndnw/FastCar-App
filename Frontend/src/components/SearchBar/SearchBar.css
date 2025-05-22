@@ -1,0 +1,242 @@
+.search-bar-container {
+    position: absolute;
+    top: 120px;
+    /* Khoảng cách từ top của Hero */
+    left: 0;
+    right: 0;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.search-bar-container.sticky {
+    position: fixed;
+    top: 80px;
+    /* Di chuyển lên một chút khi sticky */
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.search-bar-placeholder {
+    height: 90px;
+    /* Chiều cao tương đương với search bar */
+    width: 100%;
+}
+
+.search-bar-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.search-bar-card {
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+}
+
+.search-bar-card .ant-card-body {
+    padding: 28px 32px !important;
+}
+
+/* Form Item Styling */
+.search-form-item {
+    margin-bottom: 0 !important;
+}
+
+.search-form-item .ant-form-item-label {
+    padding-bottom: 4px !important;
+}
+
+.search-form-item .ant-form-item-label>label {
+    height: auto !important;
+    font-size: 12px !important;
+    color: #666 !important;
+    font-weight: 500 !important;
+}
+
+/* Input Styling */
+.search-bar-card .ant-select,
+.search-bar-card .ant-picker,
+.search-bar-card .ant-input {
+    border-radius: 6px !important;
+    border: none !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    min-width: 100px !important;
+    background-color: rgba(248, 249, 250, 0.8) !important;
+    box-shadow: none !important;
+}
+
+.search-bar-card .ant-select-selector {
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    background-color: transparent !important;
+}
+
+.search-bar-card .ant-select:hover .ant-select-selector,
+.search-bar-card .ant-picker:hover,
+.search-bar-card .ant-input:hover {
+    border: none !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: none !important;
+}
+
+.search-bar-card .ant-select-focused .ant-select-selector,
+.search-bar-card .ant-picker-focused,
+.search-bar-card .ant-input-focused {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Static date/time display styling */
+.search-bar-card .search-form-item>div>div:not(.ant-form-item-label) {
+    padding: 8px 12px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    background: rgba(248, 249, 250, 0.8) !important;
+    font-size: 14px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.3s ease;
+    width: 100% !important;
+    min-width: 100px !important;
+    box-sizing: border-box !important;
+}
+
+.search-bar-card .search-form-item>div>div:hover {
+    border: none !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Button Styling */
+.search-button.ant-btn {
+    height: 36px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    background-color: #51c09f !important;
+    border-color: #51c09f !important;
+    border-radius: 6px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100% !important;
+    min-width: 100px !important;
+}
+
+.search-button.ant-btn:hover {
+    background-color: #45a98c !important;
+    border-color: #45a98c !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(81, 192, 159, 0.3) !important;
+}
+
+/* Row spacing để tạo khoảng cách đẹp */
+.search-bar-card .ant-row {
+    margin: 0 -8px !important;
+    gap: 16px;
+}
+
+.search-bar-card .ant-col {
+    padding: 0 8px !important;
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Select Dropdown Styling */
+.ant-select-dropdown {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: rgba(81, 192, 159, 0.1) !important;
+    color: #51c09f !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: rgba(81, 192, 159, 0.05) !important;
+}
+
+/* DatePicker và TimePicker */
+.ant-picker-dropdown {
+    border-radius: 8px !important;
+}
+
+.ant-picker-today-btn {
+    color: #51c09f !important;
+}
+
+.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-selected:hover .ant-picker-cell-inner {
+    background-color: #51c09f !important;
+}
+
+.ant-picker-time-panel-column>li.ant-picker-time-panel-cell-selected {
+    background-color: rgba(81, 192, 159, 0.1) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .search-bar-wrapper {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-bar-card .ant-card-body {
+        padding: 20px 16px !important;
+    }
+
+    .search-button.ant-btn {
+        height: 38px !important;
+        margin-top: 8px;
+    }
+
+    .search-form-item .ant-form-item-label>label {
+        font-size: 11px !important;
+    }
+
+    .search-bar-card .ant-row {
+        margin: 0 -4px !important;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .search-bar-card .ant-col {
+        padding: 0 4px !important;
+        flex: 0 0 calc(50% - 8px);
+        margin-bottom: 8px;
+    }
+
+    .search-bar-card .ant-col:first-child {
+        flex: 0 0 100%;
+    }
+
+    .search-bar-card .ant-col:last-child {
+        flex: 0 0 100%;
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .search-bar-wrapper {
+        padding: 0 10px;
+    }
+
+    .search-bar-card .ant-card-body {
+        padding: 12px !important;
+    }
+
+    .search-bar-card .ant-row {
+        margin: 0 -6px !important;
+    }
+
+    .search-bar-card .ant-col {
+        padding: 0 6px !important;
+    }
+}
