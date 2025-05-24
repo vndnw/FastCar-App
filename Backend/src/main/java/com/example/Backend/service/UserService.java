@@ -87,7 +87,6 @@ public class UserService {
         }
         return users.map(userMapper::mapToResponse);
     }
-
     public UserResponse getMe() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -96,11 +95,4 @@ public class UserService {
         return userMapper.mapToResponse(user);
     }
 
-//    public Object searchUser(String name, String email, String phone, Pageable pageable) {
-//        Page<User> users = userRepository.searchUser(name, email, phone, pageable);
-//        if (users.isEmpty()) {
-//            throw new ResourceNotFoundException("No users found");
-//        }
-//        return users.map(userMapper::mapToResponse);
-//    }
 }

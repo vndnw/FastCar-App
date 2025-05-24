@@ -1,16 +1,17 @@
 package com.example.Backend.model;
 
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.SecondaryTable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Data
@@ -23,5 +24,7 @@ public class RefreshToken {
     private String id;
     @Column(length = 500)
     private String token;
+    @CreationTimestamp
     private LocalDateTime createdAt;
+
 }

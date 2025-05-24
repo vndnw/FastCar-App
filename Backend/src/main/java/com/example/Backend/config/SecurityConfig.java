@@ -57,7 +57,7 @@ public class SecurityConfig {
             "/auth/login",
             "/auth/register",
             "/auth/confirm",
-            "/test/email"
+            "/test/**"
     };
 
     @Bean
