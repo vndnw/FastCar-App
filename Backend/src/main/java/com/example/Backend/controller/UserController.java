@@ -19,7 +19,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> getAllUsers(Pageable pageable) {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Success")
                 .data(userService.getAllUsers(pageable))
@@ -29,7 +29,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Success")
                 .data(userService.getMe())
@@ -38,7 +38,7 @@ public class UserController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(long id) {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Success")
                 .data(userService.getUserById(id))
@@ -47,7 +47,7 @@ public class UserController {
     }
 //    @GetMapping("/search")
 //    public ResponseEntity<?> searchUser(String name, String email, String phone, Pageable pageable) {
-//        ResponseData responseData = ResponseData.builder()
+//        ResponseData<?> responseData = ResponseData.builder()
 //                .status(200)
 //                .message("Success")
 //                .data(userService.searchUser(name, email, phone, pageable))
@@ -56,7 +56,7 @@ public class UserController {
 //    }
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserRequest userRequest) {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(201)
                 .message("Success")
                 .data(userService.createUser(userRequest))
@@ -65,7 +65,7 @@ public class UserController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody UserRequest userRequest) {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Success")
                 .data(userService.updateUser(id, userRequest))
@@ -75,7 +75,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable long id) {
         userService.deleteUser(id);
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Success")
                 .build();

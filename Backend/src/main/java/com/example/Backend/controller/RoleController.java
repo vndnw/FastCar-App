@@ -22,7 +22,7 @@ public class RoleController {
 
     @GetMapping
     public ResponseEntity<?> getAllRoles() {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(roleService.getAllRoles())
@@ -32,7 +32,7 @@ public class RoleController {
     @PostMapping
     public ResponseEntity<?> createRole(@RequestBody RoleRequest roleRequest) {
         log.info("Create Role: {}", roleRequest);
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Success")
                 .data(roleService.createRole(roleRequest.getRole()))
@@ -41,7 +41,7 @@ public class RoleController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<?> updateRole(@PathVariable long id, @RequestBody RoleRequest roleRequest) {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(roleService.updateRole(id, roleRequest.getRole()))
@@ -50,7 +50,7 @@ public class RoleController {
     }
     @GetMapping("/{role}")
     public ResponseEntity<?> getRoleById(@PathVariable String role) {
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(roleService.getRoleByName(role))
@@ -60,7 +60,7 @@ public class RoleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
-        ResponseData responseData = ResponseData.builder()
+        ResponseData<?> responseData = ResponseData.builder()
                 .status(HttpStatus.OK.value())
                 .message("Role deleted successfully")
                 .build();

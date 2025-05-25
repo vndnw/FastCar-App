@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class ReviewCarRequest {
+    private long userId;
     private String comment;
     private int rating;
 }

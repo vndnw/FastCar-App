@@ -1,7 +1,6 @@
 package com.example.Backend.dto.response;
 
 import com.example.Backend.model.Car;
-import com.example.Backend.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +16,7 @@ public class ReviewCarResponse {
     private long id;
     private String comment;
     private int rating;
-    private User user;
-    private Car car;
+    private UserResponse user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
