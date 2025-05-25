@@ -1,9 +1,11 @@
+
+// Xe có ngay , xe thường
 export const sampleCars = [
     {
         id: 1,
         name: "Hyundai Stargazer",
         year: 2024,
-        location: "Thành Phố Thuận An",
+        location: "Quận 2",
         currentPrice: 430,
         originalPrice: 475,
         discount: 16,
@@ -17,7 +19,7 @@ export const sampleCars = [
         id: 2,
         name: "Toyota Veloz Cross",
         year: 2024,
-        location: "Thành Phố Dĩ An",
+        location: "Quận 12",
         currentPrice: 450,
         originalPrice: 500,
         discount: 16,
@@ -31,7 +33,7 @@ export const sampleCars = [
         id: 3,
         name: "SUZUKI XL7 GLX",
         year: 2022,
-        location: "Thành Phố Dĩ An",
+        location: "Quận Gò Vấp",
         currentPrice: 430,
         originalPrice: 475,
         discount: 16,
@@ -85,16 +87,16 @@ export const sampleCars = [
     },
     {
         id: 7,
-        name: "Kia Sportage",
+        name: "Kia Sportage X-Line",
         year: 2023,
-        location: "Quận Bình Thạnh",
+        location: "Quận Tân Bình",
         currentPrice: 750,
         originalPrice: 820,
         discount: 15,
         seats: 5,
         transmission: "Số tự động",
         fuel: "Xăng",
-        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=280&h=200&fit=crop&crop=center",
+        image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=280&h=200&fit=crop&crop=center",
         available247: true
     },
     {
@@ -110,5 +112,131 @@ export const sampleCars = [
         fuel: "Xăng",
         image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=280&h=200&fit=crop&crop=center",
         available247: true
+    }
+];
+
+// cập nhật thêm
+// Xế xịn - Xe sang - Xe cao cấp
+// === THÊM LUXURY CARS DATA ===
+export const luxuryCars = [
+    {
+        id: 9,
+        name: "Mercedes E-Class",
+        year: 2023,
+        location: "Quận Bình Thạnh",
+        currentPrice: 1320,
+        originalPrice: 1500,
+        discount: 12,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
+    },
+    {
+        id: 10,
+        name: "Mercedes E200",
+        year: 2017,
+        location: "Quận Tân Bình",
+        currentPrice: 1020,
+        originalPrice: 1125,
+        discount: 10,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
+    },
+    {
+        id: 11,
+        name: "Mercedes C200",
+        year: 2020,
+        location: "Quận Tân Bình",
+        currentPrice: 930,
+        originalPrice: 1050,
+        discount: 12,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
+    },
+    {
+        id: 12,
+        name: "Mercedes E200",
+        year: 2021,
+        location: "Thành Phố Thủ Đức",
+        currentPrice: 1320,
+        originalPrice: 1500,
+        discount: 12,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
+    },
+    {
+        id: 13,
+        name: "BMW 5 Series",
+        year: 2022,
+        location: "Quận 1",
+        currentPrice: 1450,
+        originalPrice: 1620,
+        discount: 10,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
+    },
+    {
+        id: 14,
+        name: "BMW X3",
+        year: 2023,
+        location: "Quận 3",
+        currentPrice: 1580,
+        originalPrice: 1800,
+        discount: 12,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
+    },
+    {
+        id: 15,
+        name: "Audi A4",
+        year: 2022,
+        location: "Quận 7",
+        currentPrice: 1250,
+        originalPrice: 1400,
+        discount: 10,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
+    },
+    {
+        id: 16,
+        name: "Lexus ES 250",
+        year: 2021,
+        location: "Quận 2",
+        currentPrice: 1680,
+        originalPrice: 1900,
+        discount: 12,
+        seats: 5,
+        transmission: "Số tự động",
+        fuel: "Xăng",
+        image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=280&h=200&fit=crop&crop=center",
+        available247: true,
+        isLuxury: true
     }
 ];
