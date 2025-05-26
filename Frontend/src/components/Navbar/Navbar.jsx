@@ -47,7 +47,6 @@ const Navbar = () => {
 
         <div className="navbar-right">
           <Link to="/about" className="navbar-link">Về chúng tôi</Link>
-          <Link to="/contact" className="navbar-link">Liên hệ</Link>
 
           <div className="navbar-location">
             <EnvironmentOutlined className="navbar-location-icon" />

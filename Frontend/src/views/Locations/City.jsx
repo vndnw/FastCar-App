@@ -4,7 +4,6 @@ import HoChiMinh from './HoChiMinh';
 import HaNoi from './HaNoi';
 import DaNang from './DaNang';
 import BinhDuong from './BinhDuong';
-import Header from '../../components/Header/Header';
 
 const cityMap = {
   'ho-chi-minh': {
@@ -35,7 +34,6 @@ const City = () => {
         <>
           <h1 style={{ textAlign: 'center' }}>Trang địa điểm: {city.name}</h1>
           {city.component}
-          <Header/>
         </>
       ) : (
         <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Không tìm thấy địa điểm</h2>
