@@ -2,12 +2,23 @@ import React from 'react';
 import { Card, Badge, Typography, Row, Col, Space } from 'antd';
 import { UserOutlined, SettingOutlined, CarOutlined } from '@ant-design/icons';
 
+import { useNavigate } from 'react-router-dom'; // === THÊM IMPORT ===
+
 const { Text, Title } = Typography;
 
 const CarCard = ({ car }) => {
+
+    const navigate = useNavigate(); // === THÊM HOOK NAVIGATE ===
+
+    // === THÊM FUNCTION XỬ LÝ CLICK CARD ===
+    const handleCardClick = () => {
+        navigate(`/car-detail/${car.id}`);
+    };
+
     return (
         <Card
             hoverable
+            onClick={handleCardClick} // === THÊM CLICK HANDLER ===
             style={{
                 width: 280,
                 borderRadius: 12,
