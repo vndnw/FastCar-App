@@ -50,10 +50,14 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
+
     private double price;
+
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+
 
     @CreationTimestamp
     private LocalDateTime startTime;

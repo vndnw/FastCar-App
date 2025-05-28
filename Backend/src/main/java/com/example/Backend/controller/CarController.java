@@ -78,9 +78,9 @@ public class CarController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/reviewcar")
-    public ResponseEntity<?> addReviewCar(@PathVariable("id") long id, @RequestBody ReviewCarRequest reviewCarRequest) {
-
-
-    }
+//    @PostMapping("/{id}/reviewcar")
+//    public ResponseEntity<?> addReviewCar(@PathVariable("id") long id, @RequestBody ReviewCarRequest reviewCarRequest) {
+//
+//
+//    }
 }
