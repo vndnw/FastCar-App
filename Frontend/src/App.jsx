@@ -12,6 +12,9 @@ import HeroSection from './components/HeroSection/HeroSection';
 // === THÊM IMPORT CHO CARLIST PAGE ===
 import CarListing from './views/CarListing/CarListing';
 
+// === THÊM IMPORT CHO CAR DETAIL ===
+import CarDetail from './views/CarDetail/CarDetail';
+
 
 function App() {
   return (
@@ -27,6 +30,11 @@ function App() {
 
             //* === THÊM ROUTE MỚI CHO CAR LISTING === *//
             <Route path="/xe-co-ngay" element={<CarListing />} />
+
+            //* === ROUTE MỚI CHO CAR DETAIL === *//
+            <Route path="/car-detail/:carId" element={<CarDetail />} />
+
+
           </Routes>
         </div>
       </div>
