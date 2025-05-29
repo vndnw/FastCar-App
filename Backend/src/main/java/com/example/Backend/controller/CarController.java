@@ -80,7 +80,11 @@ public class CarController {
 
     @PostMapping("/{id}/reviewcar")
     public ResponseEntity<?> addReviewCar(@PathVariable("id") long id, @RequestBody ReviewCarRequest reviewCarRequest) {
-
-
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(201)
+                .message("Review car added successfully")
+                .data(reviewCarService.createReviewCar(id, reviewCarRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
 }
