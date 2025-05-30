@@ -327,6 +327,7 @@ const CarTerms = ({ car }) => {
                     <li> Khi trả xe, nếu xe bẩn hoặc có mùi trong xe, khách hàng vui lòng vệ sinh xe sạch sẽ hoặc đóng phí vệ sinh xe.</li>
                     <li> Xe được giới hạn di chuyển tối đa 400km cho 24h, và tần suất là 250km, 300km, 350 km cho 6h, 8h, 12h.</li>
                 </ul>
+                <p>Trân trọng cảm ơn, chúc quý khách hàng có những chuyến đi tuyệt vời !</p>
             </div>
         </div>
     );

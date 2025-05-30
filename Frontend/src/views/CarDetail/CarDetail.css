@@ -350,7 +350,7 @@
 }
 
 .car-description h3 {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     margin-bottom: 16px;
     color: #333;
@@ -373,7 +373,7 @@
 }
 
 .car-features-extended h3 {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     margin-bottom: 16px;
     color: #333;
@@ -391,7 +391,7 @@
 }
 
 .feature-emoji {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .feature-text {
@@ -408,7 +408,7 @@
 }
 
 .car-terms h3 {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     margin-bottom: 16px;
     color: #333;
@@ -417,7 +417,7 @@
 }
 
 .terms-content p {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     color: #333;
     margin-bottom: 12px;
@@ -430,7 +430,7 @@
 }
 
 .terms-content li {
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
     line-height: 1.5;
     margin-bottom: 6px;
