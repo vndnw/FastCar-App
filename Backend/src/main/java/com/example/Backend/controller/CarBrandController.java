@@ -18,7 +18,7 @@ public class CarBrandController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCarBrand(CarBrandRequest carBrandRequest) {
+    public ResponseEntity<?> createCarBrand(@RequestBody CarBrandRequest carBrandRequest) {
         ResponseData responseData = ResponseData.builder()
                 .message("Success")
                 .data(carBrandService.createCarBrand(carBrandRequest))

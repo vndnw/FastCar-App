@@ -1,17 +1,11 @@
 package com.example.Backend.dto.response;
 
-import com.example.Backend.model.Car;
-import com.example.Backend.model.Driver;
-import com.example.Backend.model.User;
 import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.model.enums.BookingType;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -21,9 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookingResponse {
     private long id;
-    private User user;
-    private Driver driver;
-    private Car car;
+    private UserResponse user;
+    private DriverResponse driver;
+    private CarResponse car;
     private String pickupLocation;
     private LocalDateTime pickupTime;
     private BookingType type;
@@ -31,5 +25,6 @@ public class BookingResponse {
     private double price;
     private String description;
     private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private LocalDateTime createdAt;
 }

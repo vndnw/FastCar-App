@@ -58,6 +58,8 @@ public class Booking {
     @CreationTimestamp
     private LocalDateTime startTime;
 
+    private LocalDateTime endTime;
+
     @UpdateTimestamp
     private LocalDateTime createdAt;
 }

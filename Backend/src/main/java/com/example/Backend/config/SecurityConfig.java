@@ -57,7 +57,10 @@ public class SecurityConfig {
             "/auth/login",
             "/auth/register",
             "/auth/confirm",
-            "/test/**"
+            "/test/**",
+            "/car/**",
+            "/car-brand/**",
+            "/bookings/check-availability"
     };
 
     @Bean
