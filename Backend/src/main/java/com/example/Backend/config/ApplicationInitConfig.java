@@ -38,59 +38,59 @@ public class ApplicationInitConfig {
                 adminRole = roleRepository.findByName("admin").get();
             }
 
-            Role userRole;
-            if (roleRepository.findByName("user").isEmpty()) {
-                userRole = Role.builder()
-                        .name("user")
+            Role customerRole;
+            if (roleRepository.findByName("customer").isEmpty()) {
+                customerRole = Role.builder()
+                        .name("customer")
                         .build();
-                roleRepository.save(userRole);
-                log.info("ROLE 'user' has been created");
+                roleRepository.save(customerRole);
+                log.info("ROLE 'customer' has been created");
             } else {
-                userRole = roleRepository.findByName("user").get();
+                customerRole = roleRepository.findByName("customer").get();
             }
             
-            Role driveRole;
-            if (roleRepository.findByName("drive").isEmpty()) {
-                driveRole = Role.builder()
-                        .name("drive")
+            Role driverRole;
+            if (roleRepository.findByName("driver").isEmpty()) {
+                driverRole = Role.builder()
+                        .name("driver")
                         .build();
-                roleRepository.save(driveRole);
-                log.info("ROLE 'drive' has been created");
+                roleRepository.save(driverRole);
+                log.info("ROLE 'driver' has been created");
             } else {
-                driveRole = roleRepository.findByName("drive").get();
+                driverRole = roleRepository.findByName("driver").get();
             }
 
             if (userRepository.findByEmail("admin@gmail.com").isEmpty()) {
                 List<Role> adminRoles = new ArrayList<>();
                 adminRoles.add(adminRole);
-                adminRoles.add(userRole);
-                adminRoles.add(driveRole);
+                adminRoles.add(customerRole);
+                adminRoles.add(driverRole);
                 
-                User user = User.builder()
+                User admin = User.builder()
                         .email("admin@gmail.com")
                         .password(passwordEncoder.encode("admin"))
                         .roles(adminRoles)
                         .build();
-                userRepository.save(user);
+                userRepository.save(admin);
                 log.info("ADMIN has been created with default password 'admin'");
             }
             
-            if (userRepository.findByEmail("user@gmail.com").isEmpty()) {
-                List<Role> userRoles = new ArrayList<>();
-                userRoles.add(userRole);
+            if (userRepository.findByEmail("customer@gmail.com").isEmpty()) {
+                List<Role> customerRoles = new ArrayList<>();
+                customerRoles.add(customerRole);
                 
-                User user = User.builder()
-                        .email("user@gmail.com")
-                        .password(passwordEncoder.encode("user"))
-                        .roles(userRoles)
+                User customer = User.builder()
+                        .email("customer@gmail.com")
+                        .password(passwordEncoder.encode("customer"))
+                        .roles(customerRoles)
                         .build();
-                userRepository.save(user);
-                log.info("DEFAULT USER has been created with password 'user'");
+                userRepository.save(customer);
+                log.info("DEFAULT CUSTOMER has been created with password 'customer'");
             }
 
             if (userRepository.findByEmail("driver@gmail.com").isEmpty()) {
                 List<Role> driverRoles = new ArrayList<>();
-                driverRoles.add(driveRole);
+                driverRoles.add(driverRole);
                 
                 User driver = User.builder()
                         .email("driver@gmail.com")
