@@ -17,14 +17,11 @@ public class BookingResponse {
     private long id;
     private UserResponse user;
     private DriverResponse driver;
-    private CarResponse car;
-    private String pickupLocation;
+    private CarResponse car;    private String pickupLocation;
     private LocalDateTime pickupTime;
+    private LocalDateTime returnTime;
     private BookingType type;
-    private BookingStatus status;
-    private double price;
-    private String description;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private BookingStatus status;    private double price;
+    private String discountCode;
     private LocalDateTime createdAt;
 }

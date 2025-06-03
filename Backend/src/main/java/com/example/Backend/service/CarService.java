@@ -31,13 +31,14 @@ public class CarService {
                 .fuelType(carRequest.getFuelType())
                 .capacity(carRequest.getCapacity())
                 .status(carRequest.getStatus())
+                .basePrice(carRequest.getBasePrice())
                 .imageUrl(carRequest.getImageUrl())
                 .build();
         return carMapper.mapToResponse(carRepository.save(car));
     }
 
     public CarResponse updateCar(long carId, CarRequest carRequest) {
-        Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
+        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
         car.setCarBrand(carRequest.getCarBrand());
         car.setName(carRequest.getName());
         car.setModel(carRequest.getModel());
@@ -46,17 +47,18 @@ public class CarService {
         car.setFuelType(carRequest.getFuelType());
         car.setCapacity(carRequest.getCapacity());
         car.setStatus(carRequest.getStatus());
+        car.setBasePrice(carRequest.getBasePrice());
         car.setImageUrl(carRequest.getImageUrl());
         return carMapper.mapToResponse(carRepository.save(car));
     }
 
     public void deleteCar(long carId) {
-        Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
+        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
         carRepository.delete(car);
     }
 
     public CarResponse getCarById(long carId) {
-        Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
+        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
         return carMapper.mapToResponse(car);
     }
 

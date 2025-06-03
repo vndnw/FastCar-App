@@ -19,10 +19,10 @@ public class CarRequest {
     private String name;
     private String model;
     private CarBrand carBrand;
-    private String licensePlate;
-    private int capacity;
+    private String licensePlate;    private int capacity;
     private FuelType fuelType;
     private VehicleStatus status;
     private String description;
     private List<String> imageUrl;
+    private double basePrice; // Base price per day for the car
 }

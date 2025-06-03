@@ -12,8 +12,7 @@ public class CarMapper {
         this.carBrandMapper = carBrandMapper;
     }
 
-    public CarResponse mapToResponse(Car car) {
-        return CarResponse.builder()
+    public CarResponse mapToResponse(Car car) {        return CarResponse.builder()
                 .id(car.getId())
                 .model(car.getModel())
                 .name(car.getName())
@@ -24,6 +23,7 @@ public class CarMapper {
                 .imageUrl(car.getImageUrl())
                 .fuelType(car.getFuelType())
                 .licensePlate(car.getLicensePlate())
+                .basePrice(car.getBasePrice())
                 .createdAt(car.getCreatedAt())
                 .updatedAt(car.getUpdatedAt())
                 .build();

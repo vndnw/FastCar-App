@@ -26,9 +26,9 @@ public class CarResponse {
     private String licensePlate;
     private int capacity;
     private FuelType fuelType;
-    private VehicleStatus status;
-    private String description;
+    private VehicleStatus status;    private String description;
     private List<String> imageUrl;
+    private double basePrice; // Base price per day for the car
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -9,14 +9,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingRequest {
-    private Long carId;
-    private BookingType type;
-    private String pickupLocation;
+@Builder
+public class PricingCalculationRequest {    private Long carId;
     private LocalDateTime pickupTime;
-    private LocalDateTime returnTime; // Return time for calculating rental duration
-    private String discountCode; // Added for applying discount codes
+    private LocalDateTime returnTime;
+    private BookingType type;
+    private String discountCode;
 }

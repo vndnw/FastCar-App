@@ -33,19 +33,13 @@ public class BookingMapper {
         if (booking.getDriver() != null) {
             DriverResponse driverResponse = driverMapper.mapToResponse(booking.getDriver());
             response.setDriver(driverResponse);
-        }
-
-        CarResponse carResponse = carMapper.mapToResponse(booking.getCar());
-        response.setCar(carResponse);
-
-        response.setPickupLocation(booking.getPickupLocation());
+        }        CarResponse carResponse = carMapper.mapToResponse(booking.getCar());
+        response.setCar(carResponse);        response.setPickupLocation(booking.getPickupLocation());
         response.setPickupTime(booking.getPickupTime());
+        response.setReturnTime(booking.getReturnTime());
         response.setType(booking.getType());
-        response.setStatus(booking.getStatus());
-        response.setPrice(booking.getPrice());
-        response.setDescription(booking.getDescription());
-        response.setStartTime(booking.getStartTime());
-        response.setEndTime(booking.getEndTime());
+        response.setStatus(booking.getStatus());        response.setPrice(booking.getPrice());
+        response.setDiscountCode(booking.getDiscountCode());
         response.setCreatedAt(booking.getCreatedAt());
         return response;
     }

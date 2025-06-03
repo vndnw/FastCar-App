@@ -41,13 +41,13 @@ public class Car {
     private FuelType fuelType;
 
     @Enumerated(EnumType.STRING)
-    private VehicleStatus status;
-
-    @Column(columnDefinition = "TEXT")
+    private VehicleStatus status;    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(length = 500)
     private List<String> imageUrl;
+    
+    private double basePrice; // Base price per day for the car
 
     @CreationTimestamp
     private LocalDateTime createdAt;

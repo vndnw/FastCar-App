@@ -35,14 +35,16 @@ public class Booking {
     private Driver driver;
 
     @ManyToOne
-    @JoinColumn(name  = "car_id")
+    @JoinColumn(name = "car_id")
     private Car car;
-
     @Column(name = "pickup_location", nullable = false)
     private String pickupLocation;
 
     @Column(name = "pickup_time", nullable = false)
     private LocalDateTime pickupTime;
+
+    @Column(name = "return_time", nullable = false)
+    private LocalDateTime returnTime;
 
     @Enumerated(EnumType.STRING)
     private BookingType type;
@@ -51,15 +53,13 @@ public class Booking {
     private BookingStatus status;
 
     private double price;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "discount_code")
+    private String discountCode;
 
     @CreationTimestamp
-    private LocalDateTime startTime;
-
-    private LocalDateTime endTime;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 }

@@ -17,13 +17,8 @@ public class DriverMapper {
         return DriverResponse.builder()
                 .id(driver.getId())
                 .user(userMapper.mapToResponse(driver.getUser()))
-                .imageCCCDBefore(driver.getImageCCCDBefore())
-                .imageCCCDAfter(driver.getImageCCCDAfter())
-                .active(driver.isActive())
-                .online(driver.isOnline())
                 .licenseNumber(driver.getLicenseNumber())
                 .createdAt(driver.getCreatedAt())
-                .imageFaceID(driver.getImageFaceID())
                 .updatedAt(driver.getUpdatedAt())
                 .status(driver.getStatus())
                 .build();

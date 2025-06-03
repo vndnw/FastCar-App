@@ -15,19 +15,24 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    Page<Booking> findByUserId(Long userId, Pageable pageable);
-    @Query(value = "SELECT * FROM bookings b WHERE b.car_id = :carId AND b.status != 'CANCELLED' AND " +
-            "((b.pickup_time <= :endDate AND :startDate <= DATE_ADD(b.pickup_time, INTERVAL 1 DAY)) OR " +
-            "(b.pickup_time BETWEEN :startDate AND :endDate))", nativeQuery = true)
+    Page<Booking> findByUserId(Long userId, Pageable pageable);    @Query(value = "SELECT * FROM bookings b WHERE b.car_id = :carId AND b.status != 'CANCELLED' AND " +
+            "((b.pickup_time <= :returnDate AND :pickupDate <= b.return_time) OR " +
+            "(b.pickup_time BETWEEN :pickupDate AND :returnDate))", nativeQuery = true)
     List<Booking> findOverlappingBookings(
             @Param("carId") Long carId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
-
-
+            @Param("pickupDate") LocalDateTime pickupDate,
+            @Param("returnDate") LocalDateTime returnDate);
     List<Booking> findByUserIdAndStatus(Long userId, BookingStatus status);
 
     Page<Booking> findByStatus(BookingStatus status, Pageable pageable);
 
     Page<Booking> findByCarId(Long carId, Pageable pageable);
+    
+    @Query(value = "SELECT * FROM bookings b WHERE b.driver_id = :driverId AND b.status NOT IN ('CANCELLED', 'COMPLETED') AND " +
+            "((b.pickup_time <= :returnDate AND :pickupDate <= b.return_time) OR " +
+            "(b.pickup_time BETWEEN :pickupDate AND :returnDate))", nativeQuery = true)
+    List<Booking> findDriverOverlappingBookings(
+            @Param("driverId") Long driverId,
+            @Param("pickupDate") LocalDateTime pickupDate,
+            @Param("returnDate") LocalDateTime returnDate);
 }
