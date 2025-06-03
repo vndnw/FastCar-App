@@ -26,7 +26,6 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
         ResponseData<?> responseData = ResponseData.builder()
@@ -81,5 +80,8 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+//    @PostMapping("/{id}/depositor")
+
 
 }

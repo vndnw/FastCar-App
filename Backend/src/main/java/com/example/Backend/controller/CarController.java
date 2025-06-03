@@ -1,7 +1,7 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
-import com.example.Backend.dto.request.CarRequest;
+import com.example.Backend.dto.request.CarFirstCreateRequest;
 import com.example.Backend.dto.request.ReviewCarRequest;
 import com.example.Backend.service.CarService;
 import com.example.Backend.service.ReviewCarService;
@@ -23,11 +23,11 @@ public class CarController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addCar(@RequestBody CarRequest carRequest) {
+    public ResponseEntity<?> addCar(@RequestBody CarFirstCreateRequest carFirstCreateRequest) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(201)
                 .message("Car added successfully")
-                .data(carService.createCar(carRequest))
+                .data(carService.createCar(carFirstCreateRequest))
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
@@ -50,11 +50,11 @@ public class CarController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCar(@PathVariable("id") long id, @RequestBody CarRequest carRequest) {
+    public ResponseEntity<?> updateCar(@PathVariable("id") long id, @RequestBody CarFirstCreateRequest carFirstCreateRequest) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Car updated successfully")
-                .data(carService.updateCar(id, carRequest))
+                .data(carService.updateCar(id, carFirstCreateRequest))
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }

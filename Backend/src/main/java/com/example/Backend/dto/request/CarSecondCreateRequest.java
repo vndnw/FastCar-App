@@ -1,28 +1,26 @@
 package com.example.Backend.dto.request;
 
 import com.example.Backend.model.CarBrand;
+import com.example.Backend.model.enums.CarTransmission;
 import com.example.Backend.model.enums.FuelType;
-import com.example.Backend.model.enums.VehicleStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class CarRequest {
-    private String name;
-    private String model;
-    private CarBrand carBrand;
+public class CarSecondCreateRequest {
     private String licensePlate;
-    private int capacity;
-    private FuelType fuelType;
-    private VehicleStatus status;
+    private BigDecimal pricePerHour;
+    private BigDecimal pricePer4Hour;
+    private BigDecimal pricePer8Hour;
+    private BigDecimal pricePer12Hour;
+    private BigDecimal pricePer24Hour;
     private String description;
-    private List<String> imageUrl;
+    private BigDecimal penaltyLateReturn;
 }

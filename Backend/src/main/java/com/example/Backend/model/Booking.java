@@ -38,8 +38,9 @@ public class Booking {
     @JoinColumn(name  = "car_id")
     private Car car;
 
-    @Column(name = "pickup_location", nullable = false)
-    private String pickupLocation;
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location pickupLocation;
 
     @Column(name = "pickup_time", nullable = false)
     private LocalDateTime pickupTime;

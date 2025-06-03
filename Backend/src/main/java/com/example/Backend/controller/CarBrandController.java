@@ -51,7 +51,6 @@ public class CarBrandController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCarBrand(@PathVariable Long id) {
         carBrandService.deleteCarBrand(id);

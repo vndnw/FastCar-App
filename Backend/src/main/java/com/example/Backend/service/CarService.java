@@ -1,6 +1,6 @@
 package com.example.Backend.service;
 
-import com.example.Backend.dto.request.CarRequest;
+import com.example.Backend.dto.request.CarFirstCreateRequest;
 import com.example.Backend.dto.response.CarResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarMapper;
@@ -21,32 +21,32 @@ public class CarService {
         this.carMapper = carMapper;
     }
 
-    public CarResponse createCar(CarRequest carRequest) {
+    public CarResponse createCar(CarFirstCreateRequest carFirstCreateRequest) {
         Car car = Car.builder()
-                .carBrand(carRequest.getCarBrand())
-                .name(carRequest.getName())
-                .model(carRequest.getModel())
-                .description(carRequest.getDescription())
-                .licensePlate(carRequest.getLicensePlate())
-                .fuelType(carRequest.getFuelType())
-                .capacity(carRequest.getCapacity())
-                .status(carRequest.getStatus())
-                .imageUrl(carRequest.getImageUrl())
+                .carBrand(carFirstCreateRequest.getCarBrand())
+                .name(carFirstCreateRequest.getName())
+                .model(carFirstCreateRequest.getModel())
+                .description(carFirstCreateRequest.getDescription())
+                .licensePlate(carFirstCreateRequest.getLicensePlate())
+                .fuelType(carFirstCreateRequest.getFuelType())
+                .capacity(carFirstCreateRequest.getCapacity())
+                .status(carFirstCreateRequest.getStatus())
+                .imageUrl(carFirstCreateRequest.getImageUrl())
                 .build();
         return carMapper.mapToResponse(carRepository.save(car));
     }
 
-    public CarResponse updateCar(long carId, CarRequest carRequest) {
+    public CarResponse updateCar(long carId, CarFirstCreateRequest carFirstCreateRequest) {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
-        car.setCarBrand(carRequest.getCarBrand());
-        car.setName(carRequest.getName());
-        car.setModel(carRequest.getModel());
-        car.setDescription(carRequest.getDescription());
-        car.setLicensePlate(carRequest.getLicensePlate());
-        car.setFuelType(carRequest.getFuelType());
-        car.setCapacity(carRequest.getCapacity());
-        car.setStatus(carRequest.getStatus());
-        car.setImageUrl(carRequest.getImageUrl());
+        car.setCarBrand(carFirstCreateRequest.getCarBrand());
+        car.setName(carFirstCreateRequest.getName());
+        car.setModel(carFirstCreateRequest.getModel());
+        car.setDescription(carFirstCreateRequest.getDescription());
+        car.setLicensePlate(carFirstCreateRequest.getLicensePlate());
+        car.setFuelType(carFirstCreateRequest.getFuelType());
+        car.setCapacity(carFirstCreateRequest.getCapacity());
+        car.setStatus(carFirstCreateRequest.getStatus());
+        car.setImageUrl(carFirstCreateRequest.getImageUrl());
         return carMapper.mapToResponse(carRepository.save(car));
     }
 
