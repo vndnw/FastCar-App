@@ -9,6 +9,7 @@ import com.example.Backend.repository.CarBrandRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class CarBrandService {
@@ -21,7 +22,7 @@ public class CarBrandService {
         this.carBrandMapper = carBrandMapper;
     }
 
-    public CarBrandResponse createCarBrand(CarBrandRequest carBrandRequest) {
+    public CarBrandResponse createCarBrand(@RequestBody CarBrandRequest carBrandRequest) {
         CarBrand carBrand = CarBrand.builder()
                 .logo(carBrandRequest.getLogo())
                 .name(carBrandRequest.getName())

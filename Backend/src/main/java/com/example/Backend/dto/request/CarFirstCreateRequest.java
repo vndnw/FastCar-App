@@ -1,12 +1,14 @@
 package com.example.Backend.dto.request;
 
 import com.example.Backend.model.CarBrand;
-import com.example.Backend.model.enums.CarTransmission;
 import com.example.Backend.model.enums.FuelType;
+import com.example.Backend.model.enums.CarStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -14,12 +16,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CarFirstCreateRequest {
     private String name;
-    private CarBrand carBrand;
     private String model;
-    private int year;
-    private int seats;
-    private CarTransmission transmission;
+    private CarBrand carBrand;
+    private String licensePlate;
+    private int capacity;
     private FuelType fuelType;
-    private String color;
-    private String fuelConsumption;
+    private CarStatus status;
+    private String description;
+    private List<String> imageUrl;
 }

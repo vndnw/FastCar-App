@@ -35,13 +35,8 @@ public class DriverService {
 
         Driver driver = Driver.builder()
                 .user(user)
-                .imageFaceID(driverRequest.getImageFaceID())
-                .imageCCCDBefore(driverRequest.getImageCCCDBefore())
-                .imageCCCDAfter(driverRequest.getImageCCCDAfter())
                 .licenseNumber(driverRequest.getLicenseNumber())
                 .status(driverRequest.getStatus())
-                .active(true)
-                .online(true)
                 .build();
         return driverMapper.mapToResponse(driverRepository.save(driver));
     }
@@ -52,9 +47,6 @@ public class DriverService {
         Driver driver = driverRepository.findById(driverId).orElseThrow(()-> new ResourceNotFoundException("Driver Not Found"));
         driver.setLicenseNumber(driverRequest.getLicenseNumber());
         driver.setStatus(driverRequest.getStatus());
-        driver.setImageCCCDAfter(driverRequest.getImageCCCDAfter());
-        driver.setImageCCCDBefore(driverRequest.getImageCCCDBefore());
-        driver.setImageFaceID(driverRequest.getImageFaceID());
         driver.setLicenseNumber(String.valueOf(driverRequest.getLicenseNumber()));
 
         return driverMapper.mapToResponse(driverRepository.save(driver));

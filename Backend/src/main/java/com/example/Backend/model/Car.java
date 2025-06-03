@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.Backend.model.enums.CarStatus;
 import com.example.Backend.model.enums.CarTransmission;
 import com.example.Backend.model.enums.FuelType;
 import jakarta.persistence.*;
@@ -12,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.example.Backend.model.enums.VehicleStatus;
 
 import lombok.Builder;
 import lombok.Data;
@@ -62,7 +62,7 @@ public class Car {
     private String fuelConsumption;//  fuel_consumption/100km
 
     @Enumerated(EnumType.STRING)
-    private VehicleStatus status;
+    private CarStatus status;
 
     private String color;
 

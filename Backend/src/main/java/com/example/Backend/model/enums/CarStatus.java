@@ -1,5 +1,5 @@
 package com.example.Backend.model.enums;
 
-public enum VehicleStatus {
+public enum CarStatus {
     AVAILABLE, BOOKED, MAINTENANCE
 }

@@ -1,15 +1,11 @@
 package com.example.Backend.dto.response;
 
-import com.example.Backend.model.CarBrand;
 import com.example.Backend.model.enums.FuelType;
-import com.example.Backend.model.enums.VehicleStatus;
-import jakarta.persistence.*;
+import com.example.Backend.model.enums.CarStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,9 +22,9 @@ public class CarResponse {
     private String licensePlate;
     private int capacity;
     private FuelType fuelType;
-    private VehicleStatus status;
-    private String description;
+    private CarStatus status;    private String description;
     private List<String> imageUrl;
+    private double basePrice; // Base price per day for the car
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

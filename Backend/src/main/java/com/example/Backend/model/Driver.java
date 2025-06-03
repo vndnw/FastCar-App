@@ -30,21 +30,8 @@ public class Driver {
     @Column(length = 500)
     private String licenseNumber;
 
-    @Column(length = 500)
-    private String imageCCCDBefore;
-
-    @Column(length = 500)
-    private String imageCCCDAfter;
-
-    @Column(length = 500)
-    private String imageFaceID;
-
     @Enumerated(EnumType.STRING)
     private DriverStatus status;
-
-    private boolean active;
-
-    private boolean online;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

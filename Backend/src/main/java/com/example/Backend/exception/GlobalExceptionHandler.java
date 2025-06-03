@@ -61,6 +61,7 @@ public class GlobalExceptionHandler {
 //                .build();
 //        return ResponseEntity.status(400).body(errorResponse);
 //    }
+
     @ExceptionHandler(RefreshTokenExpiredException.class)
     public ResponseEntity<?> handleRefreshTokenExpiredException(RefreshTokenExpiredException e, HttpServletRequest request) {
         ResponseData errorResponse = ResponseData.builder()
@@ -70,5 +71,16 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         return ResponseEntity.status(401).body(errorResponse);
+    }
+
+    @ExceptionHandler(BookingException.class)
+    public ResponseEntity<?> handleBookingException(BookingException e, HttpServletRequest request) {
+        ResponseData errorResponse = ResponseData.builder()
+                .status(400)
+                .timestamp(LocalDateTime.now())
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(400).body(errorResponse);
     }
 }
