@@ -80,6 +80,9 @@ public class Car {
 
     private BigDecimal penaltyLateReturn; //   price/1hour
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean active;
+
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;

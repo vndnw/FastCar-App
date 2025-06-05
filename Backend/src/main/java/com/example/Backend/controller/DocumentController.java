@@ -55,7 +55,7 @@ public class DocumentController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}") // Update status document  (URL = /document/{id}?status=APPROVED)
+    @PutMapping("/{id}/status") // Update status document  (URL = /document/{id}/status?status=APPROVED)
     public ResponseEntity<?> updateStatusDocument(@PathVariable Long id, @RequestParam("status") String status) {
         DocumentStatus documentStatus = DocumentStatus.valueOf(status.toUpperCase());
         //  có thể cập nhật thêm tính năng thong báo khi document được approve
