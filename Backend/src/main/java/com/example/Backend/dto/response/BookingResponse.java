@@ -1,5 +1,6 @@
 package com.example.Backend.dto.response;
 
+import com.example.Backend.model.Location;
 import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.model.enums.BookingType;
 import lombok.AllArgsConstructor;
@@ -17,11 +18,13 @@ public class BookingResponse {
     private long id;
     private UserResponse user;
     private DriverResponse driver;
-    private CarResponse car;    private String pickupLocation;
+    private CarResponse car;
+    private Location pickupLocation;
     private LocalDateTime pickupTime;
     private LocalDateTime returnTime;
     private BookingType type;
-    private BookingStatus status;    private double price;
+    private BookingStatus status;
+    private double price;
     private String discountCode;
     private LocalDateTime createdAt;
 }

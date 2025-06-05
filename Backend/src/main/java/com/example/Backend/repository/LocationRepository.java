@@ -9,5 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
     Page<Location> findAll(Pageable pageable);
-    Page<Location> findByLocationName(String locationName, Pageable pageable);
+
+    Page<Location> findLocationByName(String name, Pageable pageable);
+
+    Location findLocationByLatitudeAndLongitude(double latitude, double longitude);
 }

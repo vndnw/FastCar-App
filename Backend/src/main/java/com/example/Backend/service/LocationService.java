@@ -30,6 +30,23 @@ public class LocationService {
         return locationMapper.mapToResponse(location);
     }
 
+    public Location createLocation(LocationRequest locationRequest) {
+        Location location = Location.builder()
+                .name(locationRequest.getName())
+                .address(locationRequest.getAddress())
+                .longitude(locationRequest.getLongitude())
+                .latitude(locationRequest.getLatitude())
+                .build();
+        return locationRepository.save(location);
+    }
+
+    public Location checkLocation(LocationRequest locationRequest) {
+        Location location = locationRepository.findLocationByLatitudeAndLongitude(locationRequest.getLatitude(), locationRequest.getLongitude());
+        if (location == null) {
+            return createLocation(locationRequest);
+        }else return location;
+    }
+
     public LocationResponse addLocation(LocationRequest locationRequest) {
         Location location = Location.builder()
                 .name(locationRequest.getName())
@@ -54,7 +71,7 @@ public class LocationService {
 //
 //    }
     public Page<LocationResponse> getLocationByName(String name, Pageable pageable) {
-        Page<Location> locations = locationRepository.findByLocationName(name,pageable);
+        Page<Location> locations = locationRepository.findLocationByName(name,pageable);
         return locations.map(location -> locationMapper.mapToResponse(location));
     }
 }

@@ -1,7 +1,9 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
+import com.example.Backend.dto.request.CarFirstCreateRequest;
 import com.example.Backend.dto.request.UserRequest;
+import com.example.Backend.service.CarService;
 import com.example.Backend.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -12,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final CarService carService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, CarService carService) {
         this.userService = userService;
+        this.carService = carService;
     }
 
     @GetMapping
@@ -81,7 +85,29 @@ public class UserController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-//    @PostMapping("/{id}/depositor")
+    // khởi tạo kí gửi xe với các thông tin basic  của car sau đó sẽ update thông tin sau
+    @PostMapping("/{id}/depositor")
+    public ResponseEntity<?> depositCar(@PathVariable long id, @RequestBody CarFirstCreateRequest carFirstCreateRequest) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(201)
+                .message("Car added successfully")
+                .data(carService.createCarBasic(id, carFirstCreateRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+    }
+
+    // tìm danh sách carvới userID
+    @GetMapping("/{id}/car")
+    public ResponseEntity<?> getAllCarByUserId(@PathVariable long id) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Success")
+                .data(carService.getAllCarsByUserId(id))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+
 
 
 }

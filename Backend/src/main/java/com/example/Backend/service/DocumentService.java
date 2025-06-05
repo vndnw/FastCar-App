@@ -6,14 +6,14 @@ import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.DocumentMapper;
 import com.example.Backend.model.Car;
 import com.example.Backend.model.Document;
+import com.example.Backend.model.enums.DocumentStatus;
 import com.example.Backend.repository.CarRepository;
 import com.example.Backend.repository.DocumentRepository;
-import com.example.Backend.repository.UserRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 
 @Service
 public class DocumentService {
@@ -29,15 +29,15 @@ public class DocumentService {
 
     public Page<DocumentResponse> getAllDocuments(Pageable pageable) {
         Page<Document> documents = documentRepository.findAll(pageable);
-        return documents.map(document -> documentMapper.mapToResponse(document));
+        return documents.map(documentMapper::mapToResponse);
     }
     public DocumentResponse getDocumentById(Long id) {
         Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
         return documentMapper.mapToResponse(document);
     }
-    public DocumentResponse createDocument(long userId , DocumentRequest documentRequest) {
+    public DocumentResponse createDocument(long carId , @NotNull DocumentRequest documentRequest) {
 
-        Car car = carRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
 
         Document document = Document.builder()
                 .documentNumber(documentRequest.getDocumentNumber())
@@ -48,11 +48,12 @@ public class DocumentService {
                 .imageBackUrl(documentRequest.getImageBackUrl())
                 .expiryDate(documentRequest.getExpiryDate())
                 .issueDate(documentRequest.getIssueDate())
+                .status(DocumentStatus.PENDING)
                 .active(false)
                 .build();
         return documentMapper.mapToResponse(documentRepository.save(document));
     }
-    public DocumentResponse updateDocument(long id, DocumentRequest documentRequest) {
+    public DocumentResponse updateDocument(long id, @NotNull DocumentRequest documentRequest) {
         Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
         document.setDocumentNumber(documentRequest.getDocumentNumber());
         document.setDescription(documentRequest.getDescription());
@@ -63,9 +64,19 @@ public class DocumentService {
         document.setIssueDate(documentRequest.getIssueDate());
         return documentMapper.mapToResponse(documentRepository.save(document));
     }
-    public DocumentResponse updateActiveDocument(long id, boolean isActive) {
+
+    // có thể cập nhật trạng thái của document và có thể bổ xung thêm tính năng thông báo khi document được approve
+    public DocumentResponse updateStatusDocument(long id, @NotNull DocumentStatus documentStatus) {
         Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-        document.setActive(isActive);
+
+        if(documentStatus.equals(DocumentStatus.APPROVED)) {
+            document.setStatus(DocumentStatus.APPROVED);
+            document.setActive(true);
+        }
+        else {
+            document.setStatus(documentStatus);
+            document.setActive(false);
+        }
         return documentMapper.mapToResponse(documentRepository.save(document));
     }
     public void deleteDocument(long id) {

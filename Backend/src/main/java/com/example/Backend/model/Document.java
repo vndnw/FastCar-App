@@ -1,5 +1,6 @@
 package com.example.Backend.model;
 
+import com.example.Backend.model.enums.DocumentStatus;
 import com.example.Backend.model.enums.DocumentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,9 @@ public class Document {
     private String imageBackUrl;
     @Column(columnDefinition = "TEXT")
     private String description;
+    @Enumerated(EnumType.STRING)
+    private DocumentStatus status;
+    @Column(columnDefinition = "boolean default false")
     private boolean active;
     @CreationTimestamp
     private LocalDateTime createAt;

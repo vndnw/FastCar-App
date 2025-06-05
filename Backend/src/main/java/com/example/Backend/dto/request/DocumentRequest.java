@@ -20,4 +20,5 @@ public class DocumentRequest {
     private String imageFrontUrl;
     private String imageBackUrl;
     private String description;
+
 }

@@ -1,6 +1,6 @@
-package com.example.Backend.model;
+package com.example.Backend.dto.response;
 
-import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,26 +9,16 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "car_features")
-public class CarFeature {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@AllArgsConstructor
+public class CarFeatureResponse {
     private long id;
     private String name;
     private String iconUrl;
     private String description;
-    @CreationTimestamp
     private LocalDateTime createdAt;
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @ManyToMany(mappedBy = "features")
-    private List<Car> cars;
 }

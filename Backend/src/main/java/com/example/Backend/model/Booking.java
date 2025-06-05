@@ -45,6 +45,8 @@ public class Booking {
     @Column(name = "pickup_time", nullable = false)
     private LocalDateTime pickupTime;
 
+    private LocalDateTime returnTime;
+
     @Enumerated(EnumType.STRING)
     private BookingType type;
 
@@ -53,12 +55,14 @@ public class Booking {
 
     private double price;
 
+    @Column(name = "discount_code")
+    private String discountCode;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @CreationTimestamp
     private LocalDateTime startTime;
 
-    @UpdateTimestamp
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

@@ -69,7 +69,7 @@ public class Car {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "car_image_id")
+    @OneToMany(mappedBy = "car")
     private List<CarImage> images;
 
     @ManyToMany(fetch = FetchType.EAGER)

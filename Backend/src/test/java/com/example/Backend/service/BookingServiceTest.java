@@ -86,7 +86,7 @@ class BookingServiceTest {
         bookingRequest = new BookingRequest();
         bookingRequest.setCarId(1L);
         bookingRequest.setPickupTime(LocalDateTime.now().plusDays(1));
-        bookingRequest.setPickupLocation("Test Location");
+//        bookingRequest.setPickupLocation("Test Location");
         bookingRequest.setType(BookingType.VEHICLE);
         
         // Setup security context

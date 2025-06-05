@@ -28,15 +28,15 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    @PostMapping
-    public ResponseEntity<ResponseData<?>> createBooking(@RequestBody BookingRequest request) {
-        ResponseData<?> response = ResponseData.builder()
-                .status(HttpStatus.CREATED.value())
-                .message("Booking created successfully")
-                .data(bookingService.createBooking(request))
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
+//    @PostMapping
+//    public ResponseEntity<ResponseData<?>> createBooking(@RequestBody BookingRequest request) {
+//        ResponseData<?> response = ResponseData.builder()
+//                .status(HttpStatus.CREATED.value())
+//                .message("Booking created successfully")
+//                .data(bookingService.createBooking(request))
+//                .build();
+//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<?>> getBookingById(@PathVariable Long id) {

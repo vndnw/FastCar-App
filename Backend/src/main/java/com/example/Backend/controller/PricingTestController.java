@@ -43,21 +43,21 @@ public class PricingTestController {
         // Calculate duration in days
         long durationHours = java.time.Duration.between(request.getPickupTime(), request.getReturnTime()).toHours();
         long durationDays = (durationHours + 23) / 24; // Round up to the nearest day        // Calculate the price
-        double price = bookingService.calculatePriceForTest(
-                car,
-                request.getType(),
-                request.getPickupTime(),
-                request.getReturnTime(),
-                request.getDiscountCode()
-        );// Build simple response with only the essential details
+//        double price = bookingService.calculatePriceForTest(
+//                car,
+//                request.getType(),
+//                request.getPickupTime(),
+//                request.getReturnTime(),
+//                request.getDiscountCode()
+//        );// Build simple response with only the essential details
         PricingDetail detail = new PricingDetail();
         detail.setCarId(car.getId());
         detail.setCarName(car.getName());
-        detail.setCarBrand(car.getCarBrand() != null ? car.getCarBrand().getName() : "Unknown");        detail.setBasePrice(car.getBasePrice() > 0 ? car.getBasePrice() : 50.0);        detail.setBookingType(request.getType());
+//        detail.setCarBrand(car.getCarBrand() != null ? car.getCarBrand().getName() : "Unknown");        detail.setBasePrice(car.getBasePrice() > 0 ? car.getBasePrice() : 50.0);        detail.setBookingType(request.getType());
         detail.setPickupTime(pickupTimeStr);
         detail.setReturnTime(returnTimeStr);
         detail.setRentalDurationDays(durationDays);
-        detail.setCalculatedPrice(price);
+//        detail.setCalculatedPrice(price);
 
         ResponseData<?> response = ResponseData.builder()
                 .status(200)

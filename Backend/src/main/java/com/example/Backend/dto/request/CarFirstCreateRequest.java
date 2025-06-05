@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Locale;
 
 @Data
 @NoArgsConstructor
@@ -17,11 +18,8 @@ import java.util.List;
 public class CarFirstCreateRequest {
     private String name;
     private String model;
-    private CarBrand carBrand;
-    private String licensePlate;
-    private int capacity;
+    private long carBrandId;
     private FuelType fuelType;
-    private CarStatus status;
-    private String description;
-    private List<String> imageUrl;
+    private String color;
+    private LocationRequest location;
 }
