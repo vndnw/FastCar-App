@@ -2,8 +2,6 @@
     position: relative;
     height: 100vh;
     min-height: 700px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -12,6 +10,79 @@
     padding-left: 8%;
     width: 100vw;
     margin-left: calc(-50vw + 50%);
+    overflow: hidden;
+}
+
+/* Slideshow container */
+.hero-slideshow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Individual slide */
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+    z-index: 1;
+}
+
+.hero-slide.active {
+    opacity: 1;
+}
+
+/* Overlay gradient cho tất cả slides */
+.hero-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+    z-index: 2;
+}
+
+/* Dots indicator */
+.hero-dots {
+    position: absolute;
+    bottom: 40px;
+    left: 8%;
+    display: flex;
+    gap: 12px;
+    z-index: 4;
+}
+
+.hero-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hero-dot:hover {
+    background-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
+}
+
+.hero-dot.active {
+    background-color: white;
+    border-color: white;
+    transform: scale(1.2);
 }
 
 .hero-overlay {
@@ -23,6 +94,7 @@
     align-items: flex-start;
     justify-content: center;
     padding: 0;
+    z-index: 3;
 }
 
 .hero-content {
@@ -34,9 +106,35 @@
 .hero-text {
     text-align: left;
     margin-bottom: 0;
+    position: relative;
+    transition: all 0.8s ease-in-out;
 }
 
-/* Custom styles for Ant Design Typography */
+/* Các vị trí khác nhau cho slogan - chỉ giữ những vị trí được sử dụng trong JSX */
+.hero-text-left {
+    position: relative;
+    text-align: left;
+}
+
+.hero-text-right {
+    position: absolute;
+    top: 50%;
+    right: 8%;
+    transform: translateY(-50%);
+    text-align: right;
+    width: auto;
+}
+
+.hero-text-left-top {
+    position: absolute;
+    top: 30%;
+    left: 8%;
+    transform: translateY(-50%);
+    text-align: left;
+    width: auto;
+}
+
+/* Typography styling */
 .hero-title.ant-typography,
 .hero-subtitle.ant-typography {
     color: white !important;
@@ -59,6 +157,8 @@
     border-radius: 16px !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    position: relative;
+    z-index: 5;
 }
 
 /* Form styling */
@@ -174,7 +274,6 @@
 }
 
 /* Responsive Design */
-/* Responsive */
 @media (max-width: 1024px) {
     .hero-section {
         height: 80vh;
@@ -184,6 +283,10 @@
     .hero-title.ant-typography,
     .hero-subtitle.ant-typography {
         font-size: 3rem !important;
+    }
+
+    .hero-dots {
+        bottom: 30px;
     }
 }
 
@@ -205,6 +308,31 @@
         text-align: center;
         margin-bottom: 30px;
     }
+
+    .hero-dots {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 25px;
+        gap: 10px;
+    }
+
+    .hero-dot {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Điều chỉnh vị trí slogan trên mobile */
+    .hero-text-left,
+    .hero-text-right,
+    .hero-text-left-top {
+        position: relative !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        transform: none !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
 }
 
 @media (max-width: 576px) {
@@ -216,4 +344,23 @@
     .hero-subtitle.ant-typography {
         font-size: 2rem !important;
     }
+
+    .hero-dots {
+        bottom: 20px;
+        gap: 8px;
+    }
+
+    .hero-dot {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+/* Vô hiệu hóa highlight text */
+::selection {
+    background: transparent;
+}
+
+::-moz-selection {
+    background: transparent;
 }
