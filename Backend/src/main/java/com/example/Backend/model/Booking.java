@@ -1,6 +1,11 @@
 package com.example.Backend.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,6 +31,8 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private String bookingCode = "BOOKFC-" + LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -41,10 +48,9 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location pickupLocation;
-
     @Column(name = "pickup_time", nullable = false)
     private LocalDateTime pickupTime;
-
+    @Column(name = "return_time", nullable = false)
     private LocalDateTime returnTime;
 
     @Enumerated(EnumType.STRING)
@@ -53,16 +59,33 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
-    private double price;
+    private String discountCode; // ✅ Mã giảm giá (nếu có)
 
-    @Column(name = "discount_code")
-    private String discountCode;
+    private BigDecimal rentalPrice; // ✅ Tổng giá thuê xe
+    private BigDecimal reservationFee; // ✅ Phí giữ chỗ
+    private BigDecimal depositAmount;  // ✅ Số tiền cọc (tạm tính)
+    private BigDecimal totalAmount; // ✅ Tổng số tiền thanh toán (bao gồm phí giữ chỗ, tiền thuê xe, và các khoản phụ thu nếu có)
+    private BigDecimal totalPaid; // ✅ Tổng số tiền đã thanh toán
+    private BigDecimal totalRefunded; // ✅ Tổng số tiền đã hoàn trả (nếu có)
+    private BigDecimal totalExtraCharges; // ✅ Tổng phụ thu (nếu có)
+    private BigDecimal totalDiscount; // ✅ Tổng số tiền giảm giá (nếu có)
+    private BigDecimal totalLateFee; // ✅ Phí trễ hạn (nếu có)
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private LocalDateTime startTime;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExtraCharge> extraCharges;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarConditionCheck> carConditionChecks;
+
 }

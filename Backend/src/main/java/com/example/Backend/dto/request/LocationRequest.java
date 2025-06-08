@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class LocationRequest {
-    private String name;        // Tên địa điểm (ví dụ: Quận 1 - TP.HCM)
-    private String address;     // Địa chỉ cụ thể
-    private Double latitude;    // Tọa độ GPS (nếu cần)
-    private Double longitude;
+    private String address;     // Địa chỉ cụ thể(nếu có )
+    // chia nhỏ các thành phần địa chỉ sử dụng 1 trong 2 // street, ward, district, city
+    private String street;
+    private String ward;
+    private String district;
+    private String city;
 }

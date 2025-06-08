@@ -35,15 +35,6 @@ public class LocationController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-    @GetMapping("/allnamelocation/{name}")
-    public ResponseEntity<?> getAllLocationsByName(@PathVariable String name, Pageable pageable) {
-        ResponseData<?> responseData = ResponseData.builder()
-                .status(200)
-                .message("Get All Location Successfully")
-                .data(locationService.getLocationByName(name, pageable))
-                .build();
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
-    }
     @GetMapping("/{id}")
     public ResponseEntity<?> getLocationById(@PathVariable Long id) {
         ResponseData<?> responseData = ResponseData.builder()

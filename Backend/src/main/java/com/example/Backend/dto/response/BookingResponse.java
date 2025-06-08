@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,15 +17,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookingResponse {
     private long id;
+    private String bookingCode;
     private UserResponse user;
     private DriverResponse driver;
     private CarResponse car;
-    private Location pickupLocation;
+    private LocationResponse location;
     private LocalDateTime pickupTime;
     private LocalDateTime returnTime;
     private BookingType type;
     private BookingStatus status;
-    private double price;
+    private BigDecimal rentalPrice;
+    private BigDecimal reservationFee;
+    private BigDecimal depositAmount;
+    private BigDecimal totalAmount;
+    private BigDecimal totalPaid;
+    private BigDecimal totalRefunded;
+    private BigDecimal totalExtraCharges;
+    private BigDecimal totalDiscount;
+    private BigDecimal totalLateFee;
     private String discountCode;
     private LocalDateTime createdAt;
 }

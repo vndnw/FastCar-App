@@ -9,7 +9,6 @@ public class LocationMapper {
     public LocationResponse mapToResponse(Location location) {
         return LocationResponse.builder()
                 .id(location.getId())
-                .name(location.getName())
                 .address(location.getAddress())
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())

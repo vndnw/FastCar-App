@@ -12,7 +12,9 @@ public class DiscountMapper {
                 .name(discount.getName())
                 .price(discount.getPrice())
                 .percent(discount.getPercent())
-                .discription(discount.getDiscription())
+                .startDate(discount.getStartDate())
+                .endDate(discount.getEndDate())
+                .description(discount.getDescription())
                 .quantity(discount.getQuantity())
                 .build();
     }

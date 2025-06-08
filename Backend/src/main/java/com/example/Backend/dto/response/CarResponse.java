@@ -1,10 +1,7 @@
 package com.example.Backend.dto.response;
 
 import com.example.Backend.model.*;
-import com.example.Backend.model.enums.CarImageType;
-import com.example.Backend.model.enums.CarTransmission;
-import com.example.Backend.model.enums.FuelType;
-import com.example.Backend.model.enums.CarStatus;
+import com.example.Backend.model.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +26,7 @@ public class CarResponse {
     private int year;
     private int seats;
     private CarTransmission transmission;
+    private CarType carType;
     private String licensePlate;
     private BigDecimal pricePerHour;
     private BigDecimal pricePer4Hour;
@@ -42,7 +40,6 @@ public class CarResponse {
     private String description;
     private List<CarImageResponse> images;
     private List<Long> features;
-    private BigDecimal penaltyLateReturn; //   price/1hour
     private Location location;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

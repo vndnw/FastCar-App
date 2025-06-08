@@ -51,6 +51,7 @@ public class CarService {
                 .user(userRepository.findById(uesrId).orElseThrow(() -> new ResourceNotFoundException("User not found")))
                 .name(carFirstCreateRequest.getName())
                 .model(carFirstCreateRequest.getModel())
+                .carType(carFirstCreateRequest.getType())
                 .carBrand(carBrandRepository.findById(carFirstCreateRequest.getCarBrandId()).orElseThrow(() -> new ResourceNotFoundException("Car Brand Not Found")))
                 .color(carFirstCreateRequest.getColor())
                 .fuelType(carFirstCreateRequest.getFuelType())
@@ -72,7 +73,6 @@ public class CarService {
         car.setPricePer12Hour(carSecondCreateRequest.getPricePer12Hour());
         car.setPricePer24Hour(carSecondCreateRequest.getPricePer24Hour());
         car.setDescription(carSecondCreateRequest.getDescription());
-        car.getPenaltyLateReturn().add(carSecondCreateRequest.getPenaltyLateReturn());
         return carMapper.mapToResponse(carRepository.save(car));
     }
 
@@ -82,6 +82,10 @@ public class CarService {
         car.setCarBrand(carBrandRepository.findById(carRequest.getCarBrandId()).orElseThrow(() -> new ResourceNotFoundException("Car Brand Not Found")));
         car.setModel(carRequest.getModel());
         car.setColor(carRequest.getColor());
+        car.setYear(carRequest.getYear());
+        car.setSeats(carRequest.getSeats());
+        car.setTransmission(carRequest.getTransmission());
+        car.setCarType(carRequest.getType());
         car.setFuelType(carRequest.getFuelType());
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         car.setImages(carRequest.getCarImages().stream().map(image -> carImageService.checkCarImage(car, image)).collect(Collectors.toList()));
@@ -94,7 +98,6 @@ public class CarService {
         car.setPricePer12Hour(carRequest.getPricePer12Hour());
         car.setPricePer24Hour(carRequest.getPricePer24Hour());
         car.setDescription(carRequest.getDescription());
-        car.getPenaltyLateReturn().add(carRequest.getPenaltyLateReturn());
         return carMapper.mapToResponse(carRepository.save(car));
     }
 

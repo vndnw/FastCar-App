@@ -64,6 +64,7 @@ public class SecurityConfig {
             "/car-brand/**",
              "/swagger-ui/**", "/swagger-ui.html",
             "/v3/api-docs/**", "/swagger-resources/**",
+            "/api/v1/v3/api-docs/**",
             "/bookings/check-availability"
     };
 
@@ -73,7 +74,7 @@ public class SecurityConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers(URL_PUBLIC).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
         );
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

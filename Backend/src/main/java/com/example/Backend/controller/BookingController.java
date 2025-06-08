@@ -7,8 +7,10 @@ import com.example.Backend.dto.request.CancellationRequest;
 
 import java.time.LocalDateTime;
 
+import com.example.Backend.dto.request.CarConditionCheckRequest;
 import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.service.BookingService;
+import com.example.Backend.service.CarConditionCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -22,10 +24,12 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final CarConditionCheckService carConditionCheckService;
 
     @Autowired
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, CarConditionCheckService carConditionCheckService  ) {
         this.bookingService = bookingService;
+        this.carConditionCheckService = carConditionCheckService;
     }
 
 //    @PostMapping
@@ -152,5 +156,30 @@ public class BookingController {
                 .data(bookingService.getBookingsByCarId(carId, pageable))
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    // tải thông tin hình ảnh xe để check
+    @PostMapping("/{bookingId}/car-condition-check-before")
+    public ResponseEntity<ResponseData<?>> createCarConditionCheckBefore(
+            @PathVariable Long bookingId,
+            @RequestBody CarConditionCheckRequest carConditionCheckRequest) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.CREATED.value())
+                .message("Car condition check before rental created successfully")
+                .data(carConditionCheckService.createCarConditionCheckBeforeRental(bookingId, carConditionCheckRequest))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    @PostMapping("/{bookingId}/car-condition-check-after")
+    public ResponseEntity<ResponseData<?>> createCarConditionCheckAfter(
+            @PathVariable Long bookingId,
+            @RequestBody CarConditionCheckRequest carConditionCheckRequest) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.CREATED.value())
+                .message("Car condition check after rental created successfully")
+                .data(carConditionCheckService.createCarConditionCheckAfterRental(bookingId, carConditionCheckRequest))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

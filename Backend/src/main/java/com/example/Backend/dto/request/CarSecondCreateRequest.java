@@ -1,8 +1,5 @@
 package com.example.Backend.dto.request;
 
-import com.example.Backend.model.CarBrand;
-import com.example.Backend.model.enums.CarTransmission;
-import com.example.Backend.model.enums.FuelType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +24,4 @@ public class CarSecondCreateRequest {
     private BigDecimal pricePer12Hour;
     private BigDecimal pricePer24Hour;
     private String description;
-    private BigDecimal penaltyLateReturn;
 }

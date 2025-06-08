@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.example.Backend.model.enums.CarStatus;
 import com.example.Backend.model.enums.CarTransmission;
+import com.example.Backend.model.enums.CarType;
 import com.example.Backend.model.enums.FuelType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,8 @@ public class Car {
     @JoinColumn(name = "user_id")
     private User user;
 
+
+
     @ManyToOne
     @JoinColumn(name = "carBrand_id")
     private CarBrand carBrand;
@@ -55,6 +58,8 @@ public class Car {
     private BigDecimal pricePer8Hour;
     private BigDecimal pricePer12Hour;
     private BigDecimal pricePer24Hour;
+
+    private BigDecimal dipositAmount; // Amount to be paid as a deposit
 
     @Enumerated(EnumType.STRING)
     private FuelType fuelType;
@@ -78,10 +83,12 @@ public class Car {
             inverseJoinColumns = @JoinColumn(name = "car_feature_id"))
     private List<CarFeature> features;
 
-    private BigDecimal penaltyLateReturn; //   price/1hour
 
     @Column(columnDefinition = "boolean default false")
     private boolean active;
+
+    @Enumerated(EnumType.STRING)
+    private CarType carType; // Type of the car (e.g., Standard, Luxury, Super Luxury)
 
     @ManyToOne
     @JoinColumn(name = "location_id")
@@ -91,5 +98,8 @@ public class Car {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarConditionCheck> conditionChecks;
 }
 

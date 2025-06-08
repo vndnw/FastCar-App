@@ -20,8 +20,11 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String name;        // Tên địa điểm (ví dụ: Quận 1 - TP.HCM)
     private String address;     // Địa chỉ cụ thể
+    private String street;
+    private String ward;
+    private String district;
+    private String city;
     private Double latitude;    // Tọa độ GPS (nếu cần)
     private Double longitude;
     @CreationTimestamp

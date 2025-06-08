@@ -15,13 +15,13 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    Page<Booking> findByUserId(Long userId, Pageable pageable);    @Query(value = "SELECT * FROM bookings b WHERE b.car_id = :carId AND b.status != 'CANCELLED' AND " +
+    Page<Booking> findByUserId(Long userId, Pageable pageable);
+
+    @Query(value = "SELECT * FROM bookings b WHERE b.car_id = :carId AND b.status != 'CANCELLED' AND " +
             "((b.pickup_time <= :returnDate AND :pickupDate <= b.return_time) OR " +
             "(b.pickup_time BETWEEN :pickupDate AND :returnDate))", nativeQuery = true)
-    List<Booking> findOverlappingBookings(
-            @Param("carId") Long carId,
-            @Param("pickupDate") LocalDateTime pickupDate,
-            @Param("returnDate") LocalDateTime returnDate);
+    List<Booking> findOverlappingBookings(@Param("carId") Long carId, @Param("pickupDate") LocalDateTime pickupDate, @Param("returnDate") LocalDateTime returnDate);
+
     List<Booking> findByUserIdAndStatus(Long userId, BookingStatus status);
 
     Page<Booking> findByStatus(BookingStatus status, Pageable pageable);
