@@ -46,12 +46,9 @@ public class BookingMapper {
         response.setRentalPrice(booking.getRentalPrice());
         response.setReservationFee(booking.getReservationFee());
         response.setDepositAmount(booking.getDepositAmount());
-        response.setTotalAmount(booking.getTotalAmount());
-        response.setTotalPaid(booking.getTotalPaid());
         response.setTotalRefunded(booking.getTotalRefunded());
         response.setTotalExtraCharges(booking.getTotalExtraCharges());
         response.setTotalDiscount(booking.getTotalDiscount());
-        response.setTotalLateFee(booking.getTotalLateFee());
         response.setDiscountCode(booking.getDiscountCode());
         response.setCreatedAt(booking.getCreatedAt());
         return response;

@@ -1,14 +1,14 @@
 package com.example.Backend.service;
 
-import com.example.Backend.dto.request.BookingRequest;
-import com.example.Backend.dto.request.BookingStatusUpdateRequest;
-import com.example.Backend.dto.response.BookingResponse;
+import com.example.Backend.dto.request.*;
+import com.example.Backend.dto.response.*;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.BookingMapper;
 import com.example.Backend.model.*;
 import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.model.enums.BookingType;
 import com.example.Backend.model.enums.DriverStatus;
+import com.example.Backend.model.enums.PaymentType;
 import com.example.Backend.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +41,8 @@ public class BookingService {
     private final BookingMapper bookingMapper;
     private final DiscountService discountService;
     private final LocationService locationService;
+    private final PaymentService paymentService;
+    private final CarConditionCheckService carConditionCheckService;
 
     @Autowired
     public BookingService(
@@ -50,7 +52,9 @@ public class BookingService {
             DriverRepository driverRepository,
             BookingMapper bookingMapper,
             DiscountService discountService,
-            LocationService locationService) {
+            LocationService locationService,
+            PaymentService paymentService,
+            CarConditionCheckService carConditionCheckService) {
         this.bookingRepository = bookingRepository;
         this.carRepository = carRepository;
         this.userRepository = userRepository;
@@ -58,47 +62,95 @@ public class BookingService {
         this.bookingMapper = bookingMapper;
         this.discountService = discountService;
         this.locationService = locationService;
+        this.paymentService = paymentService;
+        this.carConditionCheckService = carConditionCheckService;
     }
 
-//
-    //tính toán theo giá khác chứ đâu phải tính theo giá basic này được
-//    private double calculatePrice(Car car, BookingType type, LocalDateTime pickupTime, LocalDateTime returnTime, String discountCode) {
-//        // Get base price per day from car or use default if not set
-//        double basePrice = car.getBasePrice() > 0 ? car.getBasePrice() : 50.0;
-//
-//        // Calculate rental duration in days
-//        long durationDays = 1; // Default to 1 day
-//        if (pickupTime != null && returnTime != null) {
-//            // Calculate days between pickup and return time (rounded up)
-//            long durationHours = java.time.Duration.between(pickupTime, returnTime).toHours();
-//            durationDays = (durationHours + 23) / 24; // Round up to the nearest day
-//            if (durationDays < 1) {
-//                durationDays = 1; // Minimum one day charge
-//            }
-//        }
-//        // Apply duration-based pricing - simply multiply base price by number of days
-//        basePrice *= durationDays;
-//
-//        // Ensure the price is not negative
-//        return Math.max(0, basePrice);
-//    }
+    public ReservationFeeResponse createBooking(BookingRequest request) {
+        BookingResponse bookingResponse = addBooking(request);
+        PaymentResponse paymentResponse = paymentService.addPayment(bookingResponse.getId(), PaymentRequest.builder()
+                .amount(bookingResponse.getReservationFee())
+                .type(PaymentType.RESERVED)
+                .build());
+        return ReservationFeeResponse.builder()
+                .bookingId(bookingResponse.getId())
+                .transactionId(paymentResponse.getId())
+                .reservationFee(paymentResponse.getAmount())
+                .paymentUrl("hello")
+                .build();
+    }
+
+    public RentalFeeResponse createCheckin(long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
+        PaymentResponse paymentRental = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
+                .amount(booking.getRentalPrice())
+                .type(PaymentType.RENTAL)
+                .build());
+        PaymentResponse paymentDeposit = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
+                .amount(booking.getDepositAmount())
+                .type(PaymentType.DEPOSIT)
+                .build());
+        List<Long> transactionIds = List.of(paymentRental.getId(), paymentDeposit.getId());
+
+        //ở đây sẽ thêm logicthuwuc hiện thanh toán cho tiền thuê xe và tiền cọc bằng VNPAY
+
+        return RentalFeeResponse.builder()
+                .rentalFee(paymentRental.getAmount())
+                .depositFee(paymentDeposit.getAmount())
+                .totalFee(paymentDeposit.getAmount().add(paymentRental.getAmount()))
+                .bookingId(booking.getId())
+                .transactionId(transactionIds)
+                .paymentUrl("https://vnpay.vn") // Placeholder URL, replace with actual payment URL
+                .build();
+    }
+
+    public BookingResponse createCheckout(long bookingId, @NotNull CheckoutRequest checkoutRequest) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
+
+        carConditionCheckService.createCarConditionCheck(bookingId, checkoutRequest.getCarConditionCheck());
+
+        BigDecimal depositAmount = booking.getDepositAmount();
+        List<ExtraChargeRequest> extraCharges = checkoutRequest.getExtraCharges();
+        BigDecimal totalExtraCharges = extraCharges.stream().map(ExtraChargeRequest::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalRefunded = depositAmount.subtract(totalExtraCharges);
 
 
-    public BookingResponse createBooking(long carId , BookingRequest bookingRequest) {
+        int compare = totalRefunded.compareTo(BigDecimal.ZERO);
+        if (compare == 0) {
+            booking.setStatus(BookingStatus.COMPLETED);
+        } else if (compare > 0) {
+            booking.setStatus(BookingStatus.WAITING_REFUND);
+            paymentService.addPayment(booking.getId(), PaymentRequest.builder()
+                    .amount(totalRefunded)
+                    .type(PaymentType.REFUND)
+                    .build());
+        } else {
+            booking.setStatus(BookingStatus.WAITING_EXTRA_CHARGE);
+            paymentService.addPayment(booking.getId(), PaymentRequest.builder()
+                    .amount(totalExtraCharges.negate()) // Negative amount for extra charges
+                    .type(PaymentType.EXTRA_CHARGE)
+                    .extraChargeRequest(extraCharges)
+                    .build());
+        }
+
+        booking.setTotalExtraCharges(totalExtraCharges);
+        booking.setTotalRefunded(totalRefunded);
+
+        return bookingMapper.mapToResponse(bookingRepository.save(booking));
+    }
+
+    public BookingResponse addBooking(@NotNull BookingRequest bookingRequest) {
         User user = getCurrentUser();
-        Car car = carRepository.findById(carId)
-                .orElseThrow(() -> new ResourceNotFoundException("Car not found with ID: " + carId));
+        Car car = carRepository.findById(bookingRequest.getCarId())
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found with ID: " + bookingRequest.getCarId()));
 
         validateCarAvailability(car.getId(), bookingRequest.getPickupTime(), bookingRequest.getReturnTime());
 
         BigDecimal rentalPrice = calculatePriceCar(car, bookingRequest.getPickupTime(), bookingRequest.getReturnTime());// ✅ Tổng giá thuê xe
         BigDecimal reservationFee = BigDecimal.valueOf(500000); // ✅ Phí giữ chỗ 500K
         BigDecimal depositAmount = car.getCarType().getDefaultDepositAmount();  // ✅ Số tiền cọc (tạm tính)
-        BigDecimal totalDiscount = calculateDiscount(rentalPrice, bookingRequest.getDiscountCode()); // ✅ Tổng số tiền giảm giá (nếu có)
+        BigDecimal totalDiscount = calculateDiscount(rentalPrice, bookingRequest.getDiscountCode());// ✅ Tổng số tiền giảm giá (nếu có)
         BigDecimal totalExtraCharges = BigDecimal.ZERO; // ✅ Tổng phụ thu (nếu có)
-        BigDecimal totalLateFee = BigDecimal.ZERO; // ✅ Phí trễ hạn (nếu có)
-        BigDecimal totalAmount = rentalPrice.add(reservationFee).add(depositAmount).add(totalExtraCharges).add(totalLateFee).subtract(totalDiscount); // ✅ Tổng số tiền thanh toán (bao gồm phí giữ chỗ, tiền thuê xe, và các khoản phụ thu nếu có)
-        BigDecimal totalPaid = BigDecimal.ZERO; // ✅ Tổng số tiền đã thanh toán
         BigDecimal totalRefunded = BigDecimal.ZERO; // ✅ Tổng số tiền đã hoàn trả (nếu có)
 
         Booking booking = Booking.builder()
@@ -116,9 +168,6 @@ public class BookingService {
                 .totalDiscount(totalDiscount)
                 .totalExtraCharges(totalExtraCharges)
                 .totalExtraCharges(totalExtraCharges)
-                .totalLateFee(totalLateFee)
-                .totalAmount(totalAmount)
-                .totalPaid(totalPaid)
                 .totalRefunded(totalRefunded)
                 .status(BookingStatus.PENDING)
                 .description(bookingRequest.getDescription())
@@ -153,22 +202,18 @@ public class BookingService {
         return totalPrice;
     }
 
-    private BigDecimal calculateDiscount(BigDecimal price, String discountCode) {
+    private BigDecimal calculateDiscount(BigDecimal price,String discountCode) {
         if (discountCode.isEmpty()) {
-            return BigDecimal.ZERO; // No discount applied
+            return BigDecimal.ZERO;
         }
-        if(!discountService.useDiscount(discountCode)) {
-            log.info("Discount code not used or invalid");
-            return BigDecimal.ZERO; // Discount code is invalid or out of stock
-        }
-        Discount discount = discountService.getDiscountByName(discountCode);
-        if (discount == null) {
-            throw new BookingException("Invalid discount code");
-        }
-        BigDecimal discountAmount = price.multiply(BigDecimal.valueOf(discount.getPercent() / 100));
-        return discountAmount.min(price); // Ensure discount does not exceed total price
+
+        int percentDiscount = discountService.useDiscount(discountCode.toUpperCase());
+
+        BigDecimal discountAmount = price.multiply(BigDecimal.valueOf(percentDiscount / 100));
+        return discountAmount.min(price);
     }
 
+    @NotNull
     private String generateBookingCode() {
         return "BOOKFC-" + LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase(); // Simple example, replace with better logic if needed
     }
@@ -203,7 +248,7 @@ public class BookingService {
         LocalDateTime now = LocalDateTime.now();
 
         // Find all confirmed bookings that haven't started yet
-        List<Booking> bookings = bookingRepository.findByUserIdAndStatus(currentUser.getId(), BookingStatus.CONFIRMED)
+        List<Booking> bookings = bookingRepository.findByUserIdAndStatus(currentUser.getId(), BookingStatus.RESERVED)
                 .stream()
                 .filter(booking -> booking.getPickupTime().isAfter(now))
                 .sorted((b1, b2) -> b1.getPickupTime().compareTo(b2.getPickupTime()))
@@ -256,7 +301,7 @@ public class BookingService {
         BookingStatus newStatus = request.getStatus();
 
         // Security checks
-        if ((newStatus == BookingStatus.CONFIRMED || newStatus == BookingStatus.COMPLETED) && !isAdmin(currentUser)) {
+        if ((newStatus == BookingStatus.RESERVED || newStatus == BookingStatus.COMPLETED) && !isAdmin(currentUser)) {
             throw new AccessDeniedException("Not authorized to change booking status to " + newStatus);
         }
         if (newStatus == BookingStatus.CANCELLED &&
@@ -270,7 +315,7 @@ public class BookingService {
             validateCancellation(booking);
         }
 
-        if (newStatus == BookingStatus.COMPLETED && booking.getStatus() != BookingStatus.CONFIRMED) {
+        if (newStatus == BookingStatus.COMPLETED && booking.getStatus() != BookingStatus.USE_IN) {
             throw new BookingException("Only confirmed bookings can be marked as completed");
         }        booking.setStatus(newStatus);
         

@@ -1,16 +1,18 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
-import com.example.Backend.dto.request.BookingRequest;
-import com.example.Backend.dto.request.BookingStatusUpdateRequest;
-import com.example.Backend.dto.request.CancellationRequest;
+import com.example.Backend.dto.request.*;
 
 import java.time.LocalDateTime;
 
-import com.example.Backend.dto.request.CarConditionCheckRequest;
+import com.example.Backend.dto.response.BookingResponse;
+import com.example.Backend.dto.response.PaymentResponse;
+import com.example.Backend.dto.response.ReservationFeeResponse;
 import com.example.Backend.model.enums.BookingStatus;
+import com.example.Backend.model.enums.PaymentType;
 import com.example.Backend.service.BookingService;
 import com.example.Backend.service.CarConditionCheckService;
+import com.example.Backend.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,27 +22,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/bookings")
+@RequestMapping("/booking")
 public class BookingController {
 
     private final BookingService bookingService;
     private final CarConditionCheckService carConditionCheckService;
+    private final PaymentService paymentService;
 
     @Autowired
-    public BookingController(BookingService bookingService, CarConditionCheckService carConditionCheckService  ) {
+    public BookingController(BookingService bookingService,
+                             CarConditionCheckService carConditionCheckService  ,
+                             PaymentService paymentService) {
         this.bookingService = bookingService;
         this.carConditionCheckService = carConditionCheckService;
+        this.paymentService = paymentService;
     }
 
-//    @PostMapping
-//    public ResponseEntity<ResponseData<?>> createBooking(@RequestBody BookingRequest request) {
-//        ResponseData<?> response = ResponseData.builder()
-//                .status(HttpStatus.CREATED.value())
-//                .message("Booking created successfully")
-//                .data(bookingService.createBooking(request))
-//                .build();
-//        return new ResponseEntity<>(response, HttpStatus.CREATED);
-//    }
+    @PostMapping
+    public ResponseEntity<ResponseData<?>> createBooking(@RequestBody BookingRequest request) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.CREATED.value())
+                .message("Booking created successfully")
+                .data(bookingService.createBooking(request))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<?>> getBookingById(@PathVariable Long id) {
@@ -160,26 +166,67 @@ public class BookingController {
 
 
     // tải thông tin hình ảnh xe để check
-    @PostMapping("/{bookingId}/car-condition-check-before")
+    @PostMapping("/{bookingId}/condition-check")
     public ResponseEntity<ResponseData<?>> createCarConditionCheckBefore(
             @PathVariable Long bookingId,
             @RequestBody CarConditionCheckRequest carConditionCheckRequest) {
+
         ResponseData<?> response = ResponseData.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Car condition check before rental created successfully")
-                .data(carConditionCheckService.createCarConditionCheckBeforeRental(bookingId, carConditionCheckRequest))
+                .data(carConditionCheckService.createCarConditionCheck(bookingId, carConditionCheckRequest))
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-    @PostMapping("/{bookingId}/car-condition-check-after")
-    public ResponseEntity<ResponseData<?>> createCarConditionCheckAfter(
-            @PathVariable Long bookingId,
-            @RequestBody CarConditionCheckRequest carConditionCheckRequest) {
+    @PostMapping("/{id}/checkin")
+    public ResponseEntity<ResponseData<?>> createCheckin(@PathVariable long id){
+        if (!carConditionCheckService.isCarConditionCheckExists(id)) {
+            return new ResponseEntity<>(ResponseData.builder()
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .message("Car condition check does not exist for this booking")
+                    .build(), HttpStatus.BAD_REQUEST);
+        }
         ResponseData<?> response = ResponseData.builder()
-                .status(HttpStatus.CREATED.value())
-                .message("Car condition check after rental created successfully")
-                .data(carConditionCheckService.createCarConditionCheckAfterRental(bookingId, carConditionCheckRequest))
+                .status(HttpStatus.OK.value())
+                .message("Check-in created successfully")
+                .data(bookingService.createCheckin(id))
                 .build();
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PostMapping("/{id}/checkout")
+    public ResponseEntity<ResponseData<?>> createCheckout(@PathVariable long id, @RequestBody CheckoutRequest checkoutRequest) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("Checkout created successfully")
+                .data(bookingService.createCheckout(id, checkoutRequest))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PostMapping("/{id}/finalize")
+    public ResponseEntity<ResponseData<?>> finalizeBooking(@PathVariable long id) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("Booking finalized successfully")
+//                .data(bookingService.finalizeBooking(id))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PostMapping("/{id}/refund")
+    public ResponseEntity<?> processRefund(@PathVariable long id) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("Refund processed successfully")
+                .data(paymentService.processRefund(id))
+                .build();
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/{id}/extra-charge")
+    public ResponseEntity<?> processExtraCharge(@PathVariable long id) {
+         ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("Extra charge processed successfully")
+                .data(paymentService.processExtraCharge(id))
+                .build();
+        return ResponseEntity.ok(response);
     }
 }

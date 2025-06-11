@@ -6,11 +6,14 @@ import com.example.Backend.exception.ResourceAlreadyExistsException;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.RoleMapper;
 import com.example.Backend.model.Role;
+import com.example.Backend.model.User;
 import com.example.Backend.repository.RoleRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class RoleService {
     private final RoleRepository roleRepository;
@@ -52,6 +55,10 @@ public class RoleService {
     public void deleteRole(long id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+        for (User user : role.getUsers()) {
+            user.getRoles().remove(role);
+        }
+        role.getUsers().clear();
         roleRepository.delete(role);
     }
 

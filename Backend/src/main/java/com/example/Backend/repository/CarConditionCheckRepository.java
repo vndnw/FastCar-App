@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface CarConditionCheckRepository extends JpaRepository<CarConditionCheck, Long>{
     List<CarConditionCheck> findCarConditionCheckByBookingId(long bookingId);
 
+    boolean existsByBookingId(long bookingId);
+
     Page<CarConditionCheck> findAll(Pageable pageable);
 
 }

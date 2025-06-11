@@ -1,7 +1,10 @@
 package com.example.Backend.model.enums;
 
+import lombok.Getter;
+
 import java.math.BigDecimal;
 
+@Getter
 public enum CarType {
     STANDARD("Xe thường", new BigDecimal("2000000")),
     LUXURY("Xe sang", new BigDecimal("10000000")),
@@ -15,11 +18,4 @@ public enum CarType {
         this.defaultDepositAmount = defaultDepositAmount;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public BigDecimal getDefaultDepositAmount() {
-        return defaultDepositAmount;
-    }
 }

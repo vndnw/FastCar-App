@@ -20,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CarResponse {
     private long id;
+    private String username;
     private String name;
     private CarBrandResponse carBrand;
     private String model;
@@ -40,7 +41,7 @@ public class CarResponse {
     private String description;
     private List<CarImageResponse> images;
     private List<Long> features;
-    private Location location;
+    private LocationResponse location;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

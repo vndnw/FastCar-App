@@ -16,4 +16,7 @@ public class LocationRequest {
     private String ward;
     private String district;
     private String city;
+
+    private Double latitude;    // Vĩ độ
+    private Double longitude;   // Kinh độ
 }

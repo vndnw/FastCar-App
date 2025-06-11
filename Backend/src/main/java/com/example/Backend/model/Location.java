@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -25,11 +26,16 @@ public class Location {
     private String ward;
     private String district;
     private String city;
-    private Double latitude;    // Tọa độ GPS (nếu cần)
+    private Double latitude;
     private Double longitude;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Car> cars;
+
+    @OneToOne(mappedBy = "address", cascade = CascadeType.ALL)
+    private User user;
 }

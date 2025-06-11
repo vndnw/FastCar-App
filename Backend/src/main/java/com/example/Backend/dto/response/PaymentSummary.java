@@ -1,4 +1,4 @@
-package com.example.Backend.dto.request;
+package com.example.Backend.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExtraChargeRequest {
-    private String reason;
+@Builder
+public class PaymentSummary {
     private BigDecimal amount;
-    private String image;
+    private Long paymentId;
+    private String transactionCode;
+    private String status;
+    private String reason;
 }

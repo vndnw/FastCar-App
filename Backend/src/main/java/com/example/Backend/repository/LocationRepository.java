@@ -11,4 +11,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     Page<Location> findAll(Pageable pageable);
 
     Location findLocationByAddress(String address);
+
+    Location findByAddressAndLatitudeAndLongitude(String address, Double latitude, Double longitude);
 }

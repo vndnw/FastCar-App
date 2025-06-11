@@ -20,9 +20,10 @@ public class UserResponse {
     private String firstName;
     private String email;
     private String phone;
-    private String address;
+    private LocationResponse address;
     private String profilePicture;
     private LocalDate dateOfBirth;
+    private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<String> roles;

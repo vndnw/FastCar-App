@@ -9,8 +9,7 @@ public class DiscountMapper {
     public DiscountResponse mapToResponse(Discount discount) {
         return DiscountResponse.builder()
                 .id(discount.getId())
-                .name(discount.getName())
-                .price(discount.getPrice())
+                .code(discount.getCode())
                 .percent(discount.getPercent())
                 .startDate(discount.getStartDate())
                 .endDate(discount.getEndDate())

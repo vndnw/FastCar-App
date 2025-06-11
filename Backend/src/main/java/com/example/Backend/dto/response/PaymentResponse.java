@@ -4,6 +4,7 @@ import com.example.Backend.model.Booking;
 import com.example.Backend.model.enums.PaymentMethod;
 import com.example.Backend.model.enums.PaymentStatus;
 import com.example.Backend.model.enums.PaymentType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,18 +14,19 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentResponse {
     private long id;
+    private String transactionCode;
     private BigDecimal amount;
     private PaymentType type;
-    private PaymentMethod method;
     private PaymentStatus status;
-    private String bookingCode;
-    private String transactionCode;
-    private LocalDateTime createdAt;
+    private List<ExtraChargeResponse> charges;
+
 }

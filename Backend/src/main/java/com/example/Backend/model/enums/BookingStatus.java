@@ -1,5 +1,5 @@
 package com.example.Backend.model.enums;
 
 public enum BookingStatus {
-    PENDING, CONFIRMED, CANCELLED, COMPLETED
+    PENDING, RESERVED , USE_IN ,WAITING_REFUND, WAITING_EXTRA_CHARGE, CANCELLED, COMPLETED
 }

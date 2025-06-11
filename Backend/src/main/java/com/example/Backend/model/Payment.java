@@ -13,6 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,10 +31,9 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     private PaymentType type;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod method;
-
+//
+//    @Enumerated(EnumType.STRING)
+//    private PaymentMethod method;
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
@@ -41,8 +41,11 @@ public class Payment {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    private String transactionCode;
+    private String externalRef;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExtraCharge> extraCharges;
 }

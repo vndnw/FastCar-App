@@ -57,8 +57,8 @@ public class SecurityConfig {
 
     private String[] URL_PUBLIC  = {
             "/auth/login",
-            "/auth/register",
-            "/auth/confirm",
+            "/api/v1/auth/refresh",
+            "/auth/verify-otp",
             "/test/**",
             "/car/**",
             "/car-brand/**",
@@ -74,7 +74,7 @@ public class SecurityConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers(URL_PUBLIC).permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
         );
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

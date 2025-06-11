@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface DiscountRepository extends JpaRepository<Discount, Long> {
     Optional<Discount> findById(Long id);
-    Optional<Discount> findByName(String name);
+    Optional<Discount> findDiscountByCode(String code);
     Page<Discount> findAll(Pageable pageable);
 }

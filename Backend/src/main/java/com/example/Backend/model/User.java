@@ -35,13 +35,16 @@ public class User {
     @Column(unique = true)
     private String phone;
 
-    @Column(length = 500)
-    private String address;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location address;
 
     @Column(length = 500)
     private String profilePicture;
 
     private LocalDate dateOfBirth;
+
+    private boolean active;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -53,4 +56,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Car> cars;
 }

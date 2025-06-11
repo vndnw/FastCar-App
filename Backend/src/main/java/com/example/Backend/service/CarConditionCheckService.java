@@ -10,6 +10,7 @@ import com.example.Backend.model.enums.CheckStatus;
 import com.example.Backend.model.enums.CheckType;
 import com.example.Backend.repository.BookingRepository;
 import com.example.Backend.repository.CarConditionCheckRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,39 +31,14 @@ public class CarConditionCheckService {
         this.bookingRepository = bookingRepository;
     }
 
-    public CarConditionCheckResponse createCarConditionCheckBeforeRental(long bookingId , CarConditionCheckRequest carConditionCheckRequest) {
+    public CarConditionCheckResponse createCarConditionCheck(long bookingId , @NotNull CarConditionCheckRequest carConditionCheckRequest) {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
 
         CarConditionCheck carConditionCheck = new CarConditionCheck();
         carConditionCheck.setBooking(booking);
         carConditionCheck.setCar(booking.getCar());
-        carConditionCheck.setType(CheckType.BEFORE_RENTAL);
-        carConditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
-        carConditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
-        carConditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
-        carConditionCheck.setDamageNote(carConditionCheckRequest.getDamageNote());
-        carConditionCheck.setImageFrontUrl(carConditionCheckRequest.getImageFrontUrl());
-        carConditionCheck.setImageRearUrl(carConditionCheckRequest.getImageRearUrl());
-        carConditionCheck.setImageLeftUrl(carConditionCheckRequest.getImageLeftUrl());
-        carConditionCheck.setImageRightUrl(carConditionCheckRequest.getImageRightUrl());
-        carConditionCheck.setImageOdoUrl(carConditionCheckRequest.getImageOdoUrl());
-        carConditionCheck.setImageFuelUrl(carConditionCheckRequest.getImageFuelUrl());
-        carConditionCheck.setImageOtherUrl(carConditionCheckRequest.getImageOtherUrl());
-        carConditionCheck.setStatus(CheckStatus.PENDING);
-        carConditionCheck.setChecked(false);
-
-        return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(carConditionCheck));
-    }
-
-    public CarConditionCheckResponse createCarConditionCheckAfterRental(long bookingId, CarConditionCheckRequest carConditionCheckRequest) {
-
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
-
-        CarConditionCheck carConditionCheck = new CarConditionCheck();
-        carConditionCheck.setBooking(booking);
-        carConditionCheck.setCar(booking.getCar());
-        carConditionCheck.setType(CheckType.AFTER_RENTAL);
+        carConditionCheck.setType(carConditionCheckRequest.getCheckType());
         carConditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
         carConditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
         carConditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
@@ -100,7 +76,16 @@ public class CarConditionCheckService {
                 .orElseThrow(() -> new ResourceNotFoundException("Car condition check not found with id: " + id));
         return carConditionCheckMapper.mapToResponse(carConditionCheck);
     }
-    
+
+    public boolean isCarConditionCheckExists(long bookingId) {
+        if(carConditionCheckRepository.existsByBookingId(bookingId)){
+            return true;
+        } else {
+            //thực hiện gửi mail hoặc thông báo cho chủ xe
+            return false;
+        }
+    }
+
     public void deleteCarConditionCheckById(long id) {
         CarConditionCheck carConditionCheck = carConditionCheckRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car condition check not found with id: " + id));
@@ -115,7 +100,7 @@ public class CarConditionCheckService {
         carConditionCheckRepository.deleteAll(carConditionCheck);
     }
 
-    public CarConditionCheckResponse updateCarConditionCheckByBookingId(long id, CarConditionCheckRequest carConditionCheckRequest) {
+    public CarConditionCheckResponse updateCarConditionCheckByBookingId(long id, @NotNull CarConditionCheckRequest carConditionCheckRequest) {
         CarConditionCheck carConditionCheck = carConditionCheckRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car condition check not found with id: " + id));
 
