@@ -23,7 +23,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentResponse {
     private long id;
-    private String transactionCode;
+    private String externalRef;
     private BigDecimal amount;
     private PaymentType type;
     private PaymentStatus status;

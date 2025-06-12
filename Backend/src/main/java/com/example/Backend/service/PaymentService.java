@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +37,7 @@ public class PaymentService {
         this.paymentMapper = paymentMapper;
     }
 
-    public PaymentResponse addPayment(long bookingId, @NotNull PaymentRequest  paymentRequest) {
+    public Payment addPayment(long bookingId, @NotNull PaymentRequest  paymentRequest) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
         Payment payment = new Payment();
@@ -54,14 +55,18 @@ public class PaymentService {
                     .toList();
             payment.setAmount(extraCharges.stream().map(ExtraCharge::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add));
             payment.setExtraCharges(extraCharges);
-//            payment.setExternalRef();
+            payment.setExternalRef(generateExternalRef());
         } else {
             payment.setType(paymentRequest.getType());
             payment.setAmount(paymentRequest.getAmount());
             payment.setStatus(PaymentStatus.PENDING);
-//            payment.setExternalRef();
+            payment.setExternalRef(generateExternalRef());
         }
-        return paymentMapper.mapToResponse(paymentRepository.save(payment));
+        return paymentRepository.save(payment);
+    }
+
+    public String generateExternalRef() {
+        return "VNPAY-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 6);
     }
 
     public PaymentResponse getPaymentById(long paymentId) {
@@ -70,7 +75,7 @@ public class PaymentService {
         return paymentMapper.mapToResponse(payment);
     }
 
-    public boolean processPaymentCallback(String externalRef, String status) {
+    public void processPaymentCallback(String externalRef, String status) {
         Payment payment = paymentRepository.findByExternalRef(externalRef)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with externalRef: " + externalRef));
         Booking booking = payment.getBooking();
@@ -95,7 +100,6 @@ public class PaymentService {
             throw new IllegalArgumentException("Invalid payment status: " + status);
         }
         paymentRepository.save(payment);
-        return true;
     }
 
 //    public PaymentResponse retryPayment(long id) {

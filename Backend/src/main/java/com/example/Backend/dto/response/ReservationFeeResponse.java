@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 public class ReservationFeeResponse {
-    private long transactionId; // Mã giao dịch thanh toán
+    private String transactionCode; // Mã giao dịch thanh toán
     private long bookingId; // Mã đặt chỗ
     private BigDecimal reservationFee; // Phí đặt chỗ
     private String paymentUrl; // URL thanh toán

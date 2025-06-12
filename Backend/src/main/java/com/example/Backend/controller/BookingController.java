@@ -13,6 +13,7 @@ import com.example.Backend.model.enums.PaymentType;
 import com.example.Backend.service.BookingService;
 import com.example.Backend.service.CarConditionCheckService;
 import com.example.Backend.service.PaymentService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -39,11 +40,11 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseData<?>> createBooking(@RequestBody BookingRequest request) {
+    public ResponseEntity<ResponseData<?>> createBooking(HttpServletRequest request, @RequestBody BookingRequest bookingRequest) {
         ResponseData<?> response = ResponseData.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Booking created successfully")
-                .data(bookingService.createBooking(request))
+                .data(bookingService.createBooking(request, bookingRequest))
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
