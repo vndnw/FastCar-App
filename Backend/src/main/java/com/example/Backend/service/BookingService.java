@@ -10,6 +10,7 @@ import com.example.Backend.model.enums.BookingType;
 import com.example.Backend.model.enums.DriverStatus;
 import com.example.Backend.model.enums.PaymentType;
 import com.example.Backend.repository.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,7 @@ public class BookingService {
     private final LocationService locationService;
     private final PaymentService paymentService;
     private final CarConditionCheckService carConditionCheckService;
+    private final VNPAYService vnpayService;
 
     @Autowired
     public BookingService(
@@ -54,7 +56,8 @@ public class BookingService {
             DiscountService discountService,
             LocationService locationService,
             PaymentService paymentService,
-            CarConditionCheckService carConditionCheckService) {
+            CarConditionCheckService carConditionCheckService,
+            VNPAYService vnpayService) {
         this.bookingRepository = bookingRepository;
         this.carRepository = carRepository;
         this.userRepository = userRepository;
@@ -64,29 +67,31 @@ public class BookingService {
         this.locationService = locationService;
         this.paymentService = paymentService;
         this.carConditionCheckService = carConditionCheckService;
+        this.vnpayService = vnpayService;
     }
 
-    public ReservationFeeResponse createBooking(BookingRequest request) {
-        BookingResponse bookingResponse = addBooking(request);
-        PaymentResponse paymentResponse = paymentService.addPayment(bookingResponse.getId(), PaymentRequest.builder()
+    public ReservationFeeResponse createBooking(HttpServletRequest request, BookingRequest bookingRequest) {
+        BookingResponse bookingResponse = addBooking(bookingRequest);
+        Payment payment = paymentService.addPayment(bookingResponse.getId(), PaymentRequest.builder()
                 .amount(bookingResponse.getReservationFee())
                 .type(PaymentType.RESERVED)
                 .build());
+        String paymentUrl = vnpayService.generatePayUrl(request, payment.getAmount(),payment.getExternalRef());
         return ReservationFeeResponse.builder()
                 .bookingId(bookingResponse.getId())
-                .transactionId(paymentResponse.getId())
-                .reservationFee(paymentResponse.getAmount())
+                .transactionCode(payment.getExternalRef())
+                .reservationFee(payment.getAmount())
                 .paymentUrl("hello")
                 .build();
     }
 
     public RentalFeeResponse createCheckin(long bookingId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
-        PaymentResponse paymentRental = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
+        Payment paymentRental = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
                 .amount(booking.getRentalPrice())
                 .type(PaymentType.RENTAL)
                 .build());
-        PaymentResponse paymentDeposit = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
+        Payment paymentDeposit = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
                 .amount(booking.getDepositAmount())
                 .type(PaymentType.DEPOSIT)
                 .build());
