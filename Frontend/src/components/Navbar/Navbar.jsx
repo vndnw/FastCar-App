@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import './Navbar.css';
 import { Layout, Select, Button, Avatar, Dropdown } from 'antd';
-import { UserOutlined, DownOutlined, CarOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  DownOutlined,
+  CarOutlined,
+  EnvironmentOutlined,
+} from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
@@ -14,13 +19,14 @@ const userMenuItems = [
   { key: '2', label: 'Đơn thuê của tôi' },
   { key: '3', label: 'Đăng xuất' },
 ];
+
 const Navbar = () => {
   const [location, setLocation] = useState('Hồ Chí Minh');
   const navigate = useNavigate();
 
   const handleLocationChange = (value) => {
     setLocation(value);
-  
+
     const locationSlug = value
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -28,26 +34,41 @@ const Navbar = () => {
       .replace(/\s+/g, '-')
       .replace(/đ/g, 'd')
       .replace(/Đ/g, 'D');
+
     navigate(`/${locationSlug}`);
   };
 
   const handleLogoClick = () => {
     navigate('/');
   };
-  
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
   return (
     <Header className="navbar">
       <div className="navbar-content">
+        {/* Logo */}
         <div className="navbar-left">
-          <div className="navbar-logo" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
+          <div
+            className="navbar-logo"
+            onClick={handleLogoClick}
+            style={{ cursor: 'pointer' }}
+          >
             <CarOutlined />
             CarRental
           </div>
         </div>
 
+        {/* Right section */}
         <div className="navbar-right">
-          <Link to="/about" className="navbar-link">Về chúng tôi</Link>
+          {/* Link about */}
+          <Link to="/about" className="navbar-link">
+            Về chúng tôi
+          </Link>
 
+          {/* Select Location */}
           <div className="navbar-location">
             <EnvironmentOutlined className="navbar-location-icon" />
             <Select
@@ -57,21 +78,26 @@ const Navbar = () => {
               variant={false}
             >
               {locationList.map((loc) => (
-                <Option key={loc} value={loc}>{loc}</Option>
+                <Option key={loc} value={loc}>
+                  {loc}
+                </Option>
               ))}
             </Select>
           </div>
 
-          <Button type="primary">Đăng nhập</Button>
+          {/* Login button */}
+          <Button type="primary" onClick={handleLoginClick}>
+            Đăng nhập
+          </Button>
 
+          {/* Avatar dropdown */}
           <Dropdown menu={{ items: userMenuItems }}>
             <div className="navbar-avatar" style={{ cursor: 'pointer' }}>
               <Avatar icon={<UserOutlined />} size="medium" />
               <span className="navbar-avatar-name">Nguyễn Văn A</span>
               <DownOutlined />
             </div>
-        </Dropdown>
-
+          </Dropdown>
         </div>
       </div>
     </Header>
