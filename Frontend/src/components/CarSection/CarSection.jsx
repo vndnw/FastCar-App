@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Carousel, Button } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
@@ -9,7 +10,7 @@ const CarSection = ({
     cars,
     buttonText,
     onButtonClick,
-    backgroundColor = '#f5f5f5'
+    backgroundColor = 'transparent' // Loại bỏ hoàn toàn nền
 }) => {
     const carouselRef = React.useRef();
     const navigate = useNavigate();
@@ -69,7 +70,7 @@ const CarSection = ({
         if (onButtonClick) {
             onButtonClick();
         } else {
-            // Hành động mặc định - chuyển đến trang danh sách xe
+            // Chuyển đến trang danh sách xe
             navigate('/xe-co-ngay');
         }
     };
@@ -77,7 +78,7 @@ const CarSection = ({
     return (
         <div style={{
             padding: '40px 100px',
-            backgroundColor: backgroundColor
+            backgroundColor: 'transparent' // Loại bỏ hoàn toàn nền
         }}>
             {/* Tiêu đề section */}
             <h2 style={{
@@ -91,9 +92,24 @@ const CarSection = ({
             </h2>
 
             {/* Container carousel */}
-            <div style={{ position: 'relative', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{
+                position: 'relative',
+                maxWidth: '1200px',
+                margin: '0 auto'
+            }}>
+                <style>
+                    {`
+                        .custom-carousel .slick-slide > div {
+                            padding: 0 12px !important;
+                        }
+                        .custom-carousel .slick-list {
+                            margin: 0 -12px !important;
+                        }
+                    `}
+                </style>
                 <Carousel
                     ref={carouselRef}
+                    className="custom-carousel"
                     arrows
                     prevArrow={<CustomPrevArrow />}
                     nextArrow={<CustomNextArrow />}
@@ -128,14 +144,14 @@ const CarSection = ({
                 >
                     {/* Render từng xe trong carousel */}
                     {cars.map(car => (
-                        <div key={car.id} style={{ padding: '0 8px' }}>
-                            <CarCard car={car} />
+                        <div key={car.id}>
+                            <CarCard car={car} isInCarousel={true} />
                         </div>
                     ))}
                 </Carousel>
             </div>
 
-            {/* Nút xem thêm */}
+            {/* Nút xem thêm - cập nhật màu giống ảnh 1 */}
             <div style={{
                 textAlign: 'center',
                 marginTop: 40
@@ -145,8 +161,8 @@ const CarSection = ({
                     size="large"
                     onClick={handleButtonClick}
                     style={{
-                        borderColor: '#1890ff',
-                        color: '#1890ff',
+                        borderColor: '#52c41a', // Màu xanh lá cây nhạt giống nút TÌM XE
+                        color: '#52c41a',
                         fontWeight: 'normal',
                         height: 40,
                         padding: '0 24px',

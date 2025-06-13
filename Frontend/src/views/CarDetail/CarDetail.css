@@ -16,7 +16,7 @@
     color: #666;
 }
 
-/* === HEADER VỚI NÚT QUAY LẠI === */
+/* Header */
 .car-detail-header {
     background: #2c3e50;
     padding: 16px 0;
@@ -32,25 +32,27 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    transition: color 0.3s ease;
 }
 
 .back-button:hover {
     color: #52c41a !important;
 }
 
-/* === MAIN CONTENT === */
+/* Main Content */
 .car-detail-content {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 24px;
 }
 
-/* === CAR GALLERY === */
+/* Gallery ảnh */
 .car-gallery {
     background: white;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
 }
 
 .main-image {
@@ -63,6 +65,11 @@
     height: 400px;
     object-fit: cover;
     border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.main-car-image:hover {
+    transform: scale(1.02);
 }
 
 .view-all-badge {
@@ -79,6 +86,11 @@
     font-weight: bold;
     padding: 6px 12px;
     height: auto;
+    border-radius: 4px !important;
+}
+
+.view-all-btn:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
 }
 
 .thumbnail-gallery {
@@ -102,6 +114,7 @@
 .thumbnail:hover,
 .thumbnail.active {
     border-color: #1890ff;
+    transform: scale(1.05);
 }
 
 .thumbnail img {
@@ -110,7 +123,7 @@
     object-fit: cover;
 }
 
-/* === CAR INFO === */
+/* Thông tin xe */
 .car-info {
     background: white;
     border-radius: 12px;
@@ -145,12 +158,13 @@
     margin-bottom: 20px;
 }
 
-/* === PRICING === */
+/* Giá xe */
 .car-pricing {
     margin-bottom: 24px;
     padding: 16px;
     background: #f8f9fa;
     border-radius: 8px;
+    border-left: 4px solid #52c41a;
 }
 
 .current-price {
@@ -187,9 +201,12 @@
     font-size: 12px;
     color: #ff4d4f;
     font-weight: 500;
+    background: rgba(255, 77, 79, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
-/* === FEATURES === */
+/* Đặc điểm xe */
 .car-features h3 {
     font-size: 18px;
     font-weight: bold;
@@ -204,6 +221,12 @@
     padding: 12px;
     background: #f8f9fa;
     border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    background: #e6f7ff;
+    transform: translateY(-2px);
 }
 
 .feature-icon {
@@ -223,15 +246,14 @@
     color: #333;
 }
 
-/* === BOOKING FORM === */
+/* Form đặt xe */
 .booking-form {
     background: white;
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     position: sticky;
-    top: 180px;
-    /* Dưới fixed header */
+    top: 100px;
 }
 
 .booking-form h3 {
@@ -261,15 +283,24 @@
     font-size: 14px;
     color: #333;
     margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.datetime-input:hover {
+    border-color: #1890ff;
 }
 
 .time-note {
     font-size: 12px;
     color: #ff4d4f;
     margin: 0;
+    background: rgba(255, 77, 79, 0.05);
+    padding: 6px;
+    border-radius: 4px;
 }
 
-/* === PICKUP LOCATION === */
+/* Địa điểm nhận xe */
 .pickup-location {
     margin-bottom: 24px;
     padding: 16px;
@@ -297,7 +328,7 @@
     margin-top: 8px !important;
 }
 
-/* === PRICE SUMMARY === */
+/* Tóm tắt giá */
 .price-summary {
     margin-bottom: 24px;
     padding: 16px;
@@ -325,7 +356,7 @@
     margin-top: 8px;
 }
 
-/* === RENT BUTTON === */
+/* Nút thuê xe */
 .rent-button {
     background: #52c41a !important;
     border-color: #52c41a !important;
@@ -333,27 +364,32 @@
     font-size: 16px !important;
     font-weight: bold !important;
     border-radius: 8px !important;
+    transition: all 0.3s ease !important;
 }
 
 .rent-button:hover {
     background: #389e0d !important;
     border-color: #389e0d !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
 }
 
-/* === CAR DESCRIPTION - Di chuyển xuống dưới gallery === */
+/* Mô tả xe */
 .car-description {
     background: white;
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 24px;
+    margin-bottom: 24px;
 }
 
 .car-description h3 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 16px;
     color: #333;
+    border-bottom: 2px solid #1890ff;
+    padding-bottom: 8px;
 }
 
 .car-description p {
@@ -361,22 +397,25 @@
     line-height: 1.6;
     color: #666;
     margin: 0;
+    text-align: justify;
 }
 
-/* === CÁC TIỆN NGHI KHÁC === */
+/* Tiện nghi mở rộng */
 .car-features-extended {
     background: white;
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 24px;
+    margin-bottom: 24px;
 }
 
 .car-features-extended h3 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 16px;
     color: #333;
+    border-bottom: 2px solid #52c41a;
+    padding-bottom: 8px;
 }
 
 .feature-item-extended {
@@ -388,31 +427,39 @@
     border-radius: 6px;
     font-size: 13px;
     color: #333;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.feature-item-extended:hover {
+    background: #e6f7ff;
+    border-color: #1890ff;
+    transform: translateY(-1px);
 }
 
 .feature-emoji {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .feature-text {
     font-weight: 500;
 }
 
-/* === ĐIỀU KHOẢN === */
+/* Điều khoản */
 .car-terms {
     background: white;
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 24px;
+    margin-bottom: 24px;
 }
 
 .car-terms h3 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 16px;
     color: #333;
-    border-bottom: 2px solid #52c41a;
+    border-bottom: 2px solid #ff4d4f;
     padding-bottom: 8px;
 }
 
@@ -440,13 +487,17 @@
 
 .terms-content li:before {
     content: "•";
-    color: #52c41a;
+    color: #ff4d4f;
     font-weight: bold;
     position: absolute;
     left: 0;
 }
 
-/* === RESPONSIVE === */
+.terms-content li:hover {
+    color: #333;
+}
+
+/* Responsive */
 @media (max-width: 1024px) {
     .booking-form {
         position: static;
@@ -461,13 +512,15 @@
 
     .back-button {
         margin-left: 16px;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .car-info,
     .booking-form,
     .car-gallery,
-    .car-description {
+    .car-description,
+    .car-features-extended,
+    .car-terms {
         padding: 16px;
         margin-bottom: 16px;
     }
@@ -491,6 +544,10 @@
 
     .feature-item {
         padding: 8px;
+    }
+
+    .car-header {
+        gap: 12px;
     }
 }
 
@@ -517,5 +574,18 @@
         flex-direction: column;
         gap: 4px;
         align-items: flex-start;
+    }
+
+    .booking-form {
+        top: 20px;
+    }
+
+    .thumbnail-gallery {
+        gap: 8px;
+    }
+
+    .thumbnail {
+        width: 50px;
+        height: 40px;
     }
 }

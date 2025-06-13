@@ -1,29 +1,25 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Row, Col, Button, Badge, Carousel } from 'antd';
+import { Row, Col, Button, Badge } from 'antd';
 import { ArrowLeftOutlined, UserOutlined, SettingOutlined, CarOutlined } from '@ant-design/icons';
 import { sampleCars, luxuryCars } from '../../data/sampleCars';
 import './CarDetail.css';
 
 const CarDetail = () => {
-    const { carId } = useParams(); // Lấy carId từ URL
+    const { carId } = useParams();
     const navigate = useNavigate();
     const [car, setCar] = useState(null);
 
-    // Tìm xe theo ID khi component mount
     useEffect(() => {
         const allCars = [...sampleCars, ...luxuryCars];
         const foundCar = allCars.find(c => c.id === parseInt(carId));
         setCar(foundCar);
     }, [carId]);
 
-    // Xử lý nút quay lại
     const handleGoBack = () => {
-        navigate(-1); // Quay lại trang trước
+        navigate(-1);
     };
 
-    // Loading state
     if (!car) {
         return (
             <div className="car-detail-loading">
@@ -34,7 +30,6 @@ const CarDetail = () => {
 
     return (
         <div className="car-detail-page">
-            {/* Header với nút quay lại */}
             <div className="car-detail-header">
                 <Button
                     type="text"
@@ -46,53 +41,44 @@ const CarDetail = () => {
                 </Button>
             </div>
 
-            {/* Main Content */}
             <div className="car-detail-content">
                 <Row gutter={[32, 32]}>
-                    {/* Cột trái - Gallery ảnh và Mô tả */}
                     <Col xs={24} lg={14}>
                         <CarGallery car={car} />
-                        {/* === ĐI CHUYỂN MÔ TẢ VÀO ĐÂY === */}
                         <CarDescription car={car} />
                         <CarFeatures car={car} />
                         <CarTerms car={car} />
                     </Col>
 
-                    {/* Cột phải - Thông tin và booking */}
                     <Col xs={24} lg={10}>
                         <CarInfo car={car} />
                         <BookingForm car={car} />
                     </Col>
                 </Row>
-
-                {/* Bỏ mô tả ở đây vì đã chuyển lên trên */}
             </div>
         </div>
     );
 };
 
-// === COMPONENT GALLERY ẢNH ===
+// Gallery ảnh xe
 const CarGallery = ({ car }) => {
     const [activeImage, setActiveImage] = useState(0);
 
-    // Tạo array ảnh giả (thực tế sẽ có nhiều ảnh)
     const images = [
         car.image,
-        car.image, // Giả lập có nhiều ảnh
+        car.image,
         car.image,
         car.image
     ];
 
     return (
         <div className="car-gallery">
-            {/* Ảnh chính */}
             <div className="main-image">
                 <img
                     src={images[activeImage]}
                     alt={car.name}
                     className="main-car-image"
                 />
-                {/* Badge "XEM TẤT CẢ" */}
                 <div className="view-all-badge">
                     <Button type="primary" className="view-all-btn">
                         XEM TẤT CẢ
@@ -100,7 +86,6 @@ const CarGallery = ({ car }) => {
                 </div>
             </div>
 
-            {/* Thumbnails */}
             <div className="thumbnail-gallery">
                 {images.map((image, index) => (
                     <div
@@ -116,11 +101,10 @@ const CarGallery = ({ car }) => {
     );
 };
 
-// === COMPONENT THÔNG TIN XE ===
+// Thông tin xe
 const CarInfo = ({ car }) => {
     return (
         <div className="car-info">
-            {/* Tên xe và badges */}
             <div className="car-header">
                 <h1 className="car-title">{car.name} {car.year}</h1>
                 <div className="car-badges">
@@ -133,24 +117,27 @@ const CarInfo = ({ car }) => {
                 </div>
             </div>
 
-            {/* Địa điểm */}
             <p className="car-location">📍 {car.location}</p>
 
-            {/* Giá */}
             <div className="car-pricing">
                 <div className="current-price">
-                    <span className="price-value">{(car.currentPrice * 1000).toLocaleString('vi-VN')}K</span>
+                    <span className="price-value">
+                        {(car.currentPrice * 1000).toLocaleString('vi-VN')}K
+                    </span>
                     <span className="price-unit">/giờ</span>
                 </div>
                 {car.originalPrice && (
                     <div className="original-price">
-                        <span className="original-value">{(car.originalPrice * 1000).toLocaleString('vi-VN')}K</span>
-                        <span className="discount-amount">Tiết kiệm {((car.originalPrice - car.currentPrice) * 1000).toLocaleString('vi-VN')}K</span>
+                        <span className="original-value">
+                            {(car.originalPrice * 1000).toLocaleString('vi-VN')}K
+                        </span>
+                        <span className="discount-amount">
+                            Tiết kiệm {((car.originalPrice - car.currentPrice) * 1000).toLocaleString('vi-VN')}K
+                        </span>
                     </div>
                 )}
             </div>
 
-            {/* Đặc điểm */}
             <div className="car-features">
                 <h3>Đặc điểm</h3>
                 <Row gutter={[16, 16]}>
@@ -196,13 +183,12 @@ const CarInfo = ({ car }) => {
     );
 };
 
-// === COMPONENT FORM BOOKING ===
+// Form đặt xe
 const BookingForm = ({ car }) => {
     return (
         <div className="booking-form">
             <h3>Thời gian thuê</h3>
 
-            {/* Form chọn thời gian */}
             <div className="time-selection">
                 <div className="time-input">
                     <label>Nhận xe</label>
@@ -215,7 +201,6 @@ const BookingForm = ({ car }) => {
                 </div>
             </div>
 
-            {/* Địa điểm nhận xe */}
             <div className="pickup-location">
                 <h4>🟢 Nhận xe tại vị trí xe</h4>
                 <div className="location-info">
@@ -226,7 +211,6 @@ const BookingForm = ({ car }) => {
                 </div>
             </div>
 
-            {/* Tổng tiền */}
             <div className="price-summary">
                 <div className="price-row">
                     <span>Đơn giá gốc:</span>
@@ -244,7 +228,6 @@ const BookingForm = ({ car }) => {
                 </div>
             </div>
 
-            {/* Nút thuê xe */}
             <Button
                 type="primary"
                 size="large"
@@ -257,7 +240,7 @@ const BookingForm = ({ car }) => {
     );
 };
 
-// === COMPONENT MÔ TẢ XE ===
+// Mô tả xe
 const CarDescription = ({ car }) => {
     return (
         <div className="car-description">
@@ -273,7 +256,7 @@ const CarDescription = ({ car }) => {
     );
 };
 
-// === COMPONENT CÁC TIỆN NGHI KHÁC ===
+// Tiện nghi xe
 const CarFeatures = ({ car }) => {
     const features = [
         { icon: '📻', label: 'Bản đồ' },
@@ -310,7 +293,7 @@ const CarFeatures = ({ car }) => {
     );
 };
 
-// === COMPONENT ĐIỀU KHOẢN ===
+// Điều khoản
 const CarTerms = ({ car }) => {
     return (
         <div className="car-terms">
@@ -318,16 +301,16 @@ const CarTerms = ({ car }) => {
             <div className="terms-content">
                 <p><strong>Quy định khác:</strong></p>
                 <ul>
-                    <li> Sử dụng xe đúng mục đích.</li>
-                    <li> Không sử dụng xe thuê vào mục đích phi pháp, trái pháp luật.</li>
-                    <li> Không sử dụng xe thuê để cầm cố, thế chấp.</li>
-                    <li> Không hút thuốc, nhả kẹo cao su, xả rác trong xe.</li>
-                    <li> Không chở hàng quốc cấm dễ cháy nổ.</li>
-                    <li> Không chở hoa quả, thực phẩm nặng mùi trong xe.</li>
-                    <li> Khi trả xe, nếu xe bẩn hoặc có mùi trong xe, khách hàng vui lòng vệ sinh xe sạch sẽ hoặc đóng phí vệ sinh xe.</li>
-                    <li> Xe được giới hạn di chuyển tối đa 400km cho 24h, và tần suất là 250km, 300km, 350 km cho 6h, 8h, 12h.</li>
+                    <li>Sử dụng xe đúng mục đích.</li>
+                    <li>Không sử dụng xe thuê vào mục đích phi pháp, trái pháp luật.</li>
+                    <li>Không sử dụng xe thuê để cầm cố, thế chấp.</li>
+                    <li>Không hút thuốc, nhả kẹo cao su, xả rác trong xe.</li>
+                    <li>Không chở hàng quốc cấm dễ cháy nổ.</li>
+                    <li>Không chở hoa quả, thực phẩm nặng mùi trong xe.</li>
+                    <li>Khi trả xe, nếu xe bẩn hoặc có mùi trong xe, khách hàng vui lòng vệ sinh xe sạch sẽ hoặc đóng phí vệ sinh xe.</li>
+                    <li>Xe được giới hạn di chuyển tối đa 400km cho 24h, và tần suất là 250km, 300km, 350 km cho 6h, 8h, 12h.</li>
                 </ul>
-                <p>Trân trọng cảm ơn, chúc quý khách hàng có những chuyến đi tuyệt vời !</p>
+                <p>Trân trọng cảm ơn, chúc quý khách hàng có những chuyến đi tuyệt vời!</p>
             </div>
         </div>
     );
