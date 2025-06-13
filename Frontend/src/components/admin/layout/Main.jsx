@@ -17,6 +17,10 @@ import Sidenav from "./Sidenav";
 import Header from "./Header";
 import Footer from "./Footer";
 
+// import "antd/dist/reset.css";
+import "./../../../assets/styles/main.css";
+import "./../../../assets/styles/responsive.css";
+
 const { Header: AntHeader, Content, Sider } = Layout;
 
 function Main() {

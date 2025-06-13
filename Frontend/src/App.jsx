@@ -16,9 +16,6 @@ import Billing from "./views/admin/Billing";
 import Profile from "./views/admin/Profile";
 import Main from "./components/admin/layout/Main";
 
-import "antd/dist/reset.css";
-import "./assets/styles/main.css";
-import "./assets/styles/responsive.css";
 
 function App() {
   return (

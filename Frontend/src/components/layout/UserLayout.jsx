@@ -6,14 +6,14 @@ import { Outlet } from "react-router-dom";
 
 function UserLayout() {
     return (
-        <>
+        <div className="app">
             <Navbar />
             <div className="content">
                 <Outlet />
             </div>
             <Footer />
             <ScrollToTop />
-        </>
+        </div>
     );
 }
 
