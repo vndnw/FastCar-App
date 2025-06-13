@@ -37,6 +37,7 @@ function App() {
 
       {/* Layout cho trang admin */}
       <Route path="/admin" element={<Main />}>
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="tables" element={<Tables />} />
         <Route path="billing" element={<Billing />} />
