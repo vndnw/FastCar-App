@@ -5,14 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
 public class DiscountResquest {
-    private String name;
-    private double price;
-    private double percent;
+    private String code;
+    private int percent;
     private int quantity;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String discription;
 }

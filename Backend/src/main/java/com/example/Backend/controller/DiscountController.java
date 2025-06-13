@@ -4,6 +4,7 @@ import com.example.Backend.dto.ResponseData;
 import com.example.Backend.dto.request.DiscountResquest;
 import com.example.Backend.service.DiscountService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class DiscountController {
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
     @GetMapping
-    public ResponseEntity<?> getAllDiscount(Pageable pageable) {
+    public ResponseEntity<?> getAllDiscount(@PageableDefault(page = 0, size = 10) Pageable pageable) {
         ResponseData<?> responseData = ResponseData.builder()
                 .message("Successfully retrieved all discounts")
                 .data(discountService.getAllDiscount(pageable))

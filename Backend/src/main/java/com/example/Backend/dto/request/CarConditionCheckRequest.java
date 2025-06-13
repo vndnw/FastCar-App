@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class CarConditionCheckRequest {
+    private CheckType checkType; // Loại kiểm tra: EXTERIOR, INTERIOR, ODOMETER, FUEL
     private int odometer;
     private String fuelLevel;
     private String interiorStatus;

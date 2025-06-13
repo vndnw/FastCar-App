@@ -35,6 +35,10 @@ public class UserDetailsServiceCustom implements UserDetailsService {
 
         User userDetails = user.orElseThrow(() -> new UsernameNotFoundException("User not found with email(phone) : " + username));
 
+        if(!userDetails.isActive()) {
+            throw new RuntimeException("User is not active: " + username);
+        }
+
         return org.springframework.security.core.userdetails.User.builder()
                 .username(userDetails.getEmail())
                 .password(userDetails.getPassword())

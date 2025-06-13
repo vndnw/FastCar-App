@@ -2,6 +2,7 @@ package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
 import com.example.Backend.dto.request.*;
+import com.example.Backend.service.BookingService;
 import com.example.Backend.service.CarService;
 import com.example.Backend.service.DocumentService;
 import com.example.Backend.service.ReviewCarService;
@@ -17,21 +18,16 @@ public class CarController {
     private final CarService carService;
     private final ReviewCarService reviewCarService;
     private final DocumentService documentService;
+    private final BookingService bookingService;
 
-    public CarController(CarService carService, ReviewCarService reviewCarService, DocumentService documentService) {
+    public CarController(CarService carService,
+                         ReviewCarService reviewCarService,
+                         DocumentService documentService,
+                         BookingService bookingService) {
         this.carService = carService;
         this.reviewCarService = reviewCarService;
         this.documentService = documentService;
-    }
-
-    @PostMapping("/{id}/createcomplete")
-    public ResponseEntity<?> addCarComplete(@PathVariable long id, @RequestBody CarSecondCreateRequest carSecondCreateRequest) {
-        ResponseData<?> responseData = ResponseData.builder()
-                .status(201)
-                .message("Car added successfully")
-                .data(carService.createCompleteCar(id, carSecondCreateRequest))
-                .build();
-        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+        this.bookingService = bookingService;
     }
 
     @GetMapping
@@ -82,6 +78,7 @@ public class CarController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
+
 
 //    @GetMapping("/{id}/reviewcar")
 //    public ResponseEntity<?> getAllReviewCars(@PathVariable("id") long id, Pageable pageable) {

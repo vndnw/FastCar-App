@@ -28,9 +28,12 @@ public class ExtraCharge {
 
     private String reason;
     private BigDecimal amount;
+    private String image;
 
-    @Enumerated(EnumType.STRING)
-    private ExtraChargeStatus status; // PENDING, PAID, DISPUTED
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 }

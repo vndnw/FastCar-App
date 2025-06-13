@@ -8,12 +8,8 @@ import org.springframework.stereotype.Service;
 public class ExtraChargeMapper {
     public ExtraChargeResponse mapToResponse(ExtraCharge extraCharge) {
         return ExtraChargeResponse.builder()
-                .id(extraCharge.getId())
-                .bookingCode(extraCharge.getBooking().getBookingCode())
                 .amount(extraCharge.getAmount())
                 .reason(extraCharge.getReason())
-                .status(extraCharge.getStatus())
-                .createdAt(extraCharge.getCreatedAt())
                 .build();
     }
 

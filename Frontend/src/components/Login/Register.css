@@ -1,0 +1,265 @@
+/* Register.css */
+
+.register-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.register-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.register-header {
+  background: linear-gradient(90deg, #16a34a 0%, #2563eb 100%);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.register-icon {
+  width: 4rem;
+  height: 4rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+}
+
+.register-icon svg {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+}
+
+.register-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.register-subtitle {
+  color: #bbf7d0;
+}
+
+.register-form {
+  padding: 1.5rem;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  ring: 2px solid #16a34a;
+  border-color: transparent;
+}
+
+.form-input.error {
+  border-color: #fca5a5;
+}
+
+.form-input-password {
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.password-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+}
+
+.error-text {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #dc2626;
+}
+
+.terms-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.terms-checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.form-checkbox {
+  width: 1rem;
+  height: 1rem;
+  color: #16a34a;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.form-checkbox:focus {
+  ring: 2px solid #16a34a;
+}
+
+.terms-text {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.terms-link {
+  color: #16a34a;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.terms-link:hover {
+  color: #15803d;
+}
+
+.register-button {
+  width: 100%;
+  background: linear-gradient(90deg, #16a34a 0%, #2563eb 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.register-button:hover:not(:disabled) {
+  background: linear-gradient(90deg, #15803d 0%, #1d4ed8 100%);
+}
+
+.register-button:focus {
+  ring: 4px solid #86efac;
+}
+
+.register-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-link-section {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.login-text {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.login-link {
+  margin-left: 0.25rem;
+  color: #16a34a;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.login-link:hover {
+  color: #15803d;
+}
+
+.back-home-section {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.back-home-link {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.back-home-link:hover {
+  color: #374151;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .register-container {
+    padding: 0.5rem;
+  }
+  
+  .register-header {
+    padding: 1rem;
+  }
+  
+  .register-form {
+    padding: 1rem;
+  }
+  
+  .terms-checkbox-wrapper {
+    align-items: flex-start;
+  }
+  
+  .terms-text {
+    font-size: 0.8125rem;
+  }
+}

@@ -1,10 +1,10 @@
 package com.example.Backend.model.enums;
 
 public enum PaymentType {
-    RESERVATION_FEE, RENTAL_FEE, DEPOSIT, EXTRA_CHARGE, REFUND
-//    RESERVATION_FEE, // Phí đặt chỗ
-//    RENTAL_FEE,    // Phí thuê xe
-//    DEPOSIT,       // Đặt cọc
-//    EXTRA_CHARGE,  // Phụ phí
-//    REFUND         // Hoàn tiền
+    RESERVED, RENTAL, DEPOSIT, EXTRA_CHARGE, REFUND
+    // RESERVED: Thanh toán đặt cọc trước
+    // RENTAL: Thanh toán cho thuê
+    // DEPOSIT: Thanh toán tiền đặt cọc
+    // EXTRA_CHARGE: Thanh toán phí phát sinh
+    // REFUND: Hoàn tiền
 }

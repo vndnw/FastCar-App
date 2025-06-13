@@ -66,38 +66,20 @@ public class AuthService {
                 .user(userService.getUserByEmail(userDetails.getUsername()))
                 .build();
     }
-
     public UserResponse register(UserRequest userRequest) {
         UserResponse userResponse = userService.createUser(userRequest);
-
         String otp = otpService.generateOtp(userRequest.getEmail());
         log.info("OTP register email "+ userRequest.getEmail() +": " + otp);
         emailService.sendOTPEmail(userRequest.getEmail(), otp);
-
         return userResponse;
     }
-
-    public AuthResponse confirm(String email, String otp) {
-
+    public boolean verifyOtp(String email, String otp) {
         if (!otpService.validateOtp(otp, email)) {
-            throw new ResourceNotFoundException("OTP không hợp lệ");
+            throw new RuntimeException("OTP không hợp lệ");
         }
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        if (userDetails == null) {
-            throw new ResourceNotFoundException("User not found ở confirm");
-        }
-        String idToken = UUID.randomUUID().toString();
-        String accessToken = jwtService.generateToken(userDetails, TokenType.ACCESS_TOKEN, idToken);
-        String refreshToken = jwtService.generateToken(userDetails, TokenType.REFRESH_TOKEN, idToken);
-
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .user(userService.getUserByEmail(userDetails.getUsername()))
-                .build();
+        userService.updateActive(email, true);
+        return true;
     }
-
     public AuthResponse refreshToken(RefreshRequest refreshRequest) {
         if(jwtService.isTokenExpired(refreshRequest.getRefreshToken())) {
             throw new RefreshTokenExpiredException("Refresh token expired");
@@ -113,8 +95,6 @@ public class AuthService {
                 .user(userService.getUserByEmail(email))
                 .build();
     }
-
-
     public void logout(String accessToken) {
 
         accessToken = accessToken.replace("Bearer ", "");
@@ -126,24 +106,13 @@ public class AuthService {
         refreshTokenRepository.deleteById(idToken);
 
     }
-
-    public AuthValidateResponse validateToken(String token) {
-
+    public boolean validateToken(String token) {
         if (blackListService.isTokenBlacklisted(token)) {
-            return AuthValidateResponse.builder()
-                    .status(false)
-                    .message("Token is blacklisted")
-                    .build();
+            return false;
         }
         if (jwtService.isExpiration(token, TokenType.ACCESS_TOKEN)) {
-            return AuthValidateResponse.builder()
-                    .status(false)
-                    .message("Token is expired")
-                    .build();
+            return false;
         }
-        return AuthValidateResponse.builder()
-                .status(true)
-                .message("Token is valid")
-                .build();
+        return jwtService.validateToken(token, userDetailsService.loadUserByUsername(jwtService.extractEmail(token, TokenType.ACCESS_TOKEN)));
     }
 }

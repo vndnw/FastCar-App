@@ -30,11 +30,10 @@ public class CarRequest {
     private List<Long> carFeatures;
     private String licensePlate;
     private String fuelConsumption;//  fuel_consumption/100km
-    private BigDecimal pricePerHour;
-    private BigDecimal pricePer4Hour;
-    private BigDecimal pricePer8Hour;
-    private BigDecimal pricePer12Hour;
-    private BigDecimal pricePer24Hour;
+    private double pricePerHour;
+    private double pricePer4Hour;
+    private double pricePer8Hour;
+    private double pricePer12Hour;
+    private double pricePer24Hour;
     private String description;
-    private BigDecimal penaltyLateReturn;
 }

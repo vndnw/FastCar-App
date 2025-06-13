@@ -23,9 +23,11 @@ public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @ManyToOne
     @JoinColumn(name = "car_id")
     private Car car;
+
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
     private String documentNumber;

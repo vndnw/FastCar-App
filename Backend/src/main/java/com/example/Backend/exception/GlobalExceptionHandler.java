@@ -1,7 +1,9 @@
 package com.example.Backend.exception;
 
 import com.example.Backend.dto.ResponseData;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,8 +14,8 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
-        ResponseData errorResponse = ResponseData.builder()
+    public ResponseEntity<?> handleRuntimeException(@NotNull RuntimeException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
                 .status(500)
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())
@@ -22,8 +24,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(500).body(errorResponse);
     }
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException e, HttpServletRequest request) {
-        ResponseData errorResponse = ResponseData.builder()
+    public ResponseEntity<?> handleResourceNotFoundException(@NotNull ResourceNotFoundException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
                 .status(404)
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())
@@ -32,8 +34,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(errorResponse);
     }
     @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<?> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e, HttpServletRequest request) {
-        ResponseData errorResponse = ResponseData.builder()
+    public ResponseEntity<?> handleResourceAlreadyExistsException(@NotNull ResourceAlreadyExistsException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
                 .status(409)
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())
@@ -42,8 +44,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(409).body(errorResponse);
     }
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleInvalidTokenException(IllegalArgumentException e, HttpServletRequest request) {
-        ResponseData errorResponse = ResponseData.builder()
+    public ResponseEntity<?> handleInvalidTokenException(@NotNull IllegalArgumentException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
                 .status(400)
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())
@@ -63,8 +65,8 @@ public class GlobalExceptionHandler {
 //    }
 
     @ExceptionHandler(RefreshTokenExpiredException.class)
-    public ResponseEntity<?> handleRefreshTokenExpiredException(RefreshTokenExpiredException e, HttpServletRequest request) {
-        ResponseData errorResponse = ResponseData.builder()
+    public ResponseEntity<?> handleRefreshTokenExpiredException(@NotNull RefreshTokenExpiredException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
                 .status(401)
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())
@@ -74,8 +76,30 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BookingException.class)
-    public ResponseEntity<?> handleBookingException(BookingException e, HttpServletRequest request) {
-        ResponseData errorResponse = ResponseData.builder()
+    public ResponseEntity<?> handleBookingException(@NotNull BookingException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
+                .status(400)
+                .timestamp(LocalDateTime.now())
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(400).body(errorResponse);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<?> handleExpiredJwtException(@NotNull ExpiredJwtException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
+                .status(401)
+                .timestamp(LocalDateTime.now())
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(401).body(errorResponse);
+    }
+
+    @ExceptionHandler(DiscountException.class)
+    public ResponseEntity<?> handleDiscountException(@NotNull DiscountException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
                 .status(400)
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())

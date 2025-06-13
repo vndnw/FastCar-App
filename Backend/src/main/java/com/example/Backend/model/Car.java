@@ -32,11 +32,9 @@ public class Car {
 
     private String name;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
-
-
 
     @ManyToOne
     @JoinColumn(name = "carBrand_id")
@@ -59,7 +57,6 @@ public class Car {
     private BigDecimal pricePer12Hour;
     private BigDecimal pricePer24Hour;
 
-    private BigDecimal dipositAmount; // Amount to be paid as a deposit
 
     @Enumerated(EnumType.STRING)
     private FuelType fuelType;
@@ -74,11 +71,11 @@ public class Car {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CarImage> images;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "car_features",
+    @JoinTable(name = "car_feature",
         joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "car_feature_id"))
     private List<CarFeature> features;
@@ -101,5 +98,8 @@ public class Car {
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CarConditionCheck> conditionChecks;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Document> documents;
 }
 

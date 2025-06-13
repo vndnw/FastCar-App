@@ -1,20 +1,16 @@
 package com.example.Backend.service;
 
-import com.example.Backend.dto.request.CarFirstCreateRequest;
 import com.example.Backend.dto.request.CarRequest;
-import com.example.Backend.dto.request.CarSecondCreateRequest;
 import com.example.Backend.dto.response.CarResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarMapper;
-import com.example.Backend.model.Car;
-import com.example.Backend.model.CarBrand;
-import com.example.Backend.model.Location;
-import com.example.Backend.model.User;
+import com.example.Backend.model.*;
 import com.example.Backend.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,34 +41,39 @@ public class CarService {
         this.userRepository = userRepository;
     }
 
-    // khởi tạo lần đầu cơ bản cho car sau đó chúng ta sẽ update thêm thông tin cho nó
-    public CarResponse createCarBasic(long uesrId , CarFirstCreateRequest carFirstCreateRequest) {
-        Car car = Car.builder()
-                .user(userRepository.findById(uesrId).orElseThrow(() -> new ResourceNotFoundException("User not found")))
-                .name(carFirstCreateRequest.getName())
-                .model(carFirstCreateRequest.getModel())
-                .carType(carFirstCreateRequest.getType())
-                .carBrand(carBrandRepository.findById(carFirstCreateRequest.getCarBrandId()).orElseThrow(() -> new ResourceNotFoundException("Car Brand Not Found")))
-                .color(carFirstCreateRequest.getColor())
-                .fuelType(carFirstCreateRequest.getFuelType())
-                .location(locationService.checkLocation(carFirstCreateRequest.getLocation()))
-                .build();
-        return carMapper.mapToResponse(carRepository.save(car));
-    }
-    //  bổ sung đầy đủ thông của car
-    public CarResponse createCompleteCar(long carId , CarSecondCreateRequest carSecondCreateRequest) {
-        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car Not Found"));
-
-        car.setImages(carSecondCreateRequest.getCarImages().stream().map(image -> carImageService.checkCarImage(car, image)).collect(Collectors.toList()));
-        car.setFeatures(carSecondCreateRequest.getCarFeatures().stream().map(carFeatureService::getCarFeatureById).collect(Collectors.toList()));
-        car.setLicensePlate(carSecondCreateRequest.getLicensePlate());
-        car.setFuelConsumption(carSecondCreateRequest.getFuelConsumption());
-        car.setPricePerHour(carSecondCreateRequest.getPricePerHour());
-        car.setPricePer4Hour(carSecondCreateRequest.getPricePer4Hour());
-        car.setPricePer8Hour(carSecondCreateRequest.getPricePer8Hour());
-        car.setPricePer12Hour(carSecondCreateRequest.getPricePer12Hour());
-        car.setPricePer24Hour(carSecondCreateRequest.getPricePer24Hour());
-        car.setDescription(carSecondCreateRequest.getDescription());
+    public CarResponse createCar(long userId, CarRequest carRequest) {
+        Car car = new Car();
+        car.setUser(userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found")));
+        car.setName(carRequest.getName().trim());
+        car.setCarBrand(carBrandRepository.findById(carRequest.getCarBrandId()).orElseThrow(() -> new ResourceNotFoundException("Car Brand Not Found")));
+        car.setModel(carRequest.getModel());
+        car.setColor(carRequest.getColor());
+        car.setYear(carRequest.getYear());
+        car.setSeats(carRequest.getSeats());
+        car.setTransmission(carRequest.getTransmission());
+        car.setCarType(carRequest.getType());
+        car.setFuelType(carRequest.getFuelType());
+        car.setFeatures(carRequest.getCarFeatures().stream().map(carFeatureService::getCarFeatureById).toList());
+        car.setLicensePlate(carRequest.getLicensePlate().trim());
+        car.setFuelConsumption(carRequest.getFuelConsumption().trim());
+        car.setPricePerHour(BigDecimal.valueOf(carRequest.getPricePerHour()));
+        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePer4Hour()));
+        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePer8Hour()));
+        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePer12Hour()));
+        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePer24Hour()));
+        car.setDescription(carRequest.getDescription());
+        car.setActive(false);
+        List<CarImage> carImages = carRequest.getCarImages().stream()
+                .map( image -> {
+                    CarImage carImage = new CarImage();
+                    carImage.setImageUrl(image.getImageUrl());
+                    carImage.setImageType(image.getImageType());
+                    carImage.setCar(car);
+                    return carImage;
+                })
+                .toList();
+        car.setImages(carImages);
+        car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         return carMapper.mapToResponse(carRepository.save(car));
     }
 
@@ -88,16 +89,27 @@ public class CarService {
         car.setCarType(carRequest.getType());
         car.setFuelType(carRequest.getFuelType());
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
-        car.setImages(carRequest.getCarImages().stream().map(image -> carImageService.checkCarImage(car, image)).collect(Collectors.toList()));
         car.setFeatures(carRequest.getCarFeatures().stream().map(carFeatureService::getCarFeatureById).collect(Collectors.toList()));
         car.setLicensePlate(carRequest.getLicensePlate());
         car.setFuelConsumption(carRequest.getFuelConsumption());
-        car.setPricePerHour(carRequest.getPricePerHour());
-        car.setPricePer4Hour(carRequest.getPricePer4Hour());
-        car.setPricePer8Hour(carRequest.getPricePer8Hour());
-        car.setPricePer12Hour(carRequest.getPricePer12Hour());
-        car.setPricePer24Hour(carRequest.getPricePer24Hour());
+        car.setPricePerHour(BigDecimal.valueOf(carRequest.getPricePerHour()));
+        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePer4Hour()));
+        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePer8Hour()));
+        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePer12Hour()));
+        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePer24Hour()));
         car.setDescription(carRequest.getDescription());
+        List<CarImage> carImages = carRequest.getCarImages().stream()
+                .map(image -> {
+                    CarImage carImage = new CarImage();
+                    carImage.setImageUrl(image.getImageUrl());
+                    carImage.setImageType(image.getImageType());
+                    carImage.setCar(car);
+                    return carImage;
+                })
+                .toList();
+        car.getImages().clear();
+        car.setImages(carImages);
+        car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         return carMapper.mapToResponse(carRepository.save(car));
     }
 
@@ -115,7 +127,6 @@ public class CarService {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User Not Found"));
         List<Car> cars = carRepository.findCarsByUser(user);
         return cars.stream().map(carMapper::mapToResponse).collect(Collectors.toList());
-
     }
 
     public CarResponse getCarById(long carId) {
@@ -125,6 +136,21 @@ public class CarService {
 
     public Page<CarResponse> getAllCars(Pageable pageable) {
         Page<Car> cars = carRepository.findAll(pageable);
-        return cars.map(car -> carMapper.mapToResponse(car));
+        return cars.map(carMapper::mapToResponse);
+    }
+
+    public boolean activeCar(long carId) {
+        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+        if (car.isActive()) {
+            return false; // Car is already active
+        }
+        List<Document> document = car.getDocuments();
+        boolean hasInactive = car.getDocuments().stream().anyMatch(doc -> !doc.isActive());
+        if (hasInactive) {
+            throw new RuntimeException("Cannot activate car with inactive documents");
+        }
+        car.setActive(true);
+        carRepository.save(car);
+        return true; // Car is now active
     }
 }

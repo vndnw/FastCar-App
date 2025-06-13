@@ -1,5 +1,6 @@
 package com.example.Backend.dto.request;
 
+import com.example.Backend.model.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +14,13 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class UserRequest {
+
     private String lastName;
     private String firstName;
     private String email;
     private String phone;
     private String password;
-    private String address;
+    private LocationRequest address;
     private String profilePicture;
     private LocalDate dateOfBirth;
     private List<String> roles;

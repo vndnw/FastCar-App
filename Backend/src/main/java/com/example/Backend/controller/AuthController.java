@@ -1,17 +1,11 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
-import com.example.Backend.dto.request.AuthRequest;
-import com.example.Backend.dto.request.ConfirmRegister;
-import com.example.Backend.dto.request.RefreshRequest;
-import com.example.Backend.dto.request.UserRequest;
+import com.example.Backend.dto.request.*;
 import com.example.Backend.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -43,13 +37,20 @@ public class AuthController {
         return ResponseEntity.ok(responseData);
     }
 
-    @PostMapping("/confirm")
+    @PostMapping("/verify-otp")
     public ResponseEntity<?> confirm(@RequestBody ConfirmRegister confirmRegister) {
-        ResponseData<?> responseData = ResponseData.builder()
-                .status(200)
-                .message("Successfully confirmed")
-                .data(authService.confirm(confirmRegister.getEmail(), confirmRegister.getOtp()))
-                .build();
+        ResponseData<?> responseData;
+        if(authService.verifyOtp(confirmRegister.getEmail(), confirmRegister.getOtp())){
+            responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Successfully verify otp")
+                    .build();
+        }else{
+            responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Unsuccessfully verify otp")
+                    .build();
+        }
         return ResponseEntity.ok(responseData);
     }
 
@@ -76,13 +77,23 @@ public class AuthController {
         authService.logout(token);
         return ResponseEntity.ok(responseData);
     }
-    @PostMapping("validate_token")
-    public ResponseEntity<?> validateToken(@RequestBody String token) {
-        ResponseData<?> responseData = ResponseData.builder()
-                .status(200)
-                .message("Successfully validated")
-                .data(authService.validateToken(token))
-                .build();
+
+    @PostMapping("/validate_token")
+    public ResponseEntity<?> validateToken(@RequestBody ValidateTokenRequest token) {
+        ResponseData<?> responseData ;
+        if(authService.validateToken(token.getToken())) {
+            responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Token is valid")
+                    .data(null)
+                    .build();
+        } else {
+            responseData = ResponseData.builder()
+                    .status(400)
+                    .message("Token is invalid")
+                    .data(null)
+                    .build();
+        }
         return ResponseEntity.ok(responseData);
     }
 }

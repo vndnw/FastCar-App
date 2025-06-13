@@ -64,12 +64,9 @@ public class Booking {
     private BigDecimal rentalPrice; // ✅ Tổng giá thuê xe
     private BigDecimal reservationFee; // ✅ Phí giữ chỗ
     private BigDecimal depositAmount;  // ✅ Số tiền cọc (tạm tính)
-    private BigDecimal totalAmount; // ✅ Tổng số tiền thanh toán (bao gồm phí giữ chỗ, tiền thuê xe, và các khoản phụ thu nếu có)
-    private BigDecimal totalPaid; // ✅ Tổng số tiền đã thanh toán
     private BigDecimal totalRefunded; // ✅ Tổng số tiền đã hoàn trả (nếu có)
     private BigDecimal totalExtraCharges; // ✅ Tổng phụ thu (nếu có)
     private BigDecimal totalDiscount; // ✅ Tổng số tiền giảm giá (nếu có)
-    private BigDecimal totalLateFee; // ✅ Phí trễ hạn (nếu có)
 
     @Column(columnDefinition = "TEXT")
     private String description;

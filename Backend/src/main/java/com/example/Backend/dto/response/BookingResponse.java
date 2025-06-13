@@ -29,12 +29,9 @@ public class BookingResponse {
     private BigDecimal rentalPrice;
     private BigDecimal reservationFee;
     private BigDecimal depositAmount;
-    private BigDecimal totalAmount;
-    private BigDecimal totalPaid;
     private BigDecimal totalRefunded;
     private BigDecimal totalExtraCharges;
     private BigDecimal totalDiscount;
-    private BigDecimal totalLateFee;
     private String discountCode;
     private LocalDateTime createdAt;
 }

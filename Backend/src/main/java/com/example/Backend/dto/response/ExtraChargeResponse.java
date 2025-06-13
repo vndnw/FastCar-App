@@ -17,10 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExtraChargeResponse {
-    private long id;
-    private String bookingCode;
-    private String reason;
     private BigDecimal amount;
-    private ExtraChargeStatus status;
-    private LocalDateTime createdAt;
+    private String reason;
+
 }

@@ -6,14 +6,16 @@ import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.LocationMapper;
 import com.example.Backend.model.Location;
 import com.example.Backend.repository.LocationRepository;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
+@Slf4j
 @Service
 public class LocationService {
     private final LocationRepository locationRepository;
@@ -25,107 +27,68 @@ public class LocationService {
     }
 
     public Page<LocationResponse> getAllLocations(Pageable pageable) {
-        Page<Location> locations = locationRepository.findAll(pageable);
-        return locations.map(location -> locationMapper.mapToResponse(location));
+        return locationRepository.findAll(pageable)
+                .map(locationMapper::mapToResponse);
     }
 
     public LocationResponse getLocationById(Long id) {
-        Location location = locationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Location not found"));
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
         return locationMapper.mapToResponse(location);
     }
 
+    @Transactional
     public LocationResponse addLocation(LocationRequest locationRequest) {
-        String street, ward, district, city, address;
-
-        if (locationRequest.getAddress() != null && !locationRequest.getAddress().trim().isEmpty()) {
-            Map<String, String> addressParts = parseAddress(locationRequest.getAddress());
-            street = normalize(addressParts.get("street"));
-            ward = normalize(addressParts.get("ward"));
-            district = normalize(addressParts.get("district"));
-            city = normalize(addressParts.get("city"));
-        } else if (locationRequest.getStreet() != null && locationRequest.getWard() != null
-                && locationRequest.getDistrict() != null && locationRequest.getCity() != null) {
-            street = normalize(locationRequest.getStreet());
-            ward = normalize(locationRequest.getWard());
-            district = normalize(locationRequest.getDistrict());
-            city = normalize(locationRequest.getCity());
-        } else {
-            throw new IllegalArgumentException("Yêu cầu location không hợp lệ: cần cung cấp địa chỉ hoặc đầy đủ các thành phần (street, ward, district, city)");
-        }
-
-        address = street + ", " + ward + ", " + district + ", " + city;
-
-        Location location = Location.builder()
-                .address(address)
-                .street(street)
-                .ward(ward)
-                .district(district)
-                .city(city)
-                // .latitude(locationRequest.getLatitude())
-                // .longitude(locationRequest.getLongitude())
-                .build();
-
+        Location location = buildLocationEntity(locationRequest);
         return locationMapper.mapToResponse(locationRepository.save(location));
     }
 
+    @Transactional
     public Location createLocation(LocationRequest locationRequest) {
-        String street, ward, district, city, address;
-
-        if (locationRequest.getAddress() != null && !locationRequest.getAddress().trim().isEmpty()) {
-            Map<String, String> addressParts = parseAddress(locationRequest.getAddress());
-            street = normalize(addressParts.get("street"));
-            ward = normalize(addressParts.get("ward"));
-            district = normalize(addressParts.get("district"));
-            city = normalize(addressParts.get("city"));
-        } else if (locationRequest.getStreet() != null && locationRequest.getWard() != null
-                && locationRequest.getDistrict() != null && locationRequest.getCity() != null) {
-            street = normalize(locationRequest.getStreet());
-            ward = normalize(locationRequest.getWard());
-            district = normalize(locationRequest.getDistrict());
-            city = normalize(locationRequest.getCity());
-        } else {
-            throw new IllegalArgumentException("Yêu cầu location không hợp lệ: cần cung cấp địa chỉ hoặc đầy đủ các thành phần (street, ward, district, city)");
-        }
-
-        address = street + ", " + ward + ", " + district + ", " + city;
-
-        Location location = Location.builder()
-                .address(address)
-                .street(street)
-                .ward(ward)
-                .district(district)
-                .city(city)
-                // .latitude(locationRequest.getLatitude())
-                // .longitude(locationRequest.getLongitude())
-                .build();
-
+        Location location = buildLocationEntity(locationRequest);
         return locationRepository.save(location);
     }
 
-    public Location checkLocation(LocationRequest locationRequest) {
-        String address = "";
-        if(locationRequest.getStreet() != null && locationRequest.getWard() != null && locationRequest.getDistrict() != null && locationRequest.getCity() != null) {
-            String street = normalize(locationRequest.getStreet());
-            String ward = normalize(locationRequest.getWard());
-            String district = normalize(locationRequest.getDistrict());
-            String city = normalize(locationRequest.getCity());
-            address = street + ", " + ward + ", " + district + ", " + city;
-        }else {
-            address = locationRequest.getAddress();
+    @Transactional
+    public Location checkLocation(LocationRequest request) {
+        String address = buildNormalizedAddress(request);
+
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            Location existing = locationRepository
+                    .findByAddressAndLatitudeAndLongitude(address, request.getLatitude(), request.getLongitude());
+            return existing != null ? existing : createLocation(request);
         }
-        Location location = locationRepository.findLocationByAddress(address);
-        if (location == null) {
-            return createLocation(locationRequest);
-        }else return location;
+
+        Location existing = locationRepository.findLocationByAddress(address);
+        return existing != null ? existing : createLocation(request);
+    }
+    public Location checkLocationA(LocationRequest request) {
+        String address = buildNormalizedAddress(request);
+
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            Location existing = locationRepository
+                    .findByAddressAndLatitudeAndLongitude(address, request.getLatitude(), request.getLongitude());
+            return existing != null ? existing : buildLocationEntity(request);
+        }
+
+        Location existing = locationRepository.findLocationByAddress(address);
+        return existing != null ? existing : buildLocationEntity(request);
     }
 
 
     public LocationResponse updateLocation(Long id, LocationRequest locationRequest) {
-        Location location = locationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Location not found"));
-        location.setAddress(locationRequest.getAddress());
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Location not found"));
 
-//        location.setLongitude(locationRequest.getLongitude());
-//        location.setLatitude(locationRequest.getLatitude());
+        Location updated = buildLocationEntity(locationRequest);
+        location.setAddress(updated.getAddress());
+        location.setStreet(updated.getStreet());
+        location.setWard(updated.getWard());
+        location.setDistrict(updated.getDistrict());
+        location.setCity(updated.getCity());
+        location.setLatitude(updated.getLatitude());
+        location.setLongitude(updated.getLongitude());
+
         return locationMapper.mapToResponse(locationRepository.save(location));
     }
 
@@ -137,56 +100,98 @@ public class LocationService {
     }
 
 
-    private String normalize(String input) {
-        if (input == null) return null;
-        // Xoá khoảng trắng thừa, viết thường toàn bộ, sau đó viết hoa chữ cái đầu
-        String cleaned = input.trim().toLowerCase().replaceAll("\\s+", " ");
-        String[] words = cleaned.split(" ");
-        StringBuilder result = new StringBuilder();
+    public Location buildLocationEntity(LocationRequest request) {
+        String normalizedAddress = buildNormalizedAddress(request);
 
-        for (String word : words) {
+        log.info("Normalized address: " + request);
+
+        // Nếu người dùng chỉ nhập address, thì tách ra các phần
+        String street = request.getStreet();
+        String ward = request.getWard();
+        String district = request.getDistrict();
+        String city = request.getCity();
+
+        if (street == null || ward == null || district == null || city == null) {
+            Map<String, String> parts = parseAddress(normalizedAddress);
+            street = parts.get("street");
+            ward = parts.get("ward");
+            district = parts.get("district");
+            city = parts.get("city");
+        }
+
+        Location.LocationBuilder builder = Location.builder()
+                .address(normalizedAddress)
+                .street(normalize(street))
+                .ward(normalize(ward))
+                .district(normalize(district))
+                .city(normalize(city));
+
+        // Nếu có tọa độ thì set thêm
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            builder.latitude(request.getLatitude());
+            builder.longitude(request.getLongitude());
+//            builder.geom(geometryFactory.createPoint(
+//                    new Coordinate(request.getLongitude(), request.getLatitude())
+//            ));
+        }
+        return builder.build();
+    }
+
+    private String buildNormalizedAddress(LocationRequest request) {
+        if (request.getAddress() != null && !request.getAddress().trim().isEmpty()) {
+            Map<String, String> parts = parseAddress(request.getAddress());
+            return normalize(parts.get("street")) + ", " +
+                    normalize(parts.get("ward")) + ", " +
+                    normalize(parts.get("district")) + ", " +
+                    normalize(parts.get("city"));
+        } else if (request.getStreet() != null && request.getWard() != null &&
+                request.getDistrict() != null && request.getCity() != null) {
+            return normalize(request.getStreet()) + ", " +
+                    normalize(request.getWard()) + ", " +
+                    normalize(request.getDistrict()) + ", " +
+                    normalize(request.getCity());
+        } else {
+            throw new IllegalArgumentException("Địa chỉ không hợp lệ: cần đủ thông tin.");
+        }
+    }
+
+    private Map<String, String> parseAddress(String fullAddress) {
+        String[] parts = fullAddress.split(",");
+        if (parts.length < 4) {
+            throw new IllegalArgumentException("Invalid address format. Expected format: 'Street, Ward, District, City'");
+        }
+        Map<String, String> address = new HashMap<>();
+        address.put("street", parts[0].trim());
+        address.put("ward", parts[1].trim());
+        address.put("district", parts[2].trim());
+        address.put("city", parts[3].trim());
+        return address;
+    }
+
+    private String normalize(String input) {
+        if (input == null) return "";
+        String cleaned = input.trim().toLowerCase().replaceAll("\\s+", " ");
+        StringBuilder result = new StringBuilder();
+        for (String word : cleaned.split(" ")) {
             if (!word.isBlank()) {
                 result.append(Character.toUpperCase(word.charAt(0)))
                         .append(word.substring(1))
                         .append(" ");
             }
         }
-
         return result.toString().trim();
     }
 
-    private Map<String , String> parseAddress(String fullAddress) {
-        String[] parts = fullAddress.split(",");
-        Map<String, String> address = new HashMap<>();
-
-        if (parts.length >= 4) {
-            address.put("street", parts[0].trim());
-            address.put("ward", parts[1].trim());
-            address.put("district", parts[2].trim());
-            address.put("city", parts[3].trim());
-//            address.setStreet(parts[0].trim());
-//            address.setWard(parts[1].trim());
-//            address.setDistrict(parts[2].trim());
-//            address.setCity(parts[3].trim());
-        } else {
-            throw new IllegalArgumentException("Invalid address format. Expected format: 'Street, Ward, District, City'");
-        }
-        return address;
-    }
-
+    // Optional future use:
     private Map<String, String> extractCoordinates(String address) {
-        Map<String, String> coordinates = new HashMap<>();
-
-        // cập nhật phương thức để trích xuất tọa độ từ địa chỉ update sau giờ lười chưa bt làm
-        // Giả sử địa chỉ có định dạng "Latitude, Longitude"
-
         String[] parts = address.split(",");
         if (parts.length >= 2) {
+            Map<String, String> coordinates = new HashMap<>();
             coordinates.put("latitude", parts[0].trim());
             coordinates.put("longitude", parts[1].trim());
+            return coordinates;
         } else {
             throw new IllegalArgumentException("Invalid address format for coordinates. Expected format: 'Latitude, Longitude'");
         }
-        return coordinates;
     }
 }

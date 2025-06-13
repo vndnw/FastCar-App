@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DiscountResponse {
     private long id;
-    private String name;
-    private double price;
+    private String code;
     private double percent;
     private LocalDateTime startDate;
     private LocalDateTime endDate;

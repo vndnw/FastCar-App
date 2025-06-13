@@ -6,6 +6,7 @@ import com.example.Backend.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
-import java.security.Provider;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
@@ -45,12 +45,12 @@ public class JwtService {
         log.info("Roles: {}", getRole(userDetails));
 
         String token = Jwts.builder()
-                .setId(idToken)
+                .id(idToken)
                 .claim("roles", getRole(userDetails))
-                .setSubject(userDetails.getUsername())
-                .setIssuer(ISSUER)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + getExpiration(tokenType)))
+                .subject(userDetails.getUsername())
+                .issuer(ISSUER)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + getExpiration(tokenType)))
                 .signWith(getSigningKey(tokenType))
                 .compact();
         if(tokenType.equals(TokenType.REFRESH_TOKEN)){
@@ -69,11 +69,11 @@ public class JwtService {
                 .verifyWith(getSigningKey(tokenType))
                 .requireIssuer(ISSUER)
                 .build()
-                .parseClaimsJws(token)
+                .parseSignedClaims(token)
                 .getPayload();
     }
 
-    public String getRole(UserDetails userDetails) {
+    public String getRole(@NotNull UserDetails userDetails) {
         return userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -85,11 +85,11 @@ public class JwtService {
         return Arrays.asList(roles.split(","));
     }
 
-    public long getExpiration(TokenType tokenType) {
+    public long getExpiration(@NotNull TokenType tokenType) {
         return tokenType.equals(TokenType.ACCESS_TOKEN) ? EXPIRATION_ACCESS : EXPIRATION_REFRESH;
     }
 
-    public SecretKey getSigningKey(TokenType tokenType) {
+    public SecretKey getSigningKey(@NotNull TokenType tokenType) {
         return tokenType.equals(TokenType.ACCESS_TOKEN) ? Keys.hmacShaKeyFor(SECRETKEY_ACCESS.getBytes()) : Keys.hmacShaKeyFor(SECRETKEY_REFRESH.getBytes());
     }
 
@@ -101,7 +101,7 @@ public class JwtService {
         return extractAllClaims(token, tokenType).getId();
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token, @NotNull UserDetails userDetails) {
         String username = extractEmail(token, TokenType.ACCESS_TOKEN);
         return (username.equals(userDetails.getUsername()) && !isExpiration(token, TokenType.ACCESS_TOKEN));
     }

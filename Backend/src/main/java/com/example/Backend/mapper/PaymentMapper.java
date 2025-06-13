@@ -11,11 +11,7 @@ public class PaymentMapper {
                 .id(payment.getId())
                 .amount(payment.getAmount())
                 .type(payment.getType())
-                .method(payment.getMethod())
                 .status(payment.getStatus())
-                .bookingCode(payment.getBooking().getBookingCode())
-                .transactionCode(payment.getTransactionCode())
-                .createdAt(payment.getCreatedAt())
                 .build();
     }
 

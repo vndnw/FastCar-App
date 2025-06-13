@@ -1,11 +1,14 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
-import com.example.Backend.dto.request.CarFirstCreateRequest;
+import com.example.Backend.dto.request.BookingRequest;
+import com.example.Backend.dto.request.CarRequest;
 import com.example.Backend.dto.request.UserRequest;
+import com.example.Backend.service.BookingService;
 import com.example.Backend.service.CarService;
 import com.example.Backend.service.UserService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,14 +18,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final CarService carService;
+    private final BookingService bookingService;
 
-    public UserController(UserService userService, CarService carService) {
+    public UserController(UserService userService, CarService carService, BookingService bookingService) {
         this.userService = userService;
         this.carService = carService;
+        this.bookingService = bookingService;
     }
-
     @GetMapping
-    public ResponseEntity<?> getAllUsers(Pageable pageable) {
+    public ResponseEntity<?> getAllUsers(@PageableDefault(page = 0, size = 10) Pageable pageable) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Success")
@@ -39,6 +43,7 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(long id) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -80,24 +85,23 @@ public class UserController {
         userService.deleteUser(id);
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
-                .message("Success")
+                .message("Successfully deleted user")
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     // khởi tạo kí gửi xe với các thông tin basic  của car sau đó sẽ update thông tin sau
-    @PostMapping("/{id}/depositor")
-    public ResponseEntity<?> depositCar(@PathVariable long id, @RequestBody CarFirstCreateRequest carFirstCreateRequest) {
+    @PostMapping("/{id}/create-car")
+    public ResponseEntity<?> depositCar(@PathVariable long id, @RequestBody CarRequest carRequest) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(201)
                 .message("Car added successfully")
-                .data(carService.createCarBasic(id, carFirstCreateRequest))
+                .data(carService.createCar(id, carRequest))
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
-
     // tìm danh sách carvới userID
-    @GetMapping("/{id}/car")
+    @GetMapping("/{id}/list-car")
     public ResponseEntity<?> getAllCarByUserId(@PathVariable long id) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
