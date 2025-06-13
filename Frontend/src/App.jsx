@@ -16,29 +16,47 @@ import CarListing from './views/CarListing/CarListing';
 // === THÊM IMPORT CHO CAR DETAIL PAGE ===
 import CarDetail from './views/CarDetail/CarDetail';
 
+
+import { Navigate } from "react-router-dom";
+import Dashboard from "./views/admin/Home";
+import Tables from "./views/admin/Tables";
+import Billing from "./views/admin/Billing";
+import Profile from "./views/admin/Profile";
+import Main from "./components/admin/layout/Main";
+import "antd/dist/reset.css";
+import "./assets/styles/main.css";
+import "./assets/styles/responsive.css";
+
+
 function App() {
   return (
     <>
-      <div className="app">
-        <Navbar />
+      <Navbar />
+      <div className="content">
+        <Routes>
+          {/* Client routes */}
+          <Route path="/" element={<><HeroSection /><Home /></>} />
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/:cityName" element={<><HeroSection /><City /></>} />
+          <Route path="/xe-co-ngay" element={<CarListing />} />
+          <Route path="/car-detail/:carId" element={<CarDetail />} />          {
 
-        <div className="content">
-          <Routes>
-            <Route path="/" element={<><HeroSection /><Home /></>} />
-            <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/:cityName" element={<><HeroSection /><City /></>} />
+          /* Admin routes with layout */}
+          <Route path="/admin" element={<Main />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="tables" element={<Tables />} />
+            <Route path="billing" element={<Billing />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+          </Route>
 
-            {/* === THÊM ROUTE MỚI CHO CAR LISTING === */}
-            <Route path="/xe-co-ngay" element={<CarListing />} />
-
-            {/* === THÊM ROUTE MỚI CHO CAR DETAIL === */}
-            <Route path="/car-detail/:carId" element={<CarDetail />} />
-          </Routes>
-        </div>
+          {/* Fallback route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
-
       <Footer />
       <ScrollToTop />
     </>
