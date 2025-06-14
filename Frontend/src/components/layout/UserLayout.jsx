@@ -5,15 +5,16 @@ import ScrollToTop from "../ScrollToTop/ScrollToTop";
 import { Outlet } from "react-router-dom";
 
 function UserLayout() {
-    return (
+    return (<>
         <div className="app">
             <Navbar />
             <div className="content">
                 <Outlet />
             </div>
-            <Footer />
-            <ScrollToTop />
         </div>
+        <Footer />
+        <ScrollToTop />
+    </>
     );
 }
 
