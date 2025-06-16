@@ -14,19 +14,16 @@ public class TestController {
     // In a real application, you would inject an email service and use it here
     private final EmailService emailService;
     private final CloudinaryService cloudinaryService;
-
     public TestController(EmailService emailService, CloudinaryService cloudinaryService) {
         this.emailService = emailService;
         this.cloudinaryService = cloudinaryService;
     }
-
     // Example endpoint to send a test email
      @GetMapping("/sendEmail")
      public ResponseEntity<?> sendTestEmail() {
          emailService.sendOTPEmail("xuanduong.261104@gmail.com", "123456");
          return ResponseEntity.ok("Test email sent successfully");
      }
-
      @PostMapping("/uploadImage")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         String image = cloudinaryService.uploadImage(file);

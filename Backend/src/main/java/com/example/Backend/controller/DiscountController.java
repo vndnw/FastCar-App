@@ -59,4 +59,12 @@ public class DiscountController {
         discountService.deleteDiscount(id);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+    @GetMapping("/check/{code}")
+    public ResponseEntity<?> checkDiscountCode(@PathVariable String code) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Successfully checked discount code")
+                .data(discountService.getDiscountByCode(code))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
 }

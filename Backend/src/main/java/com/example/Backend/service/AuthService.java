@@ -3,6 +3,7 @@ package com.example.Backend.service;
 
 import com.example.Backend.dto.request.AuthRequest;
 import com.example.Backend.dto.request.RefreshRequest;
+import com.example.Backend.dto.request.RegisterRequest;
 import com.example.Backend.dto.request.UserRequest;
 import com.example.Backend.dto.response.AuthResponse;
 import com.example.Backend.dto.response.AuthValidateResponse;
@@ -12,6 +13,7 @@ import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.model.enums.TokenType;
 import com.example.Backend.repository.RefreshTokenRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,7 +52,7 @@ public class AuthService {
         this.otpService = otpService;
     }
 
-    public AuthResponse login(AuthRequest authRequest) {
+    public AuthResponse login(@NotNull AuthRequest authRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmailOrPhone(), authRequest.getPassword()));
         UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmailOrPhone());
         if (userDetails == null) {
@@ -66,11 +68,11 @@ public class AuthService {
                 .user(userService.getUserByEmail(userDetails.getUsername()))
                 .build();
     }
-    public UserResponse register(UserRequest userRequest) {
-        UserResponse userResponse = userService.createUser(userRequest);
-        String otp = otpService.generateOtp(userRequest.getEmail());
-        log.info("OTP register email "+ userRequest.getEmail() +": " + otp);
-        emailService.sendOTPEmail(userRequest.getEmail(), otp);
+    public UserResponse register(RegisterRequest registerRequest) {
+        UserResponse userResponse = userService.registerUser(registerRequest);
+        String otp = otpService.generateOtp(registerRequest.getEmail());
+        log.info("OTP register email "+ registerRequest.getEmail() +": " + otp);
+        emailService.sendOTPEmail(registerRequest.getEmail(), otp);
         return userResponse;
     }
     public boolean verifyOtp(String email, String otp) {

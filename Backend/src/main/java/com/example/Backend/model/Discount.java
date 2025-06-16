@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Data
-@Table(name = "Discounts")
+@Table(name = "discounts")
 public class Discount {
 
     @Id

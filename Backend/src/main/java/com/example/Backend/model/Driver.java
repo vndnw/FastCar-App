@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "Drivers")
+@Table(name = "drivers")
 public class Driver {
 
     @Id

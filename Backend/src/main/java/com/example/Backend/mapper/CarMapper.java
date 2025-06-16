@@ -27,7 +27,7 @@ public class CarMapper {
                 .year(car.getYear())
                 .name(car.getName())
                 .carType(car.getCarType())
-                .carBrand(carBrandMapper.mapToResponse(car.getCarBrand()))
+                .carBrand(carBrandMapper.mapToResponse(car.getBrand()))
                 .color(car.getColor())
                 .licensePlate(String.valueOf(car.getLicensePlate()))
                 .fuelType(car.getFuelType())

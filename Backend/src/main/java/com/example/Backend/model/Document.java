@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "car_documents")
+@Table(name = "documents")
 public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

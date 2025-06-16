@@ -7,6 +7,7 @@ import com.example.Backend.dto.request.UserRequest;
 import com.example.Backend.service.BookingService;
 import com.example.Backend.service.CarService;
 import com.example.Backend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -53,15 +54,6 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-//    @GetMapping("/search")
-//    public ResponseEntity<?> searchUser(String name, String email, String phone, Pageable pageable) {
-//        ResponseData<?> responseData = ResponseData.builder()
-//                .status(200)
-//                .message("Success")
-//                .data(userService.searchUser(name, email, phone, pageable))
-//                .build();
-//        return new ResponseEntity<>(responseData, HttpStatus.OK);
-//    }
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserRequest userRequest) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -111,7 +103,13 @@ public class UserController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-
-
-
+    @PostMapping("/{id}/book-car")
+    public ResponseEntity<?> bookCar(HttpServletRequest request, @PathVariable long id, @RequestBody BookingRequest bookingRequest) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(201)
+                .message("Booking created successfully")
+                .data(bookingService.createBooking(request, id, bookingRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+    }
 }

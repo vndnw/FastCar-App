@@ -1,31 +1,31 @@
 package com.example.Backend.mapper;
 
 import com.example.Backend.dto.response.CarConditionCheckResponse;
-import com.example.Backend.model.CarConditionCheck;
+import com.example.Backend.model.ConditionCheck;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CarConditionCheckMapper {
-    public CarConditionCheckResponse mapToResponse(CarConditionCheck carConditionCheck) {
+    public CarConditionCheckResponse mapToResponse(ConditionCheck conditionCheck) {
         return CarConditionCheckResponse.builder()
-                .id(carConditionCheck.getId())
-                .bookingCode(carConditionCheck.getBooking().getBookingCode())
-                .carId(carConditionCheck.getCar().getId())
-                .type(carConditionCheck.getType())
-                .odometer(carConditionCheck.getOdometer())
-                .fuelLevel(carConditionCheck.getFuelLevel())
-                .interiorStatus(carConditionCheck.getInteriorStatus())
-                .damageNote(carConditionCheck.getDamageNote())
-                .imageFrontUrl(carConditionCheck.getImageFrontUrl())
-                .imageRearUrl(carConditionCheck.getImageRearUrl())
-                .imageLeftUrl(carConditionCheck.getImageLeftUrl())
-                .imageRightUrl(carConditionCheck.getImageRightUrl())
-                .imageOdoUrl(carConditionCheck.getImageOdoUrl())
-                .imageFuelUrl(carConditionCheck.getImageFuelUrl())
-                .imageOtherUrl(carConditionCheck.getImageOtherUrl())
-                .status(carConditionCheck.getStatus())
-                .isChecked(carConditionCheck.isChecked())
-                .createdAt(carConditionCheck.getCreatedAt().toString()) // Assuming createdAt is a LocalDateTime
+                .id(conditionCheck.getId())
+                .bookingCode(conditionCheck.getBooking().getBookingCode())
+                .carId(conditionCheck.getCar().getId())
+                .type(conditionCheck.getType())
+                .odometer(conditionCheck.getOdometer())
+                .fuelLevel(conditionCheck.getFuelLevel())
+                .interiorStatus(conditionCheck.getInteriorStatus())
+                .damageNote(conditionCheck.getDamageNote())
+                .imageFrontUrl(conditionCheck.getImageFrontUrl())
+                .imageRearUrl(conditionCheck.getImageRearUrl())
+                .imageLeftUrl(conditionCheck.getImageLeftUrl())
+                .imageRightUrl(conditionCheck.getImageRightUrl())
+                .imageOdoUrl(conditionCheck.getImageOdoUrl())
+                .imageFuelUrl(conditionCheck.getImageFuelUrl())
+                .imageOtherUrl(conditionCheck.getImageOtherUrl())
+                .status(conditionCheck.getStatus())
+                .isChecked(conditionCheck.isChecked())
+                .createdAt(conditionCheck.getCreatedAt().toString()) // Assuming createdAt is a LocalDateTime
                 .build();
     }
 }

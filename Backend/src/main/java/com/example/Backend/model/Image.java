@@ -1,5 +1,6 @@
 package com.example.Backend.model;
 
+import com.example.Backend.model.enums.CarImageType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,26 +10,32 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
-@Table(name = "car_features")
-public class CarFeature {
+@Table(name = "images")
+public class Image {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String name;
-    private String iconUrl;
-    private String description;
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
-    @ManyToMany(mappedBy = "features")
-    private List<Car> cars;
+    @Column(length = 500)
+    private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    private CarImageType imageType;
+
+    @ManyToOne
+    @JoinColumn(name = "car_id")
+    private Car car;
+
+    @CreationTimestamp
+    private LocalDateTime creationAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updateAt;
 }

@@ -5,9 +5,8 @@ import com.example.Backend.dto.response.CarConditionCheckResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarConditionCheckMapper;
 import com.example.Backend.model.Booking;
-import com.example.Backend.model.CarConditionCheck;
+import com.example.Backend.model.ConditionCheck;
 import com.example.Backend.model.enums.CheckStatus;
-import com.example.Backend.model.enums.CheckType;
 import com.example.Backend.repository.BookingRepository;
 import com.example.Backend.repository.CarConditionCheckRepository;
 import org.jetbrains.annotations.NotNull;
@@ -35,33 +34,33 @@ public class CarConditionCheckService {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
 
-        CarConditionCheck carConditionCheck = new CarConditionCheck();
-        carConditionCheck.setBooking(booking);
-        carConditionCheck.setCar(booking.getCar());
-        carConditionCheck.setType(carConditionCheckRequest.getCheckType());
-        carConditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
-        carConditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
-        carConditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
-        carConditionCheck.setDamageNote(carConditionCheckRequest.getDamageNote());
-        carConditionCheck.setImageFrontUrl(carConditionCheckRequest.getImageFrontUrl());
-        carConditionCheck.setImageRearUrl(carConditionCheckRequest.getImageRearUrl());
-        carConditionCheck.setImageLeftUrl(carConditionCheckRequest.getImageLeftUrl());
-        carConditionCheck.setImageRightUrl(carConditionCheckRequest.getImageRightUrl());
-        carConditionCheck.setImageOdoUrl(carConditionCheckRequest.getImageOdoUrl());
-        carConditionCheck.setImageFuelUrl(carConditionCheckRequest.getImageFuelUrl());
-        carConditionCheck.setImageOtherUrl(carConditionCheckRequest.getImageOtherUrl());
-        carConditionCheck.setStatus(CheckStatus.PENDING);
-        carConditionCheck.setChecked(false);
+        ConditionCheck conditionCheck = new ConditionCheck();
+        conditionCheck.setBooking(booking);
+        conditionCheck.setCar(booking.getCar());
+        conditionCheck.setType(carConditionCheckRequest.getCheckType());
+        conditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
+        conditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
+        conditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
+        conditionCheck.setDamageNote(carConditionCheckRequest.getDamageNote());
+        conditionCheck.setImageFrontUrl(carConditionCheckRequest.getImageFrontUrl());
+        conditionCheck.setImageRearUrl(carConditionCheckRequest.getImageRearUrl());
+        conditionCheck.setImageLeftUrl(carConditionCheckRequest.getImageLeftUrl());
+        conditionCheck.setImageRightUrl(carConditionCheckRequest.getImageRightUrl());
+        conditionCheck.setImageOdoUrl(carConditionCheckRequest.getImageOdoUrl());
+        conditionCheck.setImageFuelUrl(carConditionCheckRequest.getImageFuelUrl());
+        conditionCheck.setImageOtherUrl(carConditionCheckRequest.getImageOtherUrl());
+        conditionCheck.setStatus(CheckStatus.PENDING);
+        conditionCheck.setChecked(false);
 
-        return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(carConditionCheck));
+        return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(conditionCheck));
     }
 
     public List<CarConditionCheckResponse> getCarConditionCheckByBookingId(long bookingId) {
-        List<CarConditionCheck> carConditionCheck = carConditionCheckRepository.findCarConditionCheckByBookingId(bookingId);
-        if(carConditionCheck.isEmpty()) {
+        List<ConditionCheck> conditionCheck = carConditionCheckRepository.findCarConditionCheckByBookingId(bookingId);
+        if(conditionCheck.isEmpty()) {
             throw new ResourceNotFoundException("Car condition checks not found for booking id: " + bookingId);
         }
-        return carConditionCheck.stream()
+        return conditionCheck.stream()
                 .map(carConditionCheckMapper::mapToResponse)
                 .toList();
     }
@@ -72,9 +71,9 @@ public class CarConditionCheckService {
     }
 
     public CarConditionCheckResponse getCarConditionCheckById(long id) {
-        CarConditionCheck carConditionCheck = carConditionCheckRepository.findById(id)
+        ConditionCheck conditionCheck = carConditionCheckRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car condition check not found with id: " + id));
-        return carConditionCheckMapper.mapToResponse(carConditionCheck);
+        return carConditionCheckMapper.mapToResponse(conditionCheck);
     }
 
     public boolean isCarConditionCheckExists(long bookingId) {
@@ -87,43 +86,43 @@ public class CarConditionCheckService {
     }
 
     public void deleteCarConditionCheckById(long id) {
-        CarConditionCheck carConditionCheck = carConditionCheckRepository.findById(id)
+        ConditionCheck conditionCheck = carConditionCheckRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car condition check not found with id: " + id));
-        carConditionCheckRepository.delete(carConditionCheck);
+        carConditionCheckRepository.delete(conditionCheck);
     }
 
     public void deleteCarConditionCheckByBookingId(long bookingId) {
-        List<CarConditionCheck> carConditionCheck = carConditionCheckRepository.findCarConditionCheckByBookingId(bookingId);
-        if(carConditionCheck.isEmpty()) {
+        List<ConditionCheck> conditionCheck = carConditionCheckRepository.findCarConditionCheckByBookingId(bookingId);
+        if(conditionCheck.isEmpty()) {
             throw new ResourceNotFoundException("Car condition checks not found for booking id: " + bookingId);
         }
-        carConditionCheckRepository.deleteAll(carConditionCheck);
+        carConditionCheckRepository.deleteAll(conditionCheck);
     }
 
     public CarConditionCheckResponse updateCarConditionCheckByBookingId(long id, @NotNull CarConditionCheckRequest carConditionCheckRequest) {
-        CarConditionCheck carConditionCheck = carConditionCheckRepository.findById(id)
+        ConditionCheck conditionCheck = carConditionCheckRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car condition check not found with id: " + id));
 
-        carConditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
-        carConditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
-        carConditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
-        carConditionCheck.setDamageNote(carConditionCheckRequest.getDamageNote());
-        carConditionCheck.setImageFrontUrl(carConditionCheckRequest.getImageFrontUrl());
-        carConditionCheck.setImageRearUrl(carConditionCheckRequest.getImageRearUrl());
-        carConditionCheck.setImageLeftUrl(carConditionCheckRequest.getImageLeftUrl());
-        carConditionCheck.setImageRightUrl(carConditionCheckRequest.getImageRightUrl());
-        carConditionCheck.setImageOdoUrl(carConditionCheckRequest.getImageOdoUrl());
-        carConditionCheck.setImageFuelUrl(carConditionCheckRequest.getImageFuelUrl());
-        carConditionCheck.setImageOtherUrl(carConditionCheckRequest.getImageOtherUrl());
+        conditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
+        conditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
+        conditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
+        conditionCheck.setDamageNote(carConditionCheckRequest.getDamageNote());
+        conditionCheck.setImageFrontUrl(carConditionCheckRequest.getImageFrontUrl());
+        conditionCheck.setImageRearUrl(carConditionCheckRequest.getImageRearUrl());
+        conditionCheck.setImageLeftUrl(carConditionCheckRequest.getImageLeftUrl());
+        conditionCheck.setImageRightUrl(carConditionCheckRequest.getImageRightUrl());
+        conditionCheck.setImageOdoUrl(carConditionCheckRequest.getImageOdoUrl());
+        conditionCheck.setImageFuelUrl(carConditionCheckRequest.getImageFuelUrl());
+        conditionCheck.setImageOtherUrl(carConditionCheckRequest.getImageOtherUrl());
 
-        return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(carConditionCheck));
+        return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(conditionCheck));
     }
 
     public CarConditionCheckResponse acceptedCarConditionCheck(long id, CheckStatus checkStatus) {
-        CarConditionCheck carConditionCheck = carConditionCheckRepository.findById(id)
+        ConditionCheck conditionCheck = carConditionCheckRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car condition check not found with id: " + id));
-        carConditionCheck.setStatus(checkStatus);
-        carConditionCheck.setChecked(true);
-        return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(carConditionCheck));
+        conditionCheck.setStatus(checkStatus);
+        conditionCheck.setChecked(true);
+        return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(conditionCheck));
     }
 }

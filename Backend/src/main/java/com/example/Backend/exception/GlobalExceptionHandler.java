@@ -3,6 +3,7 @@ package com.example.Backend.exception;
 import com.example.Backend.dto.ResponseData;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ValidationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,16 +54,16 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(400).body(errorResponse);
     }
-//    @ExceptionHandler(InvalidRequestException.class)
-//    public ResponseEntity<?> handleInvalidRequestException(InvalidRequestException e, HttpServletRequest request) {
-//        ResponseData errorResponse = ResponseData.builder()
-//                .status(400)
-//                .timestamp(LocalDateTime.now())
-//                .message(e.getMessage())
-//                .path(request.getRequestURI())
-//                .build();
-//        return ResponseEntity.status(400).body(errorResponse);
-//    }
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<?> handleInvalidRequestException(ValidationException e, HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
+                .status(400)
+                .timestamp(LocalDateTime.now())
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(400).body(errorResponse);
+    }
 
     @ExceptionHandler(RefreshTokenExpiredException.class)
     public ResponseEntity<?> handleRefreshTokenExpiredException(@NotNull RefreshTokenExpiredException e, @NotNull HttpServletRequest request) {

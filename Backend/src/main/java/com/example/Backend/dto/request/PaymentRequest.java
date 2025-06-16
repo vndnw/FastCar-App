@@ -1,6 +1,5 @@
 package com.example.Backend.dto.request;
 
-import com.example.Backend.model.enums.PaymentMethod;
 import com.example.Backend.model.enums.PaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

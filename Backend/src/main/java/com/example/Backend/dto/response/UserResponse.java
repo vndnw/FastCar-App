@@ -20,6 +20,7 @@ public class UserResponse {
     private String firstName;
     private String email;
     private String phone;
+    private BankInformationResponse bankInformation;
     private LocationResponse address;
     private String profilePicture;
     private LocalDate dateOfBirth;

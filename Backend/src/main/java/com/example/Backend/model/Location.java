@@ -36,6 +36,6 @@ public class Location {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Car> cars;
 
-    @OneToOne(mappedBy = "address", cascade = CascadeType.ALL)
-    private User user;
+    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
+    private List<User> user;
 }

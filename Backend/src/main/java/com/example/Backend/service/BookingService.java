@@ -70,8 +70,9 @@ public class BookingService {
         this.vnpayService = vnpayService;
     }
 
-    public ReservationFeeResponse createBooking(HttpServletRequest request, BookingRequest bookingRequest) {
-        BookingResponse bookingResponse = addBooking(bookingRequest);
+    public ReservationFeeResponse createBookingIsLogin(HttpServletRequest request, BookingRequest bookingRequest) {
+        User currentUser = getCurrentUser();
+        BookingResponse bookingResponse = addBooking(currentUser , bookingRequest);
         Payment payment = paymentService.addPayment(bookingResponse.getId(), PaymentRequest.builder()
                 .amount(bookingResponse.getReservationFee())
                 .type(PaymentType.RESERVED)
@@ -81,10 +82,25 @@ public class BookingService {
                 .bookingId(bookingResponse.getId())
                 .transactionCode(payment.getExternalRef())
                 .reservationFee(payment.getAmount())
-                .paymentUrl("hello")
+                .paymentUrl(paymentUrl)
                 .build();
     }
-
+    public ReservationFeeResponse createBooking(HttpServletRequest request, long userId ,BookingRequest bookingRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        BookingResponse bookingResponse = addBooking(user, bookingRequest);
+        Payment payment = paymentService.addPayment(bookingResponse.getId(), PaymentRequest.builder()
+                .amount(bookingResponse.getReservationFee())
+                .type(PaymentType.RESERVED)
+                .build());
+        String paymentUrl = vnpayService.generatePayUrl(request, payment.getAmount(),payment.getExternalRef());
+        return ReservationFeeResponse.builder()
+                .bookingId(bookingResponse.getId())
+                .transactionCode(payment.getExternalRef())
+                .reservationFee(payment.getAmount())
+                .paymentUrl(paymentUrl)
+                .build();
+    }
     public RentalFeeResponse createCheckin(long bookingId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
         Payment paymentRental = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
@@ -144,8 +160,7 @@ public class BookingService {
         return bookingMapper.mapToResponse(bookingRepository.save(booking));
     }
 
-    public BookingResponse addBooking(@NotNull BookingRequest bookingRequest) {
-        User user = getCurrentUser();
+    public BookingResponse addBooking(User user ,@NotNull BookingRequest bookingRequest) {
         Car car = carRepository.findById(bookingRequest.getCarId())
                 .orElseThrow(() -> new ResourceNotFoundException("Car not found with ID: " + bookingRequest.getCarId()));
 
@@ -240,6 +255,13 @@ public class BookingService {
         return bookings.map(bookingMapper::mapToResponse);
     }
 
+    public Page<BookingResponse> getUserBookingsNow(Pageable pageable) {
+        User currentUser = getCurrentUser();
+        // Find all confirmed bookings that are currently active
+        Page<Booking> bookings = bookingRepository.findByUserIdAndStatusNotAndStatusNot(currentUser.getId(), BookingStatus.COMPLETED, BookingStatus.CANCELLED, pageable);
+        return bookings.map(bookingMapper::mapToResponse);
+    }
+
     public List<BookingResponse> getUserBookingsByStatus(BookingStatus status) {
         User currentUser = getCurrentUser();
         List<Booking> bookings = bookingRepository.findByUserIdAndStatus(currentUser.getId(), status);
@@ -253,7 +275,7 @@ public class BookingService {
         LocalDateTime now = LocalDateTime.now();
 
         // Find all confirmed bookings that haven't started yet
-        List<Booking> bookings = bookingRepository.findByUserIdAndStatus(currentUser.getId(), BookingStatus.RESERVED)
+        List<Booking> bookings = bookingRepository.findByUserIdAndStatus(currentUser.getId(), BookingStatus.CONFIRMED)
                 .stream()
                 .filter(booking -> booking.getPickupTime().isAfter(now))
                 .sorted((b1, b2) -> b1.getPickupTime().compareTo(b2.getPickupTime()))
@@ -297,6 +319,15 @@ public class BookingService {
         return bookings.map(bookingMapper::mapToResponse);
     }
 
+    public Page<BookingResponse> getBookingsByUserId(Long userId, Pageable pageable) {
+        // Verify user exists
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        Page<Booking> bookings = bookingRepository.findByUserId(userId, pageable);
+        return bookings.map(bookingMapper::mapToResponse);
+    }
+
     @Transactional
     public BookingResponse updateBookingStatus(Long id, @NotNull BookingStatusUpdateRequest request) {
         Booking booking = bookingRepository.findById(id)
@@ -306,7 +337,7 @@ public class BookingService {
         BookingStatus newStatus = request.getStatus();
 
         // Security checks
-        if ((newStatus == BookingStatus.RESERVED || newStatus == BookingStatus.COMPLETED) && !isAdmin(currentUser)) {
+        if ((newStatus == BookingStatus.CONFIRMED || newStatus == BookingStatus.COMPLETED) && !isAdmin(currentUser)) {
             throw new AccessDeniedException("Not authorized to change booking status to " + newStatus);
         }
         if (newStatus == BookingStatus.CANCELLED &&

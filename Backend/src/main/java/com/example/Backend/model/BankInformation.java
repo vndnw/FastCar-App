@@ -1,6 +1,5 @@
 package com.example.Backend.model;
 
-import com.example.Backend.model.enums.CarImageType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,29 +12,24 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "car_images")
-public class CarImage {
-
+@Table(name = "bank_informations")
+public class BankInformation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(length = 500)
-    private String imageUrl;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Enumerated(EnumType.STRING)
-    private CarImageType imageType;
-
-    @ManyToOne
-    @JoinColumn(name = "car_id")
-    private Car car;
-
+    private String bankName;
+    private String accountNumber;
+    private String accountHolderName;
     @CreationTimestamp
-    private LocalDateTime creationAt;
-
+    private LocalDateTime createdAt;
     @UpdateTimestamp
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 }

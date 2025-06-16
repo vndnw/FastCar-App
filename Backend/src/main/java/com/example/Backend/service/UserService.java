@@ -1,6 +1,7 @@
 package com.example.Backend.service;
 
 
+import com.example.Backend.dto.request.RegisterRequest;
 import com.example.Backend.dto.request.UserRequest;
 import com.example.Backend.dto.response.UserResponse;
 import com.example.Backend.exception.ResourceAlreadyExistsException;
@@ -41,27 +42,21 @@ public class UserService {
         this.locationService = locationService;
     }
 
-    public UserResponse addUser(@NotNull UserRequest userRequest) {
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new ResourceAlreadyExistsException("User with email " + userRequest.getEmail() + " already exists");
-        }else if(userRepository.existsByPhone(userRequest.getPhone())){
-            throw new ResourceAlreadyExistsException("User with phone " + userRequest.getPhone() + " already exists");
+    public UserResponse registerUser(@NotNull RegisterRequest registerRequest) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new ResourceAlreadyExistsException("User with email " + registerRequest.getEmail() + " already exists");
+        }else if(userRepository.existsByPhone(registerRequest.getPhone())){
+            throw new ResourceAlreadyExistsException("User with phone " + registerRequest.getPhone() + " already exists");
         }
         User user = User.builder()
-                .firstName(userRequest.getFirstName())
-                .lastName(userRequest.getLastName())
-                .email(userRequest.getEmail())
-                .password(passwordEncoder.encode(userRequest.getPassword()))
-                .phone(userRequest.getPhone())
-                .address(locationService.checkLocation(userRequest.getAddress()))
-                .profilePicture(userRequest.getProfilePicture())
-                .dateOfBirth(userRequest.getDateOfBirth())
-                .active(false)
-                .roles(userRequest.getRoles().stream().map(role -> roleRepository.findByName(role).orElseThrow(() -> new ResourceNotFoundException("Role not found: " + role))).collect(Collectors.toList()))
+                .firstName(registerRequest.getFirstName())
+                .lastName(registerRequest.getLastName())
+                .email(registerRequest.getEmail())
+                .phone(registerRequest.getPhone())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .build();
         return userMapper.mapToResponse(userRepository.save(user));
     }
-
     public UserResponse createUser(@NotNull UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new ResourceAlreadyExistsException("User with email " + userRequest.getEmail() + " already exists");

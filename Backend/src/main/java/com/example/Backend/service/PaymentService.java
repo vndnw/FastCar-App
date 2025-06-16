@@ -82,7 +82,7 @@ public class PaymentService {
         if ("success".equalsIgnoreCase(status)) {
             payment.setStatus(PaymentStatus.SUCCESS);
             switch (payment.getType()) {
-                case RESERVED -> booking.setStatus(BookingStatus.RESERVED);
+                case RESERVED -> booking.setStatus(BookingStatus.CONFIRMED);
                 case RENTAL, DEPOSIT -> booking.setStatus(BookingStatus.USE_IN);
                 case REFUND, EXTRA_CHARGE -> booking.setStatus(BookingStatus.COMPLETED);
             }
@@ -132,7 +132,8 @@ public class PaymentService {
         Payment payment = paymentRepository.findPaymentByBookingAndType(booking, PaymentType.REFUND)
                 .orElseThrow(() -> new ResourceNotFoundException("No refund payment found for booking with id: " + bookingId));
         //ở đây có thể thêm logic gửi thông báo cho người dùng về việc hoàn tiền và mail
-        return paymentMapper.mapToResponse(payment);
+        payment.setStatus(PaymentStatus.REFUNDED);
+        return paymentMapper.mapToResponse(paymentRepository.save(payment));
     }
 
     public PaymentResponse processExtraCharge(long bookingId) {
@@ -143,8 +144,17 @@ public class PaymentService {
         }
         Payment payment = paymentRepository.findPaymentByBookingAndType(booking, PaymentType.EXTRA_CHARGE)
                 .orElseThrow(() -> new ResourceNotFoundException("No extra charge payment found for booking with id: " + bookingId));
-        // ở đây có thể thêm logic gửi thông báo cho người dùng về việc tính phí phụ thu và mail
+
+
+
         return paymentMapper.mapToResponse(payment);
+    }
+
+    public Payment getPaymentByBookingIdAndType(long bookingId, PaymentType type) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
+        return paymentRepository.findPaymentByBookingAndType(booking, type)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found for booking id: " + bookingId + " and type: " + type));
     }
 
     public List<PaymentResponse> getPaymentsByBookingId(long bookingId) {

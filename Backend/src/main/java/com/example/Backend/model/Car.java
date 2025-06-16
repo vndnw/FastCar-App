@@ -23,7 +23,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Entity
 @Data
-@Table(name = "Cars")
+@Table(name = "cars")
 public class Car {
 
     @Id
@@ -38,7 +38,7 @@ public class Car {
 
     @ManyToOne
     @JoinColumn(name = "carBrand_id")
-    private CarBrand carBrand;
+    private Brand brand;
 
     private String model;
 
@@ -72,13 +72,13 @@ public class Car {
     private String description;
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CarImage> images;
+    private List<Image> images;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "car_feature",
+    @JoinTable(name = "car_features",
         joinColumns = @JoinColumn(name = "car_id"),
-            inverseJoinColumns = @JoinColumn(name = "car_feature_id"))
-    private List<CarFeature> features;
+            inverseJoinColumns = @JoinColumn(name = "feature_id"))
+    private List<Feature> features;
 
 
     @Column(columnDefinition = "boolean default false")
@@ -97,7 +97,7 @@ public class Car {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CarConditionCheck> conditionChecks;
+    private List<ConditionCheck> conditionChecks;
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Document> documents;

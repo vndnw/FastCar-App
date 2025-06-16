@@ -16,17 +16,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "car_condition_checks")
-public class CarConditionCheck {
+@Table(name = "condition_checks")
+public class ConditionCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id")
     private Booking booking; // Assuming Booking is another entity in your application
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id")
     private Car car; // Assuming Car is another entity in your application
 

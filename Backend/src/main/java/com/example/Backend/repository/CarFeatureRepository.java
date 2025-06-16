@@ -1,9 +1,9 @@
 package com.example.Backend.repository;
 
-import com.example.Backend.model.CarFeature;
+import com.example.Backend.model.Feature;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CarFeatureRepository extends JpaRepository<CarFeature, Long> {
+public interface CarFeatureRepository extends JpaRepository<Feature, Long> {
 }

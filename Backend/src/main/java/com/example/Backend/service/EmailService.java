@@ -23,13 +23,11 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String FROM_EMAIL;
 
-
     private final JavaMailSender mailSender;
 
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
-
 
     @Async
     public void sendOTPEmail(String emailTo, String otp) {
@@ -45,7 +43,6 @@ public class EmailService {
             htmlContent = htmlContent.replace("${otpCode}", otp);
 
             mimeMessageHelper.setText(htmlContent, true);
-
 
             mailSender.send(mimeMessage);
 

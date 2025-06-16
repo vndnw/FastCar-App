@@ -4,7 +4,7 @@ import com.example.Backend.dto.request.CarFeatureRequest;
 import com.example.Backend.dto.response.CarFeatureResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarFeatureMapper;
-import com.example.Backend.model.CarFeature;
+import com.example.Backend.model.Feature;
 import com.example.Backend.repository.CarFeatureRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,38 +22,38 @@ public class CarFeatureService {
     }
 
     public CarFeatureResponse createCarFeature(CarFeatureRequest carFeatureRequest) {
-        CarFeature carFeature = CarFeature.builder()
+        Feature feature = Feature.builder()
                 .name(carFeatureRequest.getName())
                 .description(carFeatureRequest.getDescription())
                 .iconUrl(carFeatureRequest.getIconUrl())
                 .build();
-        return carFeatureMapper.mapToResponse(carFeatureRepository.save(carFeature));
+        return carFeatureMapper.mapToResponse(carFeatureRepository.save(feature));
     }
 
     public CarFeatureResponse updateCarFeature(long carFeatureId , CarFeatureRequest carFeatureRequest) {
-        CarFeature carFeature = carFeatureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
-        carFeature.setName(carFeatureRequest.getName());
-        carFeature.setDescription(carFeatureRequest.getDescription());
-        carFeature.setIconUrl(carFeatureRequest.getIconUrl());
-        return carFeatureMapper.mapToResponse(carFeatureRepository.save(carFeature));
+        Feature feature = carFeatureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
+        feature.setName(carFeatureRequest.getName());
+        feature.setDescription(carFeatureRequest.getDescription());
+        feature.setIconUrl(carFeatureRequest.getIconUrl());
+        return carFeatureMapper.mapToResponse(carFeatureRepository.save(feature));
     }
 
     public void deleteCarFeature(long carFeatureId) {
-        CarFeature carFeature = carFeatureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
-        carFeatureRepository.delete(carFeature);
+        Feature feature = carFeatureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
+        carFeatureRepository.delete(feature);
     }
 
-    public CarFeature getCarFeatureById(long carFeatureId) {
+    public Feature getCarFeatureById(long carFeatureId) {
         return carFeatureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
     }
 
     public CarFeatureResponse getCarFeature(long carFeatureId) {
-        CarFeature carFeature = carFeatureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
-        return carFeatureMapper.mapToResponse(carFeature);
+        Feature feature = carFeatureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
+        return carFeatureMapper.mapToResponse(feature);
     }
 
     public Page<CarFeatureResponse> getCarFeatures(Pageable pageable) {
-        Page<CarFeature> carFeaturePage = carFeatureRepository.findAll(pageable);
+        Page<Feature> carFeaturePage = carFeatureRepository.findAll(pageable);
         return carFeaturePage.map(carFeatureMapper::mapToResponse);
     }
 

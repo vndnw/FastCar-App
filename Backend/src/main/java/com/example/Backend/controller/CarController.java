@@ -2,6 +2,7 @@ package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
 import com.example.Backend.dto.request.*;
+import com.example.Backend.model.enums.CarStatus;
 import com.example.Backend.service.BookingService;
 import com.example.Backend.service.CarService;
 import com.example.Backend.service.DocumentService;
@@ -66,8 +67,16 @@ public class CarController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-
-
+    @PatchMapping("/{id}/update-status?status={status}")
+    public ResponseEntity<?> activeCar(@PathVariable("id") long id, @RequestParam("status") String status) {
+        CarStatus carStatus = CarStatus.valueOf(status);
+        boolean isActive = carService.updateStatus(id, carStatus);
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(isActive ? 200 : 400)
+                .message(isActive ? "Car activated successfully" : "Car is already active or has inactive documents")
+                .build();
+        return new ResponseEntity<>(responseData, isActive ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
     // Document related endpoints
     @PostMapping("/{id}/document")
     public ResponseEntity<?> createDocument(@PathVariable("id") long id, @RequestBody DocumentRequest documentRequest) {
@@ -77,6 +86,16 @@ public class CarController {
                 .data(documentService.createDocument(id,documentRequest))
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Search results found")
+                .data(carService.searchCars(criteria, pageable))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
 

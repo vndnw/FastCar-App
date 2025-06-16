@@ -3,16 +3,20 @@ package com.example.Backend.controller;
 import com.example.Backend.dto.ResponseData;
 import com.example.Backend.dto.request.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import com.example.Backend.dto.response.BookingResponse;
 import com.example.Backend.dto.response.PaymentResponse;
 import com.example.Backend.dto.response.ReservationFeeResponse;
+import com.example.Backend.model.Payment;
 import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.model.enums.PaymentType;
 import com.example.Backend.service.BookingService;
 import com.example.Backend.service.CarConditionCheckService;
 import com.example.Backend.service.PaymentService;
+import com.example.Backend.service.VNPAYService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +24,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,26 +34,27 @@ public class BookingController {
     private final BookingService bookingService;
     private final CarConditionCheckService carConditionCheckService;
     private final PaymentService paymentService;
+    private final VNPAYService vnpayService;
 
     @Autowired
     public BookingController(BookingService bookingService,
                              CarConditionCheckService carConditionCheckService  ,
-                             PaymentService paymentService) {
+                             PaymentService paymentService,
+                             VNPAYService vnpayService) {
         this.bookingService = bookingService;
         this.carConditionCheckService = carConditionCheckService;
         this.paymentService = paymentService;
+        this.vnpayService = vnpayService;
     }
-
     @PostMapping
     public ResponseEntity<ResponseData<?>> createBooking(HttpServletRequest request, @RequestBody BookingRequest bookingRequest) {
         ResponseData<?> response = ResponseData.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Booking created successfully")
-                .data(bookingService.createBooking(request, bookingRequest))
+                .data(bookingService.createBookingIsLogin(request, bookingRequest))
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<?>> getBookingById(@PathVariable Long id) {
         ResponseData<?> response = ResponseData.builder()
@@ -58,7 +64,15 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @GetMapping("/history")
+    public ResponseEntity<ResponseData<?>> getBookingHistory(@RequestParam("userId") Long userId , @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("Booking history retrieved successfully")
+                .data(bookingService.getBookingsByUserId(userId,pageable))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     @GetMapping("/my-bookings")
     public ResponseEntity<ResponseData<?>> getUserBookings(
             @PageableDefault(size = 10, page = 0) Pageable pageable) {
@@ -69,7 +83,15 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @GetMapping("/my-bookings/now")
+    public ResponseEntity<ResponseData<?>> getUserBookingsNow(@PageableDefault(size = 10, page = 0, sort = "createdAt") Pageable pageable) {
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("User bookings for now retrieved successfully")
+                .data(bookingService.getUserBookingsNow(pageable))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     @GetMapping("/my-bookings/status/{status}")
     public ResponseEntity<ResponseData<?>> getUserBookingsByStatus(
             @PathVariable BookingStatus status) {
@@ -80,7 +102,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @GetMapping("/my-bookings/upcoming")
     public ResponseEntity<ResponseData<?>> getUpcomingBookings() {
         ResponseData<?> response = ResponseData.builder()
@@ -90,7 +111,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @GetMapping
     public ResponseEntity<ResponseData<?>> getAllBookings(
             @PageableDefault(size = 10, page = 0) Pageable pageable) {
@@ -101,7 +121,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @GetMapping("/status/{status}")
     public ResponseEntity<ResponseData<?>> getBookingsByStatus(
             @PathVariable BookingStatus status,
@@ -113,7 +132,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @PatchMapping("/{id}/status")
     public ResponseEntity<ResponseData<?>> updateBookingStatus(
             @PathVariable Long id,
@@ -125,7 +143,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ResponseData<?>> cancelBooking(
             @PathVariable Long id,
@@ -137,7 +154,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @GetMapping("/check-availability")
     public ResponseEntity<ResponseData<?>> checkCarAvailability(
             @RequestParam Long carId,
@@ -152,7 +168,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @GetMapping("/car/{carId}")
     public ResponseEntity<ResponseData<?>> getBookingsByCarId(
             @PathVariable Long carId,
@@ -164,8 +179,6 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
     // tải thông tin hình ảnh xe để check
     @PostMapping("/{bookingId}/condition-check")
     public ResponseEntity<ResponseData<?>> createCarConditionCheckBefore(
@@ -213,14 +226,32 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/{id}/refund")
-    public ResponseEntity<?> processRefund(@PathVariable long id) {
-        ResponseData<?> response = ResponseData.builder()
-                .status(HttpStatus.OK.value())
-                .message("Refund processed successfully")
-                .data(paymentService.processRefund(id))
-                .build();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> createRefund(HttpServletRequest request, @PathVariable Long id) {
+        Payment refundPayment = paymentService.getPaymentByBookingIdAndType(id, PaymentType.REFUND);
+        if (refundPayment == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Không tìm thấy yêu cầu hoàn tiền cho booking này"));
+        }
+        String vnp_TxnRef = "14389106";
+        BigDecimal originalAmount = refundPayment.getAmount();
+
+        String createBy = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Map<String, String> vnPayResponse = vnpayService.refund(
+                request,
+                vnp_TxnRef,
+                originalAmount,
+                createBy
+        );
+        String responseCode = vnPayResponse.get("vnp_ResponseCode");
+        if ("00".equals(responseCode)) {
+            paymentService.processRefund(id);
+            return ResponseEntity.ok(Map.of("message", "Yêu cầu hoàn tiền thành công", "data", vnPayResponse));
+        } else {
+
+            return ResponseEntity.badRequest().body(Map.of("message", "Yêu cầu hoàn tiền thất bại", "data", vnPayResponse));
+        }
     }
+
     @PostMapping("/{id}/extra-charge")
     public ResponseEntity<?> processExtraCharge(@PathVariable long id) {
          ResponseData<?> response = ResponseData.builder()

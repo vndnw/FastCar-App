@@ -4,6 +4,7 @@ import com.example.Backend.dto.ResponseData;
 import com.example.Backend.dto.request.*;
 import com.example.Backend.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,19 +27,17 @@ public class AuthController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
-
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Successfully registered")
-                .data(authService.register(userRequest))
+                .data(authService.register(registerRequest))
                 .build();
         return ResponseEntity.ok(responseData);
     }
-
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> confirm(@RequestBody ConfirmRegister confirmRegister) {
+    public ResponseEntity<?> confirm(@RequestBody @Valid ConfirmRegister confirmRegister) {
         ResponseData<?> responseData;
         if(authService.verifyOtp(confirmRegister.getEmail(), confirmRegister.getOtp())){
             responseData = ResponseData.builder()
@@ -53,7 +52,6 @@ public class AuthController {
         }
         return ResponseEntity.ok(responseData);
     }
-
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody RefreshRequest refreshRequest) {
         ResponseData<?> responseData = ResponseData.builder()
