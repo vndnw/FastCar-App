@@ -1,47 +1,50 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import UserLayout from './components/layout/UserLayout';
+import HeroSection from './components/HeroSection/HeroSection';
 import Home from './views/Home/Home';
-import Navbar from './components/Navbar/Navbar';
 import About from './views/About/About';
 import City from './views/Locations/City';
-import ScrollToTop from './components/ScrollToTop/ScrollToTop';
-import Footer from './components/Footer/Footer';
-import HeroSection from './components/HeroSection/HeroSection';
 import Login from './components/Login/Login';
 import Register from './components/Login/Register';
-
-// === THÊM IMPORT CHO CARLIST PAGE ===
 import CarListing from './views/CarListing/CarListing';
-
-// === THÊM IMPORT CHO CAR DETAIL PAGE ===
 import CarDetail from './views/CarDetail/CarDetail';
+
+// Admin
+import Dashboard from "./views/admin/Home";
+import Tables from "./views/admin/Tables";
+import Billing from "./views/admin/Billing";
+import Profile from "./views/admin/Profile";
+import Main from "./components/admin/layout/Main";
+
 
 function App() {
   return (
-    <>
-      <div className="app">
-        <Navbar />
+    <Routes>
 
-        <div className="content">
-          <Routes>
-            <Route path="/" element={<><HeroSection /><Home /></>} />
-            <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/:cityName" element={<><HeroSection /><City /></>} />
+      {/* Layout cho trang người dùng */}
+      <Route element={<UserLayout />}>
+        <Route path="/" element={<><HeroSection /><Home /></>} />
+        <Route path="/about" element={<About />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/:cityName" element={<><HeroSection /><City /></>} />
+        <Route path="/xe-co-ngay" element={<CarListing />} />
+        <Route path="/car-detail/:carId" element={<CarDetail />} />
+      </Route>
 
-            {/* === THÊM ROUTE MỚI CHO CAR LISTING === */}
-            <Route path="/xe-co-ngay" element={<CarListing />} />
+      {/* Layout cho trang admin */}
+      <Route path="/admin" element={<Main />}>
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="tables" element={<Tables />} />
+        <Route path="billing" element={<Billing />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+      </Route>
 
-            {/* === THÊM ROUTE MỚI CHO CAR DETAIL === */}
-            <Route path="/car-detail/:carId" element={<CarDetail />} />
-          </Routes>
-        </div>
-      </div>
-
-      <Footer />
-      <ScrollToTop />
-    </>
+      {/* Fallback nếu route không khớp */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
