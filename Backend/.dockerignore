@@ -1,0 +1,7 @@
+# Nội dung file .dockerignore
+.git
+.idea
+target/
+.mvn/
+mvnw
+mvnw.cmd

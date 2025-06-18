@@ -1,0 +1,40 @@
+# docker-compose.yml (phiên bản nâng cao cho production)
+
+version: '3.8'
+
+services:
+  app:
+    image: voxuanduong/bookingacar:latest
+    container_name: spring-boot-app
+    # Thêm dòng này để container tự khởi động lại khi gặp lỗi hoặc khi server reboot
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=production
+    depends_on:
+      - redis
+    networks:
+      - spring-redis-net
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    # Thêm dòng này cho Redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - spring-redis-net
+    # Trong môi trường production, nếu không cần truy cập Redis từ bên ngoài server,
+    # bạn có thể comment/xóa phần ports này đi để tăng bảo mật.
+    ports:
+      - "6379:6379"
+
+networks:
+  spring-redis-net:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
