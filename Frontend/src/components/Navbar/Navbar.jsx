@@ -68,6 +68,10 @@ const Navbar = () => {
             Về chúng tôi
           </Link>
 
+          <Link to="/owner-car" className="navbar-link">
+            Trở thành chủ xe
+          </Link>
+
           {/* Select Location */}
           <div className="navbar-location">
             <EnvironmentOutlined className="navbar-location-icon" />

@@ -15,6 +15,7 @@ import Tables from "./views/admin/Tables";
 import Billing from "./views/admin/Billing";
 import Profile from "./views/admin/Profile";
 import Main from "./components/admin/layout/Main";
+import OwnerCar from './views/OwnerCar/OwnerCar';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <Route element={<UserLayout />}>
         <Route path="/" element={<><HeroSection /><Home /></>} />
         <Route path="/about" element={<About />} />
+        <Route path="/owner-car" element={<OwnerCar />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/:cityName" element={<><HeroSection /><City /></>} />
