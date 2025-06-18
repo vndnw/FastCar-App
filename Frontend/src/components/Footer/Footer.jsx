@@ -8,7 +8,7 @@ const Footer = () => {
     <div className="footer-container">
       <div className="footer-content">
         <Row gutter={[16, 16]} justify="space-between">
-          <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+          <Col xs={24} sm={24} md={7} lg={7} xl={7}>
             <div className="footer-column">
               <div className="navbar-logo" style={{ cursor: 'pointer' }}>
                 <CarOutlined />
