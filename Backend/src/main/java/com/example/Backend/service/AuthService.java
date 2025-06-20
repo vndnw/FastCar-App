@@ -68,6 +68,7 @@ public class AuthService {
                 .user(userService.getUserByEmail(userDetails.getUsername()))
                 .build();
     }
+
     public UserResponse register(RegisterRequest registerRequest) {
         UserResponse userResponse = userService.registerUser(registerRequest);
         String otp = otpService.generateOtp(registerRequest.getEmail());
@@ -116,5 +117,13 @@ public class AuthService {
             return false;
         }
         return jwtService.validateToken(token, userDetailsService.loadUserByUsername(jwtService.extractEmail(token, TokenType.ACCESS_TOKEN)));
+    }
+
+    public boolean checkEmailExists(String email) {
+        return userService.checkEmailExists(email);
+    }
+
+    public boolean changePassword(String email, String newPassword) {
+        return userService.changePassword(email, newPassword);
     }
 }

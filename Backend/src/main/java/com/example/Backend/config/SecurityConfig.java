@@ -1,6 +1,8 @@
 package com.example.Backend.config;
 
 import com.example.Backend.service.UserDetailsServiceCustom;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,10 +22,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${cors_allowed_origins}")
+    private String CORS_ALLOWED_ORIGINS ;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
@@ -51,13 +58,7 @@ public class SecurityConfig {
         return daoAuthenticationProvider;
     }
 
-    private List<String> allowedOrigins = List.of(
-            "http://localhost:3000",
-            "https://example.com",
-            "https://www.example.com"
-    );
-
-    private String[] URL_PUBLIC  = {
+    private final String[] URL_PUBLIC  = {
             "/auth/login",
             "/auth/register",
             "/api/v1/auth/refresh",
@@ -81,17 +82,27 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
         );
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
+
+    private List<String> allowedOrigins; // Khai báo nhưng chưa khởi tạo
+
+    @PostConstruct
+    public void init() {
+        // Phương thức này sẽ chạy sau khi CORS_ALLOWED_ORIGINS đã có giá trị
+        this.allowedOrigins = Arrays.stream(CORS_ALLOWED_ORIGINS.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
+    }
+
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.addAllowedOrigin("http://localhost:3000");
+        corsConfiguration.setAllowedOrigins(allowedOrigins);
         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
-        //        corsConfiguration.setAllowCredentials(true);
+        // corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);

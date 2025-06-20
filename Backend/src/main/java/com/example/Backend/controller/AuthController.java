@@ -6,6 +6,7 @@ import com.example.Backend.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,7 @@ public class AuthController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -36,6 +38,7 @@ public class AuthController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
     @PostMapping("/verify-otp")
     public ResponseEntity<?> confirm(@RequestBody @Valid ConfirmRegister confirmRegister) {
         ResponseData<?> responseData;
@@ -52,6 +55,7 @@ public class AuthController {
         }
         return ResponseEntity.ok(responseData);
     }
+
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody RefreshRequest refreshRequest) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -62,6 +66,7 @@ public class AuthController {
         return ResponseEntity.ok(responseData);
     }
 
+    @PreAuthorize("hasRole('user')")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -93,5 +98,35 @@ public class AuthController {
                     .build();
         }
         return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/check-email-exists")
+    public ResponseEntity<?> checkEmailExists(@RequestParam String email) {
+        boolean exists = authService.checkEmailExists(email);
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Email existence check completed")
+                .data(exists)
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam String email, @RequestParam String newPassword) {
+        if(authService.changePassword(email, newPassword)) {
+            ResponseData<?> responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Password changed successfully")
+                    .data(null)
+                    .build();
+            return ResponseEntity.ok(responseData);
+        }else {
+            ResponseData<?> responseData = ResponseData.builder()
+                    .status(400)
+                    .message("Failed to change password")
+                    .data(null)
+                    .build();
+            return ResponseEntity.badRequest().body(responseData);
+        }
     }
 }

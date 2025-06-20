@@ -1,9 +1,12 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.config.VNPAYConfig;
+import com.example.Backend.dto.ResponseData;
 import com.example.Backend.service.PaymentService;
 import com.example.Backend.service.VNPAYService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +24,6 @@ public class PaymentController {
         this.paymentService = paymentService;
         this.vnpayService = vnpayService;
     }
-
     @GetMapping("/vnpay-payment-return")
     public ResponseEntity<String> paymentReturn(HttpServletRequest request) {
         Map<String, String> fields = vnpayService.extractVnpParams(request);
@@ -47,7 +49,6 @@ public class PaymentController {
             return ResponseEntity.ok("FAILED");
         }
     }
-
     @GetMapping("/vnpay-ipn")
     public ResponseEntity<?> vnpayIpn(HttpServletRequest request) {
         Map<String, String> fields = vnpayService.extractVnpParams(request);
@@ -73,10 +74,46 @@ public class PaymentController {
             return ResponseEntity.ok("FAILED");
         }
     }
-
-    @PostMapping("/extra-charge")
-    public ResponseEntity<?> processExtraCharge(String transactionId, String reason) {
-        // paymentService.processExtraCharge(transactionId, reason);
-        return ResponseEntity.ok("Extra charge processed successfully");
+//    @PostMapping("/extra-charge")
+//    public ResponseEntity<?> processExtraCharge(String transactionId, String reason) {
+//        // paymentService.processExtraCharge(transactionId, reason);
+//        return ResponseEntity.ok("Extra charge processed successfully");
+//    }
+    @GetMapping
+    public ResponseEntity<?> getAllPayments(@PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Success")
+                .status(200)
+                .data(paymentService.getAllPayments(pageable))
+                .build();
+        return ResponseEntity.ok(responseData);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPaymentById(@PathVariable Long id) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Payment retrieved successfully")
+                .status(200)
+                .data(paymentService.getPaymentById(id))
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @GetMapping("/booking/{bookingId}")
+    public ResponseEntity<?> getPaymentsByBookingId(@PathVariable Long bookingId) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Payments retrieved successfully")
+                .status(200)
+                .data(paymentService.getPaymentsByBookingId(bookingId))
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePayment(@PathVariable Long id) {
+        paymentService.deletePayment(id);
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Payment deleted successfully")
+                .status(200)
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
 }

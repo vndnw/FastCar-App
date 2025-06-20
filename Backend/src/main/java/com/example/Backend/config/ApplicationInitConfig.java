@@ -39,14 +39,14 @@ public class ApplicationInitConfig {
             }
 
             Role customerRole;
-            if (roleRepository.findByName("customer").isEmpty()) {
+            if (roleRepository.findByName("user").isEmpty()) {
                 customerRole = Role.builder()
-                        .name("customer")
+                        .name("user")
                         .build();
                 roleRepository.save(customerRole);
-                log.info("ROLE 'customer' has been created");
+                log.info("ROLE 'user' has been created");
             } else {
-                customerRole = roleRepository.findByName("customer").get();
+                customerRole = roleRepository.findByName("user").get();
             }
             
             Role driverRole;
@@ -59,12 +59,23 @@ public class ApplicationInitConfig {
             } else {
                 driverRole = roleRepository.findByName("driver").get();
             }
+            Role ownerRole;
+            if (roleRepository.findByName("driver").isEmpty()) {
+                ownerRole = Role.builder()
+                        .name("driver")
+                        .build();
+                roleRepository.save(ownerRole);
+                log.info("ROLE 'driver' has been created");
+            } else {
+                ownerRole = roleRepository.findByName("driver").get();
+            }
 
             if (userRepository.findByEmail("admin@gmail.com").isEmpty()) {
                 List<Role> adminRoles = new ArrayList<>();
                 adminRoles.add(adminRole);
                 adminRoles.add(customerRole);
                 adminRoles.add(driverRole);
+                adminRoles.add(ownerRole);
                 
                 User admin = User.builder()
                         .email("admin@gmail.com")
@@ -75,12 +86,12 @@ public class ApplicationInitConfig {
                 log.info("ADMIN has been created with default password 'admin'");
             }
             
-            if (userRepository.findByEmail("customer@gmail.com").isEmpty()) {
+            if (userRepository.findByEmail("user@gmail.com").isEmpty()) {
                 List<Role> customerRoles = new ArrayList<>();
                 customerRoles.add(customerRole);
                 
                 User customer = User.builder()
-                        .email("customer@gmail.com")
+                        .email("user@gmail.com")
                         .password(passwordEncoder.encode("customer"))
                         .roles(customerRoles)
                         .build();

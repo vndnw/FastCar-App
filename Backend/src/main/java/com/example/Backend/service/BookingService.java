@@ -45,6 +45,7 @@ public class BookingService {
     private final PaymentService paymentService;
     private final CarConditionCheckService carConditionCheckService;
     private final VNPAYService vnpayService;
+    private final EmailService emailService;
 
     @Autowired
     public BookingService(
@@ -57,7 +58,7 @@ public class BookingService {
             LocationService locationService,
             PaymentService paymentService,
             CarConditionCheckService carConditionCheckService,
-            VNPAYService vnpayService) {
+            VNPAYService vnpayService, EmailService emailService) {
         this.bookingRepository = bookingRepository;
         this.carRepository = carRepository;
         this.userRepository = userRepository;
@@ -68,6 +69,7 @@ public class BookingService {
         this.paymentService = paymentService;
         this.carConditionCheckService = carConditionCheckService;
         this.vnpayService = vnpayService;
+        this.emailService = emailService;
     }
 
     public ReservationFeeResponse createBookingIsLogin(HttpServletRequest request, BookingRequest bookingRequest) {
@@ -113,7 +115,7 @@ public class BookingService {
                 .build());
         List<Long> transactionIds = List.of(paymentRental.getId(), paymentDeposit.getId());
 
-        //ở đây sẽ thêm logicthuwuc hiện thanh toán cho tiền thuê xe và tiền cọc bằng VNPAY
+        String paymentUrl = vnpayService.generatePayUrl(null, paymentRental.getAmount().add(paymentDeposit.getAmount()), paymentRental.getExternalRef());
 
         return RentalFeeResponse.builder()
                 .rentalFee(paymentRental.getAmount())
@@ -121,7 +123,7 @@ public class BookingService {
                 .totalFee(paymentDeposit.getAmount().add(paymentRental.getAmount()))
                 .bookingId(booking.getId())
                 .transactionId(transactionIds)
-                .paymentUrl("https://vnpay.vn") // Placeholder URL, replace with actual payment URL
+                .paymentUrl(paymentUrl) // Placeholder URL, replace with actual payment URL
                 .build();
     }
 
@@ -134,7 +136,6 @@ public class BookingService {
         List<ExtraChargeRequest> extraCharges = checkoutRequest.getExtraCharges();
         BigDecimal totalExtraCharges = extraCharges.stream().map(ExtraChargeRequest::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalRefunded = depositAmount.subtract(totalExtraCharges);
-
 
         int compare = totalRefunded.compareTo(BigDecimal.ZERO);
         if (compare == 0) {
@@ -156,6 +157,8 @@ public class BookingService {
 
         booking.setTotalExtraCharges(totalExtraCharges);
         booking.setTotalRefunded(totalRefunded);
+
+        emailService.sendMailCheckOut(booking);
 
         return bookingMapper.mapToResponse(bookingRepository.save(booking));
     }

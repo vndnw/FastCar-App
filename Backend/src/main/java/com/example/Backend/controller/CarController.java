@@ -10,6 +10,7 @@ import com.example.Backend.service.ReviewCarService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,6 +59,7 @@ public class CarController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCar(@PathVariable("id") long id) {
         carService.deleteCar(id);
@@ -67,8 +69,8 @@ public class CarController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-    @PatchMapping("/{id}/update-status?status={status}")
-    public ResponseEntity<?> activeCar(@PathVariable("id") long id, @RequestParam("status") String status) {
+    @PatchMapping("/{id}/update-status/{status}")
+    public ResponseEntity<?> activeCar(@PathVariable("id") long id, @PathVariable("status") String status) {
         CarStatus carStatus = CarStatus.valueOf(status);
         boolean isActive = carService.updateStatus(id, carStatus);
         ResponseData<?> responseData = ResponseData.builder()

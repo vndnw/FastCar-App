@@ -24,6 +24,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +47,7 @@ public class BookingController {
         this.paymentService = paymentService;
         this.vnpayService = vnpayService;
     }
+    @PreAuthorize("hasRole('admin')")
     @PostMapping
     public ResponseEntity<ResponseData<?>> createBooking(HttpServletRequest request, @RequestBody BookingRequest bookingRequest) {
         ResponseData<?> response = ResponseData.builder()
@@ -55,6 +57,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('user')")
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<?>> getBookingById(@PathVariable Long id) {
         ResponseData<?> response = ResponseData.builder()
@@ -64,6 +68,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('user')")
     @GetMapping("/history")
     public ResponseEntity<ResponseData<?>> getBookingHistory(@RequestParam("userId") Long userId , @PageableDefault(size = 10, page = 0) Pageable pageable) {
         ResponseData<?> response = ResponseData.builder()
@@ -73,6 +79,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('user')")
     @GetMapping("/my-bookings")
     public ResponseEntity<ResponseData<?>> getUserBookings(
             @PageableDefault(size = 10, page = 0) Pageable pageable) {
@@ -92,6 +100,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('user')")
     @GetMapping("/my-bookings/status/{status}")
     public ResponseEntity<ResponseData<?>> getUserBookingsByStatus(
             @PathVariable BookingStatus status) {
@@ -102,6 +112,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('user')")
     @GetMapping("/my-bookings/upcoming")
     public ResponseEntity<ResponseData<?>> getUpcomingBookings() {
         ResponseData<?> response = ResponseData.builder()
@@ -111,6 +123,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @GetMapping
     public ResponseEntity<ResponseData<?>> getAllBookings(
             @PageableDefault(size = 10, page = 0) Pageable pageable) {
@@ -121,6 +135,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @GetMapping("/status/{status}")
     public ResponseEntity<ResponseData<?>> getBookingsByStatus(
             @PathVariable BookingStatus status,
@@ -132,6 +148,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ResponseData<?>> updateBookingStatus(
             @PathVariable Long id,
@@ -143,6 +161,9 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @PreAuthorize("hasRole('admin')")
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ResponseData<?>> cancelBooking(
             @PathVariable Long id,
@@ -154,6 +175,9 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @PreAuthorize("hasRole('admin')")
     @GetMapping("/check-availability")
     public ResponseEntity<ResponseData<?>> checkCarAvailability(
             @RequestParam Long carId,
@@ -168,6 +192,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('owner')")
     @GetMapping("/car/{carId}")
     public ResponseEntity<ResponseData<?>> getBookingsByCarId(
             @PathVariable Long carId,
@@ -179,7 +205,9 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     // tải thông tin hình ảnh xe để check
+    @PreAuthorize("hasRole('owner')")
     @PostMapping("/{bookingId}/condition-check")
     public ResponseEntity<ResponseData<?>> createCarConditionCheckBefore(
             @PathVariable Long bookingId,
@@ -192,6 +220,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('user')")
     @PostMapping("/{id}/checkin")
     public ResponseEntity<ResponseData<?>> createCheckin(@PathVariable long id){
         if (!carConditionCheckService.isCarConditionCheckExists(id)) {
@@ -207,6 +237,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('owner')")
     @PostMapping("/{id}/checkout")
     public ResponseEntity<ResponseData<?>> createCheckout(@PathVariable long id, @RequestBody CheckoutRequest checkoutRequest) {
         ResponseData<?> response = ResponseData.builder()
@@ -216,6 +248,7 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @PostMapping("/{id}/finalize")
     public ResponseEntity<ResponseData<?>> finalizeBooking(@PathVariable long id) {
         ResponseData<?> response = ResponseData.builder()
@@ -225,6 +258,8 @@ public class BookingController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @PostMapping("/{id}/refund")
     public ResponseEntity<?> createRefund(HttpServletRequest request, @PathVariable Long id) {
         Payment refundPayment = paymentService.getPaymentByBookingIdAndType(id, PaymentType.REFUND);
@@ -252,12 +287,13 @@ public class BookingController {
         }
     }
 
+    @PreAuthorize("hasRole('admin')")
     @PostMapping("/{id}/extra-charge")
-    public ResponseEntity<?> processExtraCharge(@PathVariable long id) {
+    public ResponseEntity<?> processExtraCharge(HttpServletRequest request,@PathVariable long id) {
          ResponseData<?> response = ResponseData.builder()
                 .status(HttpStatus.OK.value())
                 .message("Extra charge processed successfully")
-                .data(paymentService.processExtraCharge(id))
+                .data(paymentService.processExtraCharge(request,id))
                 .build();
         return ResponseEntity.ok(response);
     }

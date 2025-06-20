@@ -7,6 +7,7 @@ import com.example.Backend.service.DocumentService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,8 @@ public class DocumentController {
     public DocumentController(DocumentService documentService) {
         this.documentService = documentService;
     }
+
+    @PreAuthorize("hasRole('admin')")
     @GetMapping
     public ResponseEntity<?> getAllDocuments(Pageable pageable) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -26,6 +29,7 @@ public class DocumentController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getDocumentById(@PathVariable Long id) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -35,6 +39,8 @@ public class DocumentController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDocument(@PathVariable Long id) {
         documentService.deleteDocument(id);
@@ -55,6 +61,7 @@ public class DocumentController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}/status") // Update status document  (URL = /document/{id}/status?status=APPROVED)
     public ResponseEntity<?> updateStatusDocument(@PathVariable Long id, @RequestParam("status") String status) {
         DocumentStatus documentStatus = DocumentStatus.valueOf(status.toUpperCase());

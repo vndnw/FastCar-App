@@ -45,6 +45,9 @@ public class User {
 
     private LocalDate dateOfBirth;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private BankInformation bankInformation;
+
     private boolean active;
 
     @CreationTimestamp
@@ -67,6 +70,5 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private BankInformation bankInformation;
+
 }

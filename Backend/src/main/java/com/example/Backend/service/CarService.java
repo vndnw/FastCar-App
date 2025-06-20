@@ -29,6 +29,7 @@ public class CarService {
     private final LocationService locationService;
     private final CarImageService carImageService;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     public CarService(CarRepository carRepository,
                       CarMapper carMapper,
@@ -36,7 +37,8 @@ public class CarService {
                       CarFeatureService carFeatureService,
                       LocationService locationService,
                       CarImageService carImageService,
-                      UserRepository userRepository) {
+                      UserRepository userRepository,
+                      UserService userService) {
         this.carRepository = carRepository;
         this.carMapper = carMapper;
         this.carBrandRepository = carBrandRepository;
@@ -44,6 +46,7 @@ public class CarService {
         this.locationService = locationService;
         this.carImageService = carImageService;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public CarResponse createCar(long userId, @NotNull CarRequest carRequest) {
@@ -80,6 +83,9 @@ public class CarService {
                 .toList();
         car.setImages(images);
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
+
+        userService.addRoleToUser(userId, "owner");
+
         return carMapper.mapToResponse(carRepository.save(car));
     }
     public CarResponse updateCar(long carId, @NotNull CarRequest carRequest) {

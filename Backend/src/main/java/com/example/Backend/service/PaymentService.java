@@ -14,7 +14,10 @@ import com.example.Backend.model.enums.PaymentStatus;
 import com.example.Backend.model.enums.PaymentType;
 import com.example.Backend.repository.BookingRepository;
 import com.example.Backend.repository.PaymentRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,13 +31,19 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final PaymentMapper paymentMapper;
+    private final EmailService emailService;
+    private final VNPAYService vnpayService;
 
     public PaymentService(PaymentRepository paymentRepository,
                           BookingRepository bookingRepository,
-                          PaymentMapper paymentMapper) {
+                          PaymentMapper paymentMapper,
+                          EmailService emailService,
+                          VNPAYService vnpayService) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
         this.paymentMapper = paymentMapper;
+        this.emailService = emailService;
+        this.vnpayService = vnpayService;
     }
 
     public Payment addPayment(long bookingId, @NotNull PaymentRequest  paymentRequest) {
@@ -87,6 +96,13 @@ public class PaymentService {
                 case REFUND, EXTRA_CHARGE -> booking.setStatus(BookingStatus.COMPLETED);
             }
             bookingRepository.save(booking);
+
+            emailService.sendMailSuccess(booking, payment);
+
+            if(payment.getType() == PaymentType.RENTAL) {
+                emailService.sendMailCheckIn(booking);
+            }
+
         } else if ("failed".equalsIgnoreCase(status)) {
             payment.setStatus(PaymentStatus.FAILED);
             if (payment.getType() == PaymentType.RESERVED) {
@@ -96,6 +112,7 @@ public class PaymentService {
               //gửi thông báo cho người dùng về việc thanh toán không thành công
                 // có thể thêm logic gửi email hoặc thông báo khác ở đây
             }
+            emailService.sendMailFailed(booking, payment);
         } else {
             throw new IllegalArgumentException("Invalid payment status: " + status);
         }
@@ -131,12 +148,14 @@ public class PaymentService {
         }
         Payment payment = paymentRepository.findPaymentByBookingAndType(booking, PaymentType.REFUND)
                 .orElseThrow(() -> new ResourceNotFoundException("No refund payment found for booking with id: " + bookingId));
-        //ở đây có thể thêm logic gửi thông báo cho người dùng về việc hoàn tiền và mail
+
         payment.setStatus(PaymentStatus.REFUNDED);
-        return paymentMapper.mapToResponse(paymentRepository.save(payment));
+        Payment payment2 = paymentRepository.save(payment);
+        emailService.sendMailRefund(booking, payment2);
+        return paymentMapper.mapToResponse(payment2);
     }
 
-    public PaymentResponse processExtraCharge(long bookingId) {
+    public PaymentResponse processExtraCharge(HttpServletRequest request, long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
         if(booking.getStatus() != BookingStatus.WAITING_EXTRA_CHARGE && booking.getStatus() == BookingStatus.COMPLETED) {
@@ -145,7 +164,9 @@ public class PaymentService {
         Payment payment = paymentRepository.findPaymentByBookingAndType(booking, PaymentType.EXTRA_CHARGE)
                 .orElseThrow(() -> new ResourceNotFoundException("No extra charge payment found for booking with id: " + bookingId));
 
+        String paymentUrl = vnpayService.generatePayUrl(request, payment.getAmount(),payment.getExternalRef());
 
+        emailService.sendMailExtra(booking, payment, paymentUrl);
 
         return paymentMapper.mapToResponse(payment);
     }
@@ -171,6 +192,11 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + paymentId));
         paymentRepository.delete(payment);
+    }
+
+    public Page<PaymentResponse> getAllPayments(Pageable pageable) {
+        Page<Payment> payments = paymentRepository.findAll(pageable);
+        return payments.map(paymentMapper::mapToResponse);
     }
 
     public PaymentResponse updatePayment(long paymentId, @NotNull PaymentRequest paymentRequest) {

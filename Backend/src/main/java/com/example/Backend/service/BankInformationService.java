@@ -65,4 +65,9 @@ public class BankInformationService {
         return bankInformations.map(bankInformationMapper::mapToResponse);
     }
 
+    public BankInformationResponse getBankInformationById(Long id) {
+        BankInformation bankInformation = bankInformationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Bank information not found with id: " + id));
+        return bankInformationMapper.mapToResponse(bankInformation);
+    }
 }

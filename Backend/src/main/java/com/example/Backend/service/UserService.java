@@ -2,6 +2,7 @@ package com.example.Backend.service;
 
 
 import com.example.Backend.dto.request.RegisterRequest;
+import com.example.Backend.dto.request.UpdateInfoRequest;
 import com.example.Backend.dto.request.UserRequest;
 import com.example.Backend.dto.response.UserResponse;
 import com.example.Backend.exception.ResourceAlreadyExistsException;
@@ -48,6 +49,9 @@ public class UserService {
         }else if(userRepository.existsByPhone(registerRequest.getPhone())){
             throw new ResourceAlreadyExistsException("User with phone " + registerRequest.getPhone() + " already exists");
         }
+        if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+            throw new IllegalArgumentException("Password and confirm password do not match");
+        }
         User user = User.builder()
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
@@ -57,6 +61,18 @@ public class UserService {
                 .build();
         return userMapper.mapToResponse(userRepository.save(user));
     }
+
+    public UserResponse updateUserInfo(long id, @NotNull UpdateInfoRequest userRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
+        user.setAddress(locationService.checkLocation(userRequest.getAddress()));
+        user.setProfilePicture(userRequest.getProfilePicture());
+        user.setDateOfBirth(userRequest.getDateOfBirth());
+        return userMapper.mapToResponse(userRepository.save(user));
+    }
+
     public UserResponse createUser(@NotNull UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new ResourceAlreadyExistsException("User with email " + userRequest.getEmail() + " already exists");
@@ -83,13 +99,13 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
-        user.setEmail(userRequest.getEmail());
         user.setPhone(userRequest.getPhone());
         user.setAddress(locationService.checkLocation(userRequest.getAddress()));
         user.setProfilePicture(userRequest.getProfilePicture());
         user.setDateOfBirth(userRequest.getDateOfBirth());
         return userMapper.mapToResponse(userRepository.save(user));
     }
+
     public UserResponse getUserById(long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -125,6 +141,31 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setActive(active);
         userRepository.save(user);
+    }
+
+    public boolean checkEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean addRoleToUser(long userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        var role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName));
+        if (user.getRoles().contains(role)) {
+            return false; // Role already exists for user
+        }
+        user.getRoles().add(role);
+        userRepository.save(user);
+        return true; // Role added successfully
+    }
+
+    public boolean changePassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
     }
 
 }

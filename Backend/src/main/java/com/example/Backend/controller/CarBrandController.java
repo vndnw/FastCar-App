@@ -6,6 +6,7 @@ import com.example.Backend.service.CarBrandService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,7 @@ public class CarBrandController {
         this.carBrandService = carBrandService;
     }
 
+    @PreAuthorize("hasRole('admin')")
     @PostMapping
     public ResponseEntity<?> createCarBrand(@RequestBody CarBrandRequest carBrandRequest) {
         ResponseData responseData = ResponseData.builder()
@@ -25,6 +27,7 @@ public class CarBrandController {
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
+
 
     @GetMapping
     public ResponseEntity<?> getAllCarBrand(Pageable pageable) {
@@ -51,6 +54,7 @@ public class CarBrandController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCarBrand(@PathVariable Long id) {
         carBrandService.deleteCarBrand(id);

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,7 @@ public class DiscountController {
         this.discountService = discountService;
     }
 
+    @PreAuthorize("hasRole('admin')")
     @PostMapping
     public ResponseEntity<?> addDiscount(@RequestBody DiscountResquest discountResquest) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -27,6 +29,8 @@ public class DiscountController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @GetMapping
     public ResponseEntity<?> getAllDiscount(@PageableDefault(page = 0, size = 10) Pageable pageable) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -35,6 +39,8 @@ public class DiscountController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getDiscountById(@PathVariable Long id) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -43,6 +49,8 @@ public class DiscountController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDiscount(@PathVariable Long id, @RequestBody DiscountResquest discountResquest) {
         ResponseData<?> responseData  = ResponseData.builder()
@@ -51,6 +59,8 @@ public class DiscountController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDiscount(@PathVariable Long id) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -59,6 +69,7 @@ public class DiscountController {
         discountService.deleteDiscount(id);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
     @GetMapping("/check/{code}")
     public ResponseEntity<?> checkDiscountCode(@PathVariable String code) {
         ResponseData<?> responseData = ResponseData.builder()
