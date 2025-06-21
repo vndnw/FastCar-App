@@ -1,0 +1,62 @@
+import apiClient from '../utils/apiClient';
+
+// User API service
+export const userService = {
+    // Get all users with pagination
+    getUsers: async (page = 0, size = 10, sort = 'email,asc') => {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            size: size.toString(),
+            sort: sort
+        });
+
+        return apiClient.get(`/user?${params}`);
+    },
+    // Get user by ID
+    getUserById: async (id) => {
+        return apiClient.get(`/user/${id}?id=${id}`);
+    },
+
+    // Create new user
+    createUser: async (userData) => {
+        return apiClient.post('/user', userData);
+    },
+    // Update user
+    updateUser: async (id, userData) => {
+        return apiClient.put(`/user/${id}?id=${id}`, userData);
+    },
+
+    // Delete user
+    deleteUser: async (id) => {
+        return apiClient.delete(`/user/${id}?id=${id}`);
+    },
+
+    // Update user status (activate/deactivate)
+    updateUserStatus: async (id, active) => {
+        return apiClient.patch(`/user/${id}/status?id=${id}`, { active });
+    },
+
+    // Search users
+    searchUsers: async (query, page = 0, size = 10) => {
+        const params = new URLSearchParams({
+            q: query,
+            page: page.toString(),
+            size: size.toString()
+        });
+
+        return apiClient.get(`/user/search?${params}`);
+    },
+
+    // Get users by role
+    getUsersByRole: async (role, page = 0, size = 10) => {
+        const params = new URLSearchParams({
+            role: role,
+            page: page.toString(),
+            size: size.toString()
+        });
+
+        return apiClient.get(`/user/role?${params}`);
+    }
+};
+
+export default userService;

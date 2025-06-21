@@ -1,4 +1,6 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import UserLayout from './components/layout/UserLayout';
 import HeroSection from './components/HeroSection/HeroSection';
 import Home from './views/Home/Home';
@@ -14,39 +16,46 @@ import Dashboard from "./views/admin/Home";
 import Tables from "./views/admin/Tables";
 import Billing from "./views/admin/Billing";
 import Profile from "./views/admin/Profile";
+import Users from "./views/admin/Users";
 import Main from "./components/admin/layout/Main";
 import OwnerCar from './views/OwnerCar/OwnerCar';
 
 
 function App() {
   return (
-    <Routes>
+    <AuthProvider>
+      <Routes>
 
-      {/* Layout cho trang người dùng */}
-      <Route element={<UserLayout />}>
-        <Route path="/" element={<><HeroSection /><Home /></>} />
-        <Route path="/about" element={<About />} />
-        <Route path="/owner-car" element={<OwnerCar />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/:cityName" element={<><HeroSection /><City /></>} />
-        <Route path="/xe-co-ngay" element={<CarListing />} />
-        <Route path="/car-detail/:carId" element={<CarDetail />} />
-      </Route>
+        {/* Layout cho trang người dùng */}
+        <Route element={<UserLayout />}>
+          <Route path="/" element={<><HeroSection /><Home /></>} />
+          <Route path="/about" element={<About />} />
+          <Route path="/owner-car" element={<OwnerCar />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/:cityName" element={<><HeroSection /><City /></>} />
+          <Route path="/xe-co-ngay" element={<CarListing />} />
+          <Route path="/car-detail/:carId" element={<CarDetail />} />
+        </Route>
+        {/* Layout cho trang admin */}
+        <Route path="/admin" element={
+          <ProtectedRoute requireAdmin={true}>
+            <Main />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="tables" element={<Tables />} />
+          <Route path="billing" element={<Billing />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="users" element={<Users />} />
+          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        </Route>
 
-      {/* Layout cho trang admin */}
-      <Route path="/admin" element={<Main />}>
-        <Route index element={<Navigate to="/admin/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="tables" element={<Tables />} />
-        <Route path="billing" element={<Billing />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-      </Route>
-
-      {/* Fallback nếu route không khớp */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Fallback nếu route không khớp */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

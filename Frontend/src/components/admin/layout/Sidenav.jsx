@@ -160,11 +160,29 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  const user = [
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      key={0}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10 9C12.2091 9 14 7.20914 14 5C14 2.79086 12.2091 1 10 1C7.79086 1 6 2.79086 6 5C6 7.20914 7.79086 9 10 9ZM10 11C6.13401 11 3 14.134 3 18C3 18.5523 3.44772 19 4 19H16C16.5523 19 17 18.5523 17 18C17 14.134 13.866 11 10 11Z"
+        fill={color}
+      />
+    </svg>,
+  ];
+
   return (
     <>
       <div className="brand">
         <img src={logo} alt="" />
-        <span>Muse Dashboard</span>
+        <span>Admin Dashboard</span>
       </div>
       <hr />
       <Menu theme="light" mode="inline">
@@ -218,6 +236,19 @@ function Sidenav({ color }) {
               {rtl}
             </span>
             <span className="label">RTL</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="9">
+          <NavLink to="/admin/users">
+            <span
+              className="icon"
+              style={{
+                background: page === "admin/users" ? color : "",
+              }}
+            >
+              {user}
+            </span>
+            <span className="label">User</span>
           </NavLink>
         </Menu.Item>
         <Menu.Item className="menu-item-header" key="5">
