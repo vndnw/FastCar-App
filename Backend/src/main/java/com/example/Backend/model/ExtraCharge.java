@@ -22,10 +22,6 @@ public class ExtraCharge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id")
-    private Booking booking; // Assuming Booking is another entity in your application
-
     private String reason;
     private BigDecimal amount;
     private String image;

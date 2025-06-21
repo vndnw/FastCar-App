@@ -21,7 +21,7 @@ public class CarSpecification {
 
             // --- Điều kiện cơ bản ---
             predicates.add(criteriaBuilder.equal(root.get("active"), true));
-            predicates.add(criteriaBuilder.equal(root.get("status"), CarStatus.ACTIVE));
+            predicates.add(criteriaBuilder.equal(root.get("status"), CarStatus.AVAILABLE));
 
             // --- Lọc theo thuộc tính xe ---
             if (criteria.getBrandId() != null) {

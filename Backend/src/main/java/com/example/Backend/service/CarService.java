@@ -21,13 +21,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class CarService {
-
     private final CarRepository carRepository;
     private final CarMapper carMapper;
     private final CarBrandRepository carBrandRepository;
     private final CarFeatureService  carFeatureService;
     private final LocationService locationService;
-    private final CarImageService carImageService;
     private final UserRepository userRepository;
     private final UserService userService;
 
@@ -36,7 +34,6 @@ public class CarService {
                       CarBrandRepository carBrandRepository,
                       CarFeatureService carFeatureService,
                       LocationService locationService,
-                      CarImageService carImageService,
                       UserRepository userRepository,
                       UserService userService) {
         this.carRepository = carRepository;
@@ -44,7 +41,6 @@ public class CarService {
         this.carBrandRepository = carBrandRepository;
         this.carFeatureService = carFeatureService;
         this.locationService = locationService;
-        this.carImageService = carImageService;
         this.userRepository = userRepository;
         this.userService = userService;
     }
@@ -71,7 +67,7 @@ public class CarService {
         car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePer24Hour()));
         car.setDescription(carRequest.getDescription());
         car.setActive(false);
-        car.setStatus(CarStatus.PENDING_APPROVAL);
+        car.setStatus(CarStatus.PENDING);
         List<Image> images = carRequest.getCarImages().stream()
                 .map( image -> {
                     Image carImage = new Image();
@@ -88,6 +84,7 @@ public class CarService {
 
         return carMapper.mapToResponse(carRepository.save(car));
     }
+
     public CarResponse updateCar(long carId, @NotNull CarRequest carRequest) {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
         car.setName(carRequest.getName());
@@ -123,31 +120,33 @@ public class CarService {
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         return carMapper.mapToResponse(carRepository.save(car));
     }
+
     public void deleteCar(long carId) {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
         carRepository.delete(car);
     }
+
     public CarResponse getCarByUserId(long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User Not Found"));
         return carMapper.mapToResponse(carRepository.findCarByUser(user));
     }
+
     public List<CarResponse> getAllCarsByUserId(long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User Not Found"));
         List<Car> cars = carRepository.findCarsByUser(user);
         return cars.stream().map(carMapper::mapToResponse).collect(Collectors.toList());
     }
-    public List<CarResponse> getAllCarsByDistrict(String district) {
-        List<Car> cars = carRepository.findAllCarsByLocation_District(district);
-        return cars.stream().map(carMapper::mapToResponse).collect(Collectors.toList());
-    }
+
     public CarResponse getCarById(long carId) {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
         return carMapper.mapToResponse(car);
     }
+
     public Page<CarResponse> getAllCars(Pageable pageable) {
         Page<Car> cars = carRepository.findAll(pageable);
         return cars.map(carMapper::mapToResponse);
     }
+
     public boolean activeCar(@NotNull Car car) {
         if (car.isActive()) {
             return false; // Car is already active
@@ -161,22 +160,24 @@ public class CarService {
         carRepository.save(car);
         return true; // Car is now active
     }
+
     public boolean updateStatus(long carId, CarStatus status) {
         Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
         if (car.getStatus() == status) {
             return false;
         }
         car.setStatus(status);
-        if (status == CarStatus.ACTIVE) {
+        if (status == CarStatus.AVAILABLE) {
             if (!activeCar(car)) {
                 throw new RuntimeException("Cannot activate car with inactive documents");
             }
-        } else if (status == CarStatus.INACTIVE) {
+        } else if (status == CarStatus.UNAVAILABLE) {
             car.setActive(false);
         }
         carRepository.save(car);
         return true;
     }
+
     public Page<CarResponse> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
         Specification<Car> spec = CarSpecification.findByCriteria(criteria);
 

@@ -8,6 +8,7 @@ import com.example.Backend.dto.response.UserResponse;
 import com.example.Backend.exception.ResourceAlreadyExistsException;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.UserMapper;
+import com.example.Backend.model.Role;
 import com.example.Backend.model.User;
 import com.example.Backend.repository.RoleRepository;
 import com.example.Backend.repository.UserRepository;
@@ -19,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -52,12 +55,18 @@ public class UserService {
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
             throw new IllegalArgumentException("Password and confirm password do not match");
         }
+
+        List<Role> roles = new ArrayList<>();
+        roles.add(roleRepository.findByName("user")
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: user")));
+
         User user = User.builder()
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .email(registerRequest.getEmail())
                 .phone(registerRequest.getPhone())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .roles(roles)
                 .build();
         return userMapper.mapToResponse(userRepository.save(user));
     }
