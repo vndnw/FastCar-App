@@ -2,6 +2,7 @@ package com.example.Backend.config;
 
 import com.example.Backend.service.UserDetailsServiceCustom;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Configuration
 public class SecurityConfig {
 
@@ -99,6 +101,7 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
+        log.info("Allowed Origins: {}", allowedOrigins);
         corsConfiguration.setAllowedOrigins(allowedOrigins);
         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);

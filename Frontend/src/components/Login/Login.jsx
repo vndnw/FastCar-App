@@ -1,42 +1,42 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import './Login.css';
+import { message } from 'antd';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
+
+  // Get the intended destination from location state
+  const from = location.state?.from?.pathname || '/'; const [formData, setFormData] = useState({
+    emailOrPhone: '',
     password: '',
     rememberMe: false
-  });
-  const [errors, setErrors] = useState({});
+  }); const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // Demo users - trong thực tế sẽ kết nối với API
-  const demoUsers = [
-    { email: 'demo@example.com', password: '123456', name: 'Demo User' }
-  ];
-
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+  const validateEmailOrPhone = (input) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10,11}$/;
+    return emailRegex.test(input) || phoneRegex.test(input);
   };
-
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.email) {
-      newErrors.email = 'Email không được để trống';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email không hợp lệ';
+
+    if (!formData.emailOrPhone) {
+      newErrors.emailOrPhone = 'Email hoặc số điện thoại không được để trống';
+    } else if (!validateEmailOrPhone(formData.emailOrPhone)) {
+      newErrors.emailOrPhone = 'Email hoặc số điện thoại không hợp lệ';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Mật khẩu không được để trống';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -47,7 +47,6 @@ const Login = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
     // Xóa lỗi khi người dùng bắt đầu nhập
     if (errors[name]) {
       setErrors(prev => ({
@@ -55,32 +54,51 @@ const Login = () => {
         [name]: ''
       }));
     }
-  };
 
-  const handleSubmit = async (e) => {
+    // Clear general error when user starts typing
+    if (errors.general) {
+      setErrors(prev => ({
+        ...prev,
+        general: ''
+      }));
+    }
+  }; const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    
-    // Giả lập API call
-    setTimeout(() => {
-      const user = demoUsers.find(u => 
-        u.email === formData.email && u.password === formData.password
-      );
-      
-      if (user) {
-        // Lưu thông tin user (trong thực tế sẽ lưu token)
-        // localStorage.setItem('user', JSON.stringify(user));
-        alert('Đăng nhập thành công!');
-        navigate('/'); // Chuyển về trang chủ
+    setErrors({}); // Clear previous errors
+
+    try {
+      const result = await login(formData.emailOrPhone, formData.password);
+      if (result.success) {
+        const { user } = result.data;
+
+        // Chuyển hướng dựa trên role hoặc intended destination
+        if (from.startsWith('/admin') && user.roles && user.roles.includes('admin')) {
+          navigate(from);
+        } else if (user.roles && user.roles.includes('admin')) {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/');
+        }
+
+        // Thông báo thành công
+        message.success('Đăng nhập thành công!');
       } else {
-        setErrors({ general: 'Email hoặc mật khẩu không đúng' });
+        setErrors({
+          general: result.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'
+        });
       }
-      
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrors({
+        general: 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -103,26 +121,25 @@ const Login = () => {
             </div>
           )}
 
-          <div>
-            <div className="form-group">
-              <label className="form-label">
-                Email
-              </label>
-              <div className="input-wrapper">
-                <Mail className="input-icon" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`form-input ${errors.email ? 'error' : ''}`}
-                  placeholder="Nhập email"
-                />
-              </div>
-              {errors.email && (
-                <p className="error-text">{errors.email}</p>
-              )}
+          <div>            <div className="form-group">
+            <label className="form-label">
+              Email hoặc Số điện thoại
+            </label>
+            <div className="input-wrapper">
+              <Mail className="input-icon" />
+              <input
+                type="text"
+                name="emailOrPhone"
+                value={formData.emailOrPhone}
+                onChange={handleInputChange}
+                className={`form-input ${errors.emailOrPhone ? 'error' : ''}`}
+                placeholder="Nhập email hoặc số điện thoại"
+              />
             </div>
+            {errors.emailOrPhone && (
+              <p className="error-text">{errors.emailOrPhone}</p>
+            )}
+          </div>
 
             <div className="form-group">
               <label className="form-label">
@@ -185,13 +202,6 @@ const Login = () => {
               >
                 Đăng ký ngay
               </Link>
-            </p>
-          </div>
-
-          {/* Demo info */}
-          <div className="demo-info">
-            <p className="demo-text">
-              <strong>Demo:</strong> email: demo@example.com, mật khẩu: 123456
             </p>
           </div>
 
