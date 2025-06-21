@@ -33,12 +33,17 @@ import {
   Modal,
   Descriptions,
   Divider,
+  Form,
+  Input,
+  DatePicker,
+  InputNumber,
 } from "antd";
 
-import { ToTopOutlined, EyeOutlined } from "@ant-design/icons";
+import { ToTopOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { userService } from "../../services/userService";
+import dayjs from 'dayjs';
 
 // Images
 import ava1 from "../../assets/images/logo-shopify.svg";
@@ -79,7 +84,7 @@ const columns = [
     title: "USER",
     dataIndex: "user",
     key: "user",
-    width: "30%",
+    width: "25%",
   },
   {
     title: "CONTACT",
@@ -109,7 +114,7 @@ const columns = [
     title: "ACTIONS",
     key: "actions",
     dataIndex: "actions",
-    width: "10%",
+    width: "15%",
   },
 ];
 
@@ -365,10 +370,12 @@ function Tables() {
     current: 1,
     pageSize: 10,
     total: 0,
-  });
-  const [selectedUser, setSelectedUser] = useState(null);
+  }); const [selectedUser, setSelectedUser] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [userDetailLoading, setUserDetailLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [form] = Form.useForm();
   const handleViewUser = async (userId) => {
     try {
       setUserDetailLoading(true);
@@ -385,10 +392,98 @@ function Tables() {
     } finally {
       setUserDetailLoading(false);
     }
-  };
-  const handleCloseModal = () => {
+  }; const handleCloseModal = () => {
     setDetailModalVisible(false);
     setSelectedUser(null);
+  };
+
+  const handleEditUser = async (userId) => {
+    try {
+      setUserDetailLoading(true);
+      const result = await userService.getUserById(userId);
+
+      if (result.status === 200) {
+        const user = result.data;
+        setSelectedUser(user);
+
+        // Populate form with user data
+        form.setFieldsValue({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profilePicture: user.profilePicture,
+          dateOfBirth: user.dateOfBirth ? dayjs(user.dateOfBirth) : null,
+          address: {
+            address: user.address?.address || '',
+            street: user.address?.street || '',
+            ward: user.address?.ward || '',
+            district: user.address?.district || '',
+            city: user.address?.city || '',
+            latitude: user.address?.latitude || 0,
+            longitude: user.address?.longitude || 0,
+          },
+          bankInformation: {
+            bankName: user.bankInformation?.bankName || '',
+            accountNumber: user.bankInformation?.accountNumber || '',
+            accountHolderName: user.bankInformation?.accountHolderName || '',
+          }
+        });
+
+        setEditModalVisible(true);
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      message.error(error.message || 'Failed to fetch user details');
+    } finally {
+      setUserDetailLoading(false);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalVisible(false);
+    setSelectedUser(null);
+    form.resetFields();
+  };
+
+  const handleUpdateUser = async (values) => {
+    try {
+      setEditLoading(true);
+
+      // Prepare data for API
+      const updateData = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        profilePicture: values.profilePicture,
+        dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
+        address: {
+          address: values.address?.address || '',
+          street: values.address?.street || '',
+          ward: values.address?.ward || '',
+          district: values.address?.district || '',
+          city: values.address?.city || '',
+          latitude: values.address?.latitude || 0,
+          longitude: values.address?.longitude || 0,
+        },
+        bankInformation: {
+          bankName: values.bankInformation?.bankName || '',
+          accountNumber: values.bankInformation?.accountNumber || '',
+          accountHolderName: values.bankInformation?.accountHolderName || '',
+        }
+      };
+
+      const result = await userService.updateUserInfo(selectedUser.id, updateData);
+
+      if (result.status === 200) {
+        message.success('User updated successfully!');
+        handleCloseEditModal();
+        // Refresh the users list
+        fetchUsers(pagination.current - 1, pagination.pageSize);
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      message.error(error.message || 'Failed to update user');
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const fetchUsers = async (page = 0, size = 10) => {
@@ -448,12 +543,20 @@ function Tables() {
             </div>
           ),
           actions: (
-            <Button
-              type="text"
-              icon={<EyeOutlined />}
-              onClick={() => handleViewUser(user.id)}
-              title="View Details"
-            />
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Button
+                type="text"
+                icon={<EyeOutlined />}
+                onClick={() => handleViewUser(user.id)}
+                title="View Details"
+              />
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => handleEditUser(user.id)}
+                title="Edit User"
+              />
+            </div>
           ),
         }));
 
@@ -658,9 +761,189 @@ function Tables() {
                   </Descriptions>
                 </>
               )}
-            </>
-          )}
+            </>)}
         </Spin>
+      </Modal>
+
+      {/* Edit User Modal */}
+      <Modal
+        title="Edit User Information"
+        open={editModalVisible}
+        onCancel={handleCloseEditModal}
+        footer={null}
+        width={900}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleUpdateUser}
+          disabled={editLoading}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="First Name"
+                name="firstName"
+                rules={[{ required: true, message: 'Please input first name!' }]}
+              >
+                <Input placeholder="Enter first name" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Last Name"
+                name="lastName"
+                rules={[{ required: true, message: 'Please input last name!' }]}
+              >
+                <Input placeholder="Enter last name" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Profile Picture URL"
+                name="profilePicture"
+              >
+                <Input placeholder="Enter profile picture URL" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Date of Birth"
+                name="dateOfBirth"
+              >
+                <DatePicker
+                  style={{ width: '100%' }}
+                  placeholder="Select date of birth"
+                  format="YYYY-MM-DD"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Divider orientation="left">Address Information</Divider>
+
+          <Form.Item
+            label="Full Address"
+            name={['address', 'address']}
+          >
+            <Input.TextArea
+              rows={2}
+              placeholder="Enter full address"
+            />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Street"
+                name={['address', 'street']}
+              >
+                <Input placeholder="Enter street" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Ward"
+                name={['address', 'ward']}
+              >
+                <Input placeholder="Enter ward" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="District"
+                name={['address', 'district']}
+              >
+                <Input placeholder="Enter district" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="City"
+                name={['address', 'city']}
+              >
+                <Input placeholder="Enter city" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Latitude"
+                name={['address', 'latitude']}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="Enter latitude"
+                  step={0.000001}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Longitude"
+                name={['address', 'longitude']}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="Enter longitude"
+                  step={0.000001}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Divider orientation="left">Bank Information</Divider>
+
+          <Form.Item
+            label="Bank Name"
+            name={['bankInformation', 'bankName']}
+          >
+            <Input placeholder="Enter bank name" />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Account Number"
+                name={['bankInformation', 'accountNumber']}
+              >
+                <Input placeholder="Enter account number" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Account Holder Name"
+                name={['bankInformation', 'accountHolderName']}
+              >
+                <Input placeholder="Enter account holder name" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
+            <Button
+              onClick={handleCloseEditModal}
+              style={{ marginRight: 8 }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={editLoading}
+            >
+              Update User
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
+import { userService } from '../services/userService';
+import tokenManager from '../utils/tokenManager';
 
 // Create Auth Context
 const AuthContext = createContext();
@@ -7,14 +9,14 @@ const AuthContext = createContext();
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('authToken'));
+    const [token, setToken] = useState(tokenManager.getAccessToken());
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     // Check if user is authenticated on app load
     useEffect(() => {
         const initAuth = async () => {
-            const savedToken = localStorage.getItem('authToken');
+            const savedToken = tokenManager.getAccessToken();
             const savedUser = localStorage.getItem('userInfo');
 
             if (savedToken) {
@@ -31,7 +33,7 @@ export const AuthProvider = ({ children }) => {
                 } else {
                     // Try to get user info from API
                     try {
-                        const result = await authService.getCurrentUser();
+                        const result = await userService.getCurrentUser();
                         if (result.status === 200) {
                             setUser(result.data);
                             setIsAuthenticated(true);
@@ -54,16 +56,11 @@ export const AuthProvider = ({ children }) => {
     // Login function
     const login = async (emailOrPhone, password) => {
         try {
-            const result = await authService.login(emailOrPhone, password);
-
-            if (result.status === 200) {
+            const result = await authService.login(emailOrPhone, password); if (result.status === 200) {
                 const { accessToken: authToken, refreshToken, user: userData } = result.data;
 
-                // Save to localStorage
-                localStorage.setItem('authToken', authToken);
-                if (refreshToken) {
-                    localStorage.setItem('refreshToken', refreshToken);
-                }
+                // Save to localStorage using tokenManager
+                tokenManager.setTokens(authToken, refreshToken);
                 localStorage.setItem('userInfo', JSON.stringify(userData));
 
                 // Update state
@@ -86,10 +83,8 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            // Clear localStorage
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('userInfo');
+            // Clear localStorage using tokenManager
+            tokenManager.clearTokens();
 
             // Reset state
             setToken(null);
@@ -101,11 +96,21 @@ export const AuthProvider = ({ children }) => {
     // Check if user has specific role
     const hasRole = (role) => {
         return user?.roles?.includes(role) || false;
-    };
-
-    // Check if user is admin
+    };    // Check if user is admin
     const isAdmin = () => {
         return hasRole('admin');
+    };    // Update tokens (called by API client when refresh token succeeds)
+    const updateTokens = (newAccessToken, newRefreshToken) => {
+        tokenManager.setTokens(newAccessToken, newRefreshToken);
+        setToken(newAccessToken);
+    };
+
+    // Force logout (called by API client when refresh token fails)
+    const forceLogout = () => {
+        tokenManager.clearTokens();
+        setToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
     };
 
     const value = {
@@ -116,7 +121,9 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         hasRole,
-        isAdmin
+        isAdmin,
+        updateTokens,
+        forceLogout
     };
 
     return (

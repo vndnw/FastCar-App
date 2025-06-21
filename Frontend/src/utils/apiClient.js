@@ -1,4 +1,5 @@
 import axios from 'axios';
+import tokenManager from './tokenManager';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
@@ -9,11 +10,27 @@ const apiClient = axios.create({
     },
 });
 
+// Flag to prevent multiple refresh token requests
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+
+    failedQueue = [];
+};
+
 // Request interceptor to add authentication token
 apiClient.interceptors.request.use(
     (config) => {
-        // Get token from localStorage or any other storage
-        const token = localStorage.getItem('authToken');
+        // Get token from tokenManager
+        const token = tokenManager.getAccessToken();
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -30,7 +47,9 @@ apiClient.interceptors.response.use(
         // Return only data if response is successful
         return response.data;
     },
-    (error) => {
+    async (error) => {
+        const originalRequest = error.config;
+
         // Handle common errors
         if (error.response) {
             // Server responded with error status
@@ -38,9 +57,71 @@ apiClient.interceptors.response.use(
 
             switch (status) {
                 case 401:
-                    // Unauthorized - redirect to login
-                    localStorage.removeItem('authToken');
-                    window.location.href = '/login';
+                    // Unauthorized - try to refresh token
+                    if (originalRequest.url?.includes('/auth/refresh')) {
+                        // If refresh token also failed, logout user
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('refreshToken');
+                        window.location.href = '/login';
+                        return Promise.reject(error);
+                    }
+
+                    if (!originalRequest._retry) {
+                        if (isRefreshing) {
+                            // If already refreshing, queue this request
+                            return new Promise((resolve, reject) => {
+                                failedQueue.push({ resolve, reject });
+                            }).then(token => {
+                                originalRequest.headers.Authorization = `Bearer ${token}`;
+                                return apiClient(originalRequest);
+                            }).catch(err => {
+                                return Promise.reject(err);
+                            });
+                        } originalRequest._retry = true;
+                        isRefreshing = true;
+
+                        const refreshToken = tokenManager.getRefreshToken();
+
+                        if (!refreshToken) {
+                            // No refresh token, logout user
+                            tokenManager.clearTokens();
+                            window.location.href = '/login';
+                            return Promise.reject(error);
+                        }
+
+                        try {
+                            // Try to refresh the token
+                            const response = await axios.post('http://localhost:8080/api/v1/auth/refresh', {
+                                refreshToken: refreshToken
+                            });
+
+                            if (response.data.status === 0 && response.data.data) {
+                                const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+
+                                // Save new tokens using tokenManager
+                                tokenManager.setTokens(accessToken, newRefreshToken);
+
+                                // Update the authorization header
+                                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+                                // Process queued requests
+                                processQueue(null, accessToken);
+
+                                // Retry the original request
+                                return apiClient(originalRequest);
+                            } else {
+                                throw new Error('Failed to refresh token');
+                            }
+                        } catch (refreshError) {
+                            // Refresh failed, logout user
+                            processQueue(refreshError, null);
+                            tokenManager.clearTokens();
+                            window.location.href = '/login';
+                            return Promise.reject(refreshError);
+                        } finally {
+                            isRefreshing = false;
+                        }
+                    }
                     break;
                 case 403:
                     // Forbidden

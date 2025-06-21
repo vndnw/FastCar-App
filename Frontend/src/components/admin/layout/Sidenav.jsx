@@ -178,6 +178,42 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  const discount = [
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      key={0}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4 3C3.44772 3 3 3.44772 3 4V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V4C17 3.44772 16.5523 3 16 3H4ZM7 6C6.44772 6 6 6.44772 6 7C6 7.55228 6.44772 8 7 8C7.55228 8 8 7.55228 8 7C8 6.44772 7.55228 6 7 6ZM13 12C12.4477 12 12 12.4477 12 13C12 13.5523 12.4477 14 13 14C13.5523 14 14 13.5523 14 13C14 12.4477 13.5523 12 13 12ZM5.70711 14.7071C5.31658 14.3166 5.31658 13.6834 5.70711 13.2929L13.2929 5.70711C13.6834 5.31658 14.3166 5.31658 14.7071 5.70711C15.0976 6.09763 15.0976 6.73079 14.7071 7.12132L7.12132 14.7071C6.73079 15.0976 6.09763 15.0976 5.70711 14.7071Z"
+        fill={color}
+      />
+    </svg>,
+  ];
+
+  const carBrand = [
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      key={0}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4 4C2.89543 4 2 4.89543 2 6V14C2 15.1046 2.89543 16 4 16H5.5C5.77614 16 6 15.7761 6 15.5V14.5C6 13.6716 6.67157 13 7.5 13C8.32843 13 9 13.6716 9 14.5V15.5C9 15.7761 9.22386 16 9.5 16H10.5C10.7761 16 11 15.7761 11 15.5V14.5C11 13.6716 11.6716 13 12.5 13C13.3284 13 14 13.6716 14 14.5V15.5C14 15.7761 14.2239 16 14.5 16H16C17.1046 16 18 15.1046 18 14V6C18 4.89543 17.1046 4 16 4H4ZM5 7C4.44772 7 4 7.44772 4 8C4 8.55228 4.44772 9 5 9H15C15.5523 9 16 8.55228 16 8C16 7.44772 15.5523 7 15 7H5Z"
+        fill={color}
+      />
+    </svg>,
+  ];
+
   return (
     <>
       <div className="brand">
@@ -249,6 +285,32 @@ function Sidenav({ color }) {
               {user}
             </span>
             <span className="label">User</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="10">
+          <NavLink to="/admin/discount">
+            <span
+              className="icon"
+              style={{
+                background: page === "admin/discount" ? color : "",
+              }}
+            >
+              {discount}
+            </span>
+            <span className="label">Discount</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="11">
+          <NavLink to="/admin/car-brand">
+            <span
+              className="icon"
+              style={{
+                background: page === "admin/car-brand" ? color : "",
+              }}
+            >
+              {carBrand}
+            </span>
+            <span className="label">Car Brand</span>
           </NavLink>
         </Menu.Item>
         <Menu.Item className="menu-item-header" key="5">

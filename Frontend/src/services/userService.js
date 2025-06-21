@@ -26,6 +26,11 @@ export const userService = {
         return apiClient.put(`/user/${id}?id=${id}`, userData);
     },
 
+    // Update user info by admin
+    updateUserInfo: async (id, userInfo) => {
+        return apiClient.put(`/user/${id}/update-info-user`, userInfo);
+    },
+
     // Delete user
     deleteUser: async (id) => {
         return apiClient.delete(`/user/${id}?id=${id}`);
@@ -56,6 +61,10 @@ export const userService = {
         });
 
         return apiClient.get(`/user/role?${params}`);
+    },
+
+    getCurrentUser: async () => {
+        return apiClient.get('/user/me');
     }
 };
 

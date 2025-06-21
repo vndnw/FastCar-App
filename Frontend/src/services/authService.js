@@ -40,6 +40,16 @@ export const authService = {
     // Get current user profile
     getCurrentUser: async () => {
         return apiClient.get('/auth/me');
+    },
+
+    // Check if token is valid
+    validateToken: async () => {
+        return apiClient.get('/auth/validate_token');
+    },
+
+    // Get new access token using refresh token
+    refreshAccessToken: async (refreshToken) => {
+        return apiClient.post('/auth/refresh', { refreshToken });
     }
 };
 
