@@ -19,6 +19,7 @@ import Profile from "./views/admin/Profile";
 import Users from "./views/admin/Users";
 import Discount from "./views/admin/Discount";
 import CarBrand from "./views/admin/CarBrand";
+import Cars from "./views/admin/Cars";
 import Main from "./components/admin/layout/Main";
 import OwnerCar from './views/OwnerCar/OwnerCar';
 
@@ -53,6 +54,7 @@ function App() {
           <Route path="users" element={<Users />} />
           <Route path="discount" element={<Discount />} />
           <Route path="car-brand" element={<CarBrand />} />
+          <Route path="cars" element={<Cars />} />
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Route>
 

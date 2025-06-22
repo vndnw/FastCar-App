@@ -44,15 +44,6 @@ export const carBrandService = {
         return apiClient.get(`/carbrand/search?${params}`);
     },
 
-    // Get active car brands
-    getActiveCarBrands: async (page = 0, size = 10) => {
-        const params = new URLSearchParams({
-            page: page.toString(),
-            size: size.toString(),
-        });
-
-        return apiClient.get(`/carbrand/active?${params}`);
-    },
 
     // Toggle car brand status
     toggleCarBrandStatus: async (id, isActive) => {
