@@ -78,9 +78,6 @@ public class Booking {
     private List<Payment> payments;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ExtraCharge> extraCharges;
-
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ConditionCheck> conditionChecks;
 
 }

@@ -58,7 +58,7 @@ public class AdminService {
         long totalCars = carRepository.count();
         long totalBookings = bookingRepository.count();
         BigDecimal totalRevenue = bookingRepository.calculateTotalRevenue().orElse(BigDecimal.ZERO);
-        long carsPending = carRepository.countByStatus(CarStatus.PENDING_APPROVAL);
+        long carsPending = carRepository.countByStatus(CarStatus.PENDING);
         long documentsPending = documentRepository.countByStatus(DocumentStatus.PENDING);
 
         List<BookingStatus> statusesToCount = List.of(
@@ -89,7 +89,7 @@ public class AdminService {
     }
 
     public Page<CarResponse> getCarsPendingApproval(Pageable pageable) {
-        return carRepository.findByStatus(CarStatus.PENDING_APPROVAL, pageable)
+        return carRepository.findByStatus(CarStatus.PENDING, pageable)
                 .map(carMapper::mapToResponse);
     }
 
