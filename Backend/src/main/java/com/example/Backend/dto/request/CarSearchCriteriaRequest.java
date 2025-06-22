@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Data
 public class CarSearchCriteriaRequest {
     private Long brandId;
+    private String name;
     private String carType;
     private String fuelType;
     private BigDecimal minPrice;

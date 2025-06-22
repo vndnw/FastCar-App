@@ -27,6 +27,9 @@ public class CarSpecification {
             if (criteria.getBrandId() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("brand").get("id"), criteria.getBrandId()));
             }
+            if (StringUtils.hasText(criteria.getName())) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + criteria.getName().toLowerCase() + "%"));
+            }
             if (StringUtils.hasText(criteria.getCarType())) {
                 predicates.add(criteriaBuilder.equal(root.get("carType").as(String.class), criteria.getCarType().toUpperCase()));
             }
