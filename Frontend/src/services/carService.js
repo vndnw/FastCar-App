@@ -10,27 +10,30 @@ export const carService = {
             sort: sort
         });
 
-        return apiClient.get(`/cars?${params}`);
+        return apiClient.get(`/car?${params}`);
     },
 
     // Get car by ID
     getCarById: async (id) => {
-        return apiClient.get(`/cars/${id}`);
+        return apiClient.get(`/car/${id}`);
+    },    // Create new car
+    createCar: async (carData) => {
+        return apiClient.post('/car', carData);
     },
 
-    // Create new car
-    createCar: async (carData) => {
-        return apiClient.post('/cars', carData);
+    // Create new car by user
+    createCarByUser: async (userId, carData) => {
+        return apiClient.post(`/user/${userId}/create-car`, carData);
     },
 
     // Update car
     updateCar: async (id, carData) => {
-        return apiClient.put(`/cars/${id}`, carData);
+        return apiClient.put(`/car/${id}`, carData);
     },
 
     // Delete car
     deleteCar: async (id) => {
-        return apiClient.delete(`/cars/${id}`);
+        return apiClient.delete(`/car/${id}`);
     },
 
     // Search cars
@@ -41,7 +44,7 @@ export const carService = {
             size: size.toString()
         });
 
-        return apiClient.get(`/cars/search?${params}`);
+        return apiClient.get(`/car/search?${params}`);
     },
 
     // Get cars by location
@@ -52,7 +55,7 @@ export const carService = {
             size: size.toString()
         });
 
-        return apiClient.get(`/cars/location?${params}`);
+        return apiClient.get(`/car/location?${params}`);
     },
 
     // Get available cars
@@ -64,12 +67,12 @@ export const carService = {
             size: size.toString()
         });
 
-        return apiClient.get(`/cars/available?${params}`);
+        return apiClient.get(`/car/available?${params}`);
     },
 
     // Upload car images
     uploadCarImages: async (carId, formData) => {
-        return apiClient.post(`/cars/${carId}/images`, formData, {
+        return apiClient.post(`/car/${carId}/images`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

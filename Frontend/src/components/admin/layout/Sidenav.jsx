@@ -214,6 +214,24 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  const car = [
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      key={0}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4.5 6.5C4.5 5.67157 5.17157 5 6 5H14C14.8284 5 15.5 5.67157 15.5 6.5V7H16.5C17.3284 7 18 7.67157 18 8.5V13.5C18 14.3284 17.3284 15 16.5 15H15.5V15.5C15.5 16.3284 14.8284 17 14 17H13C12.1716 17 11.5 16.3284 11.5 15.5V15H8.5V15.5C8.5 16.3284 7.82843 17 7 17H6C5.17157 17 4.5 16.3284 4.5 15.5V15H3.5C2.67157 15 2 14.3284 2 13.5V8.5C2 7.67157 2.67157 7 3.5 7H4.5V6.5ZM6 10.5C6 9.67157 6.67157 9 7.5 9C8.32843 9 9 9.67157 9 10.5C9 11.3284 8.32843 12 7.5 12C6.67157 12 6 11.3284 6 10.5ZM12.5 9C11.6716 9 11 9.67157 11 10.5C11 11.3284 11.6716 12 12.5 12C13.3284 12 14 11.3284 14 10.5C14 9.67157 13.3284 9 12.5 9Z"
+        fill={color}
+      />
+    </svg>,
+  ];
+
   return (
     <>
       <div className="brand">
@@ -311,6 +329,19 @@ function Sidenav({ color }) {
               {carBrand}
             </span>
             <span className="label">Car Brand</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="12">
+          <NavLink to="/admin/cars">
+            <span
+              className="icon"
+              style={{
+                background: page === "admin/cars" ? color : "",
+              }}
+            >
+              {car}
+            </span>
+            <span className="label">Cars</span>
           </NavLink>
         </Menu.Item>
         <Menu.Item className="menu-item-header" key="5">
