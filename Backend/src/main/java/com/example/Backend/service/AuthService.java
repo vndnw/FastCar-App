@@ -76,13 +76,21 @@ public class AuthService {
         emailService.sendOTPEmail(registerRequest.getEmail(), otp);
         return userResponse;
     }
-    public boolean verifyOtp(String email, String otp) {
+    public boolean verifyOtpActive(String email, String otp) {
         if (!otpService.validateOtp(otp, email)) {
             throw new RuntimeException("OTP không hợp lệ");
         }
-        userService.updateActive(email, true);
-        return true;
+        if(userService.activeUser(email)){
+            log.info("User with email {} has been activated", email);
+            return true;
+        } else {
+            log.error("Failed to activate user with email {}", email);
+            throw new ResourceNotFoundException("User not found or already activated");
+        }
     }
+
+
+
     public AuthResponse refreshToken(RefreshRequest refreshRequest) {
         if(jwtService.isTokenExpired(refreshRequest.getRefreshToken())) {
             throw new RefreshTokenExpiredException("Refresh token expired");
@@ -125,5 +133,32 @@ public class AuthService {
 
     public boolean changePassword(String email, String newPassword) {
         return userService.changePassword(email, newPassword);
+    }
+
+    public boolean changePasswordForAdmin(String email, String newPassword) {
+        return userService.changePasswordForAdmin(email, newPassword);
+    }
+
+    public boolean forgotPassword(String email) {
+        if (!userService.checkEmailExists(email)) {
+            throw new ResourceNotFoundException("User not found with email: " + email);
+        }
+        String otp = otpService.generateOtp(email);
+        log.info("OTP forgot password email "+ email +": " + otp);
+        emailService.sendOTPEmail(email, otp);
+        return userService.forgotPassword(email);
+    }
+
+    public boolean verifyOtpPassword(String email, String otp) {
+        if (!otpService.validateOtp(otp, email)) {
+            throw new RuntimeException("OTP không hợp lệ");
+        }
+        if(userService.verifyOtpPassword(email)){
+            log.info("User with email {} has been activated", email);
+            return true;
+        } else {
+            log.error("Failed to activate user with email {}", email);
+            throw new ResourceNotFoundException("User not found or already activated");
+        }
     }
 }

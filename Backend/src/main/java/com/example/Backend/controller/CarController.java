@@ -59,6 +59,7 @@ public class CarController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
     @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCar(@PathVariable("id") long id) {
@@ -69,6 +70,8 @@ public class CarController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+
     @PatchMapping("/{id}/update-status/{status}")
     public ResponseEntity<?> activeCar(@PathVariable("id") long id, @PathVariable("status") String status) {
         CarStatus carStatus = CarStatus.valueOf(status);

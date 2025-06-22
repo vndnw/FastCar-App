@@ -48,7 +48,11 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private BankInformation bankInformation;
 
+    @Column(columnDefinition = "boolean default false")
     private boolean active;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean requiredChangePassword;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

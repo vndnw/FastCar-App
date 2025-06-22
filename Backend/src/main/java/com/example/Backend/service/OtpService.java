@@ -20,7 +20,7 @@ public class OtpService {
         int otp = 100000 + secureRandom.nextInt(900000);
         String otpString = String.format("%06d", otp);
         String key = "Otp:" + email; // Generate a 4-digit OTP
-        redisTemplate.opsForValue().set(key, otpString, 5, TimeUnit.MINUTES); // Store OTP in Redis with a 5-minute expiration
+        redisTemplate.opsForValue().set(key, otpString, 15, TimeUnit.MINUTES); // Store OTP in Redis with a 5-minute expiration
         return otpString;
     }
 

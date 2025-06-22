@@ -2,6 +2,7 @@ package com.example.Backend.controller;
 
 import com.example.Backend.config.VNPAYConfig;
 import com.example.Backend.dto.ResponseData;
+import com.example.Backend.dto.request.PaymentRequest;
 import com.example.Backend.service.PaymentService;
 import com.example.Backend.service.VNPAYService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ public class PaymentController {
         this.paymentService = paymentService;
         this.vnpayService = vnpayService;
     }
+
     @GetMapping("/vnpay-payment-return")
     public ResponseEntity<String> paymentReturn(HttpServletRequest request) {
         Map<String, String> fields = vnpayService.extractVnpParams(request);
@@ -49,6 +51,7 @@ public class PaymentController {
             return ResponseEntity.ok("FAILED");
         }
     }
+
     @GetMapping("/vnpay-ipn")
     public ResponseEntity<?> vnpayIpn(HttpServletRequest request) {
         Map<String, String> fields = vnpayService.extractVnpParams(request);
@@ -74,11 +77,7 @@ public class PaymentController {
             return ResponseEntity.ok("FAILED");
         }
     }
-//    @PostMapping("/extra-charge")
-//    public ResponseEntity<?> processExtraCharge(String transactionId, String reason) {
-//        // paymentService.processExtraCharge(transactionId, reason);
-//        return ResponseEntity.ok("Extra charge processed successfully");
-//    }
+
     @GetMapping
     public ResponseEntity<?> getAllPayments(@PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -88,6 +87,7 @@ public class PaymentController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getPaymentById(@PathVariable Long id) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -97,6 +97,17 @@ public class PaymentController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePayment(@PathVariable Long id, @RequestBody PaymentRequest paymentDetails) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Payment updated successfully")
+                .status(200)
+                .data(paymentService.updatePayment(id, paymentDetails))
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
     @GetMapping("/booking/{bookingId}")
     public ResponseEntity<?> getPaymentsByBookingId(@PathVariable Long bookingId) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -106,6 +117,7 @@ public class PaymentController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePayment(@PathVariable Long id) {
         paymentService.deletePayment(id);
