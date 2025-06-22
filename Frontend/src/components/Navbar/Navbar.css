@@ -123,3 +123,26 @@
 .navbar-avatar .ant-avatar {
   border-color: #51c09f !important;
 }
+
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-auth .ant-btn {
+  border-radius: 6px;
+  font-weight: 500;
+  height: 36px;
+  padding: 0 16px;
+}
+
+.navbar-auth .ant-btn-default {
+  border-color: #51c09f;
+  color: #51c09f;
+}
+
+.navbar-auth .ant-btn-default:hover {
+  border-color: #3ea98a !important;
+  color: #3ea98a !important;
+}

@@ -1739,7 +1739,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light.left-nav
 
 body {
   overflow: visible !important;
-  width: 100% !important;
+  /* width: 100% !important; */
 }
 
 .card-info-2 .ant-card-body {

@@ -104,7 +104,7 @@ const FeatureDisplay = ({
                                         {feature.description}
                                     </Text>
                                 </div>                                <div style={{ marginTop: 12 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                                         <Tag color="blue" size="small" style={{ fontSize: 10 }}>
                                             ID: {feature.id}
                                         </Tag>
@@ -113,11 +113,20 @@ const FeatureDisplay = ({
                                             <Space size="small">
                                                 {onEdit && (
                                                     <Button
-                                                        type="text"
-                                                        size="small"
+                                                        type="primary"
+                                                        size="middle"
                                                         icon={<EditOutlined />}
                                                         onClick={() => onEdit(feature)}
-                                                        style={{ padding: '2px 6px', height: 'auto' }}
+                                                        style={{
+                                                            minWidth: 36,
+                                                            height: 36,
+                                                            borderRadius: 6,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: 14
+                                                        }}
+                                                        title="Edit Feature"
                                                     />
                                                 )}
                                                 {onDelete && (
@@ -130,11 +139,20 @@ const FeatureDisplay = ({
                                                         okType="danger"
                                                     >
                                                         <Button
-                                                            type="text"
-                                                            size="small"
-                                                            icon={<DeleteOutlined />}
+                                                            type="primary"
                                                             danger
-                                                            style={{ padding: '2px 6px', height: 'auto' }}
+                                                            size="middle"
+                                                            icon={<DeleteOutlined />}
+                                                            style={{
+                                                                minWidth: 36,
+                                                                height: 36,
+                                                                borderRadius: 6,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                fontSize: 14
+                                                            }}
+                                                            title="Delete Feature"
                                                         />
                                                     </Popconfirm>
                                                 )}

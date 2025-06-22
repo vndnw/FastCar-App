@@ -234,7 +234,7 @@ function Sidenav({ color }) {
 
   return (
     <>
-      <div className="brand">
+      <div className="brand" style={{ display: "flex", alignItems: "center" }}>
         <img src={logo} alt="" />
         <span>Admin Dashboard</span>
       </div>
