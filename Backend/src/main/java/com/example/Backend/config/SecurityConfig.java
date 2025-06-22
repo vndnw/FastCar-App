@@ -63,7 +63,7 @@ public class SecurityConfig {
     private final String[] URL_PUBLIC  = {
             "/auth/login",
             "/auth/register",
-            "/api/v1/auth/refresh",
+            "/auth/refresh",
             "/auth/verify-otp",
             "/test/**",
             "/car/**",
