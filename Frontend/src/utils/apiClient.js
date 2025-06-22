@@ -95,11 +95,16 @@ apiClient.interceptors.response.use(
                                 refreshToken: refreshToken
                             });
 
-                            if (response.data.status === 0 && response.data.data) {
-                                const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+                            if (response.data.status === 200 && response.data.data) {
+                                const { accessToken, refreshToken: newRefreshToken, user } = response.data.data;
 
                                 // Save new tokens using tokenManager
                                 tokenManager.setTokens(accessToken, newRefreshToken);
+
+                                // Update user info if provided
+                                if (user) {
+                                    localStorage.setItem('userInfo', JSON.stringify(user));
+                                }
 
                                 // Update the authorization header
                                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
