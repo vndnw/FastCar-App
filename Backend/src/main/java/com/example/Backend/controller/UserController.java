@@ -79,7 +79,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody UserRequest userRequest) {
+    public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody UpdateUserRequest userRequest) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Success")

@@ -3,6 +3,7 @@ package com.example.Backend.service;
 
 import com.example.Backend.dto.request.RegisterRequest;
 import com.example.Backend.dto.request.UpdateInfoRequest;
+import com.example.Backend.dto.request.UpdateUserRequest;
 import com.example.Backend.dto.request.UserRequest;
 import com.example.Backend.dto.response.UserResponse;
 import com.example.Backend.exception.ResourceAlreadyExistsException;
@@ -106,7 +107,7 @@ public class UserService {
         return userMapper.mapToResponse(userRepository.save(user));
     }
 
-    public UserResponse updateUser(long id, @NotNull UserRequest userRequest) {
+    public UserResponse updateUser(long id, @NotNull UpdateUserRequest userRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setFirstName(userRequest.getFirstName());
@@ -115,6 +116,7 @@ public class UserService {
         user.setAddress(locationService.checkLocation(userRequest.getAddress()));
         user.setProfilePicture(userRequest.getProfilePicture());
         user.setDateOfBirth(userRequest.getDateOfBirth());
+        user.setRoles(userRequest.getRoles().stream().map(role -> roleRepository.findByName(role).orElseThrow(() -> new ResourceNotFoundException("Role not found: " + role))).collect(Collectors.toList()));
         return userMapper.mapToResponse(userRepository.save(user));
     }
 

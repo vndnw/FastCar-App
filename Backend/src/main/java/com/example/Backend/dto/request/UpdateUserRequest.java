@@ -1,8 +1,6 @@
 package com.example.Backend.dto.request;
 
-import com.example.Backend.model.Location;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class UserRequest {
+public class UpdateUserRequest {
     @NotBlank(message = "Last name cannot be null")
     private String lastName;
     @NotBlank(message = "First name cannot be null")
     private String firstName;
-    private String email;
     private String phone;
     private String password;
     private LocationRequest address;
