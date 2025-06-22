@@ -1,18 +1,48 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
-import { Spin } from "antd";
+import CarSection from '../../components/CarSection/CarSection';
+import { sampleCars, luxuryCars } from '../../data/sampleCars';
 
 const Home = () => {
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate('/ho-chi-minh');
-  }, [navigate]);
+  // Xử lý click nút "XEM THÊM XE CÓ NGAY"
+  const handleViewMoreRegular = () => {
+    navigate('/xe-co-ngay');
+  };
+
+  // Xử lý click nút "XEM THÊM XE XẾ XIN" 
+  const handleViewMoreLuxury = () => {
+    // Có thể navigate đến trang riêng cho xe sang hoặc cùng trang với filter
+    navigate('/xe-co-ngay?category=luxury');
+  };
 
   return (
-    <Spin size="large" className='ant-spin-dot-item'/>
+    <>
+      <div>
+        {/* Section 1: Xe có ngay */}
+        <CarSection
+          title="Xe có ngay"
+          cars={sampleCars}
+          buttonText="XEM THÊM XE CÓ NGAY"
+          onButtonClick={handleViewMoreRegular}
+          backgroundColor="#f5f5f5"
+        />
+
+        {/* Section 2: Xế xịn - Xe sang - Xe cao cấp */}
+        <CarSection
+          title="Xế xịn - Xe sang - Xe cao cấp"
+          cars={luxuryCars}
+          buttonText="XEM THÊM XE XẾ XIN"
+          onButtonClick={handleViewMoreLuxury}
+          backgroundColor="#fafafa"
+        />
+      </div>
+    </>
   );
 };
+
 
 export default Home;

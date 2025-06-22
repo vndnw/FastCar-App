@@ -5,7 +5,6 @@ import UserLayout from './components/layout/UserLayout';
 import HeroSection from './components/HeroSection/HeroSection';
 import Home from './views/Home/Home';
 import About from './views/About/About';
-import City from './views/Locations/City';
 import Login from './components/Login/Login';
 import Register from './components/Login/Register';
 import CarListing from './views/CarListing/CarListing';
@@ -22,6 +21,7 @@ import CarBrand from "./views/admin/CarBrand";
 import Cars from "./views/admin/Cars";
 import Main from "./components/admin/layout/Main";
 import OwnerCar from './views/OwnerCar/OwnerCar';
+import MyTrips from './views/MyTrips/MyTrips';
 
 
 function App() {
@@ -34,9 +34,9 @@ function App() {
           <Route path="/" element={<><HeroSection /><Home /></>} />
           <Route path="/about" element={<About />} />
           <Route path="/owner-car" element={<OwnerCar />} />
+          <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/:cityName" element={<><HeroSection /><City /></>} />
           <Route path="/xe-co-ngay" element={<CarListing />} />
           <Route path="/car-detail/:carId" element={<CarDetail />} />
         </Route>

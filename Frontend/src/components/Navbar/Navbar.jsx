@@ -72,22 +72,9 @@ const Navbar = () => {
             Trở thành chủ xe
           </Link>
 
-          {/* Select Location */}
-          <div className="navbar-location">
-            <EnvironmentOutlined className="navbar-location-icon" />
-            <Select
-              value={location}
-              onChange={handleLocationChange}
-              className="navbar-select"
-              variant={false}
-            >
-              {locationList.map((loc) => (
-                <Option key={loc} value={loc}>
-                  {loc}
-                </Option>
-              ))}
-            </Select>
-          </div>
+          <Link to="/my-trips" className="navbar-link">
+            Chuyến của tôi
+          </Link>
 
           {/* Login button */}
           <Button type="primary" onClick={handleLoginClick}>

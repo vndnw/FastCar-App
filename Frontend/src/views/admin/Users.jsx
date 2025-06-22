@@ -29,17 +29,17 @@ import {
   Avatar,
   Typography,
   Spin,
-  Tag,
-  Modal,
+  Tag, Modal,
   Descriptions,
   Divider,
   Form,
   Input,
   DatePicker,
   InputNumber,
+  Popconfirm,
 } from "antd";
 
-import { ToTopOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { ToTopOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { userService } from "../../services/userService";
@@ -370,7 +370,8 @@ function Tables() {
     current: 1,
     pageSize: 10,
     total: 0,
-  }); const [selectedUser, setSelectedUser] = useState(null);
+  });
+  const [selectedUser, setSelectedUser] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [userDetailLoading, setUserDetailLoading] = useState(false);
@@ -485,6 +486,30 @@ function Tables() {
       setEditLoading(false);
     }
   };
+  const handleDeleteUser = async (userId, userName) => {
+    try {
+      // Additional validation - prevent deleting admin users or current user
+      const userToDelete = users.find(u => u.key === userId.toString());
+
+      if (userToDelete && userToDelete.roles && userToDelete.roles.includes('ADMIN')) {
+        message.warning('Cannot delete admin users for security reasons');
+        return;
+      }
+
+      const result = await userService.deleteUser(userId);
+
+      if (result.status === 200) {
+        message.success(`User "${userName}" deleted successfully!`);
+        // Refresh the users list
+        fetchUsers(pagination.current - 1, pagination.pageSize);
+      } else {
+        message.error('Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      message.error(error.message || 'Failed to delete user');
+    }
+  };
 
   const fetchUsers = async (page = 0, size = 10) => {
     try {
@@ -555,7 +580,21 @@ function Tables() {
                 icon={<EditOutlined />}
                 onClick={() => handleEditUser(user.id)}
                 title="Edit User"
-              />
+              />              <Popconfirm
+                title="Delete User Account"
+                description={`Are you sure you want to permanently delete the account for "${user.firstName} ${user.lastName}"? This action cannot be undone.`}
+                onConfirm={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
+                okText="Yes, Delete"
+                cancelText="Cancel"
+                okType="danger"
+              >
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  title="Delete User"
+                  danger
+                />
+              </Popconfirm>
             </div>
           ),
         }));
@@ -593,31 +632,27 @@ function Tables() {
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Users Table"
-              extra={
-                <>
-                  <Radio.Group onChange={onChange} defaultValue="a">
-                    <Radio.Button value="a">All</Radio.Button>
-                    <Radio.Button value="b">ACTIVE</Radio.Button>
-                  </Radio.Group>
-                </>
+              title="Users Table" extra={
+                <Radio.Group onChange={onChange} defaultValue="a">
+                  <Radio.Button value="a">All</Radio.Button>
+                  <Radio.Button value="b">ACTIVE</Radio.Button>
+                </Radio.Group>
               }
             >
               <div className="table-responsive">
-                <Spin spinning={loading}>
-                  <Table
-                    columns={columns}
-                    dataSource={users}
-                    pagination={{
-                      ...pagination,
-                      showSizeChanger: true,
-                      showQuickJumper: true,
-                      showTotal: (total, range) =>
-                        `${range[0]}-${range[1]} of ${total} users`,
-                    }}
-                    onChange={handleTableChange}
-                    className="ant-border-space"
-                  />
+                <Spin spinning={loading}>                  <Table
+                  columns={columns}
+                  dataSource={users}
+                  pagination={{
+                    ...pagination,
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                    showTotal: (total, range) =>
+                      `${range[0]}-${range[1]} of ${total} users`,
+                  }}
+                  onChange={handleTableChange}
+                  className="ant-border-space"
+                />
                 </Spin>
               </div>
             </Card>
