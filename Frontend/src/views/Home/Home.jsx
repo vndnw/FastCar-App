@@ -4,14 +4,9 @@ import './Home.css';
 import { Spin } from "antd";
 
 const Home = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate('/ho-chi-minh');
-  }, [navigate]);
 
   return (
-    <Spin size="large" className='ant-spin-dot-item'/>
+    <Spin size="large" className='ant-spin-dot-item' />
   );
 };
 
