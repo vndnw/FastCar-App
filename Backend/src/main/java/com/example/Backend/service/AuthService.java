@@ -80,8 +80,13 @@ public class AuthService {
         if (!otpService.validateOtp(otp, email)) {
             throw new RuntimeException("OTP không hợp lệ");
         }
-        userService.updateActive(email, true);
-        return true;
+        if(userService.activeUser(email, true)){
+            log.info("User with email {} has been activated", email);
+            return true;
+        } else {
+            log.error("Failed to activate user with email {}", email);
+            throw new ResourceNotFoundException("User not found or already activated");
+        }
     }
     public AuthResponse refreshToken(RefreshRequest refreshRequest) {
         if(jwtService.isTokenExpired(refreshRequest.getRefreshToken())) {

@@ -98,6 +98,18 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('admin')")
+    @PatchMapping("/{email}/activate")
+    public ResponseEntity<?> activateUser(@PathVariable String email) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Successfully activated user")
+                .data(userService.activeUser(email, true))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable long id) {

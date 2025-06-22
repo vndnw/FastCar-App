@@ -145,11 +145,12 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return userMapper.mapToResponse(user);
     }
-    public void updateActive(String email, boolean active) {
+    public boolean activeUser(String email, boolean active) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setActive(active);
         userRepository.save(user);
+        return true; // User activation status updated successfully
     }
 
     public boolean checkEmailExists(String email) {
