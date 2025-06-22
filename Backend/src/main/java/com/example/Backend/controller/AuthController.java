@@ -39,10 +39,10 @@ public class AuthController {
         return ResponseEntity.ok(responseData);
     }
 
-    @PostMapping("/verify-otp")
+    @PostMapping("/verify-active-otp")
     public ResponseEntity<?> confirm(@RequestBody @Valid ConfirmRegister confirmRegister) {
         ResponseData<?> responseData;
-        if(authService.verifyOtp(confirmRegister.getEmail(), confirmRegister.getOtp())){
+        if(authService.verifyOtpActive(confirmRegister.getEmail(), confirmRegister.getOtp())){
             responseData = ResponseData.builder()
                     .status(200)
                     .message("Successfully verify otp")
@@ -108,6 +108,52 @@ public class AuthController {
                 .message("Email existence check completed")
                 .data(exists)
                 .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PostMapping("/change-password-admin")
+    public ResponseEntity<?> changePasswordForAdmin(@RequestParam String email, @RequestParam String newPassword) {
+        if(authService.changePasswordForAdmin(email, newPassword)) {
+            ResponseData<?> responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Password changed successfully")
+                    .data(null)
+                    .build();
+            return ResponseEntity.ok(responseData);
+        }else {
+            ResponseData<?> responseData = ResponseData.builder()
+                    .status(400)
+                    .message("Failed to change password")
+                    .data(null)
+                    .build();
+            return ResponseEntity.badRequest().body(responseData);
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Password reset link sent to email")
+                .data(authService.forgotPassword(email))
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PostMapping("/verify-password-otp")
+    public ResponseEntity<?> confirm_password(@RequestBody @Valid ConfirmRegister confirmRegister) {
+        ResponseData<?> responseData = null;
+        if(authService.verifyOtpPassword(confirmRegister.getEmail(), confirmRegister.getOtp())){
+            responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Successfully verify otp")
+                    .build();
+        }else{
+            responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Unsuccessfully verify otp")
+                    .build();
+        }
         return ResponseEntity.ok(responseData);
     }
 

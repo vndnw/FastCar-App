@@ -24,7 +24,7 @@ public class CarService {
     private final CarRepository carRepository;
     private final CarMapper carMapper;
     private final CarBrandRepository carBrandRepository;
-    private final CarFeatureService  carFeatureService;
+    private final FeatureService featureService;
     private final LocationService locationService;
     private final UserRepository userRepository;
     private final UserService userService;
@@ -32,14 +32,14 @@ public class CarService {
     public CarService(CarRepository carRepository,
                       CarMapper carMapper,
                       CarBrandRepository carBrandRepository,
-                      CarFeatureService carFeatureService,
+                      FeatureService featureService,
                       LocationService locationService,
                       UserRepository userRepository,
                       UserService userService) {
         this.carRepository = carRepository;
         this.carMapper = carMapper;
         this.carBrandRepository = carBrandRepository;
-        this.carFeatureService = carFeatureService;
+        this.featureService = featureService;
         this.locationService = locationService;
         this.userRepository = userRepository;
         this.userService = userService;
@@ -57,7 +57,7 @@ public class CarService {
         car.setTransmission(carRequest.getTransmission());
         car.setCarType(carRequest.getType());
         car.setFuelType(carRequest.getFuelType());
-        car.setFeatures(carRequest.getCarFeatures().stream().map(carFeatureService::getCarFeatureById).toList());
+        car.setFeatures(carRequest.getCarFeatures().stream().map(featureService::getCarFeatureById).toList());
         car.setLicensePlate(carRequest.getLicensePlate().trim());
         car.setFuelConsumption(carRequest.getFuelConsumption().trim());
         car.setPricePerHour(BigDecimal.valueOf(carRequest.getPricePerHour()));
@@ -96,8 +96,7 @@ public class CarService {
         car.setTransmission(carRequest.getTransmission());
         car.setCarType(carRequest.getType());
         car.setFuelType(carRequest.getFuelType());
-        car.setLocation(locationService.checkLocation(carRequest.getLocation()));
-        car.setFeatures(carRequest.getCarFeatures().stream().map(carFeatureService::getCarFeatureById).collect(Collectors.toList()));
+        car.setFeatures(carRequest.getCarFeatures().stream().map(featureService::getCarFeatureById).collect(Collectors.toList()));
         car.setLicensePlate(carRequest.getLicensePlate());
         car.setFuelConsumption(carRequest.getFuelConsumption());
         car.setPricePerHour(BigDecimal.valueOf(carRequest.getPricePerHour()));
@@ -116,7 +115,7 @@ public class CarService {
                 })
                 .toList();
         car.getImages().clear();
-        car.setImages(images);
+        car.getImages().addAll(images);
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         return carMapper.mapToResponse(carRepository.save(car));
     }

@@ -105,7 +105,7 @@ public class UserController {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Successfully activated user")
-                .data(userService.activeUser(email, true))
+                .data(userService.activeUser(email))
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }

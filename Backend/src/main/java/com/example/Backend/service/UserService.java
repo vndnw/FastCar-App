@@ -67,6 +67,8 @@ public class UserService {
                 .phone(registerRequest.getPhone())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .roles(roles)
+                .active(false)
+                .requiredChangePassword(false)
                 .build();
         return userMapper.mapToResponse(userRepository.save(user));
     }
@@ -98,6 +100,7 @@ public class UserService {
                 .profilePicture(userRequest.getProfilePicture())
                 .dateOfBirth(userRequest.getDateOfBirth())
                 .active(false)
+                .requiredChangePassword(false)
                 .roles(userRequest.getRoles().stream().map(role -> roleRepository.findByName(role).orElseThrow(() -> new ResourceNotFoundException("Role not found: " + role))).collect(Collectors.toList()))
                 .build();
         return userMapper.mapToResponse(userRepository.save(user));
@@ -145,10 +148,10 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return userMapper.mapToResponse(user);
     }
-    public boolean activeUser(String email, boolean active) {
+    public boolean activeUser(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        user.setActive(active);
+        user.setActive(true);
         userRepository.save(user);
         return true; // User activation status updated successfully
     }
@@ -173,9 +176,38 @@ public class UserService {
     public boolean changePassword(String email, String newPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if(!user.isRequiredChangePassword()){
+            throw new IllegalArgumentException("User is not required to change password");
+        }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         return true;
     }
+
+    public boolean forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setRequiredChangePassword(true);
+        userRepository.save(user);
+        return true; // Password reset initiated successfully
+    }
+
+    public boolean verifyOtpPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setRequiredChangePassword(true);
+        userRepository.save(user);
+        return true; // OTP verified successfully
+    }
+
+    public boolean changePasswordForAdmin(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
+    }
+
+
 
 }

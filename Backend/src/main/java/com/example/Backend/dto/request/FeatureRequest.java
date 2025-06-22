@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class CarFeatureRequest {
+public class FeatureRequest {
     private String name;
     private String iconUrl;
     private String description;
