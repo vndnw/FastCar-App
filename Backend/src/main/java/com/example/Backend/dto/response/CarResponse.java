@@ -40,7 +40,7 @@ public class CarResponse {
     private String color;
     private String description;
     private List<CarImageResponse> images;
-    private List<Long> features;
+    private List<CarFeatureResponse> features;
     private LocationResponse location;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

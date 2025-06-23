@@ -3,7 +3,7 @@ package com.example.Backend.service;
 import com.example.Backend.dto.request.FeatureRequest;
 import com.example.Backend.dto.response.CarFeatureResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
-import com.example.Backend.mapper.CarFeatureMapper;
+import com.example.Backend.mapper.FeatureMapper;
 import com.example.Backend.model.Feature;
 import com.example.Backend.repository.FeatureRepository;
 import org.springframework.data.domain.Page;
@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 public class FeatureService {
 
     private final FeatureRepository featureRepository;
-    private final CarFeatureMapper carFeatureMapper;
+    private final FeatureMapper featureMapper;
 
-    public FeatureService(FeatureRepository featureRepository, CarFeatureMapper carFeatureMapper) {
+    public FeatureService(FeatureRepository featureRepository, FeatureMapper featureMapper) {
         this.featureRepository = featureRepository;
-        this.carFeatureMapper = carFeatureMapper;
+        this.featureMapper = featureMapper;
     }
 
     public CarFeatureResponse createFeature(FeatureRequest featureRequest) {
@@ -27,7 +27,7 @@ public class FeatureService {
                 .description(featureRequest.getDescription())
                 .iconUrl(featureRequest.getIconUrl())
                 .build();
-        return carFeatureMapper.mapToResponse(featureRepository.save(feature));
+        return featureMapper.mapToResponse(featureRepository.save(feature));
     }
 
     public CarFeatureResponse updateFeature(long carFeatureId , FeatureRequest featureRequest) {
@@ -35,7 +35,7 @@ public class FeatureService {
         feature.setName(featureRequest.getName());
         feature.setDescription(featureRequest.getDescription());
         feature.setIconUrl(featureRequest.getIconUrl());
-        return carFeatureMapper.mapToResponse(featureRepository.save(feature));
+        return featureMapper.mapToResponse(featureRepository.save(feature));
     }
 
     public void deleteFeature(long carFeatureId) {
@@ -49,12 +49,12 @@ public class FeatureService {
 
     public CarFeatureResponse getFeature(long carFeatureId) {
         Feature feature = featureRepository.findById(carFeatureId).orElseThrow(() -> new ResourceNotFoundException("CarFeature not found"));
-        return carFeatureMapper.mapToResponse(feature);
+        return featureMapper.mapToResponse(feature);
     }
 
     public Page<CarFeatureResponse> getFeatures(Pageable pageable) {
         Page<Feature> carFeaturePage = featureRepository.findAll(pageable);
-        return carFeaturePage.map(carFeatureMapper::mapToResponse);
+        return carFeaturePage.map(featureMapper::mapToResponse);
     }
 
 

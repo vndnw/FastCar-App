@@ -11,12 +11,17 @@ public class CarMapper {
     private final CarBrandMapper carBrandMapper;
     private final CarImageMapper carImageMapper;
     private final LocationMapper locationMapper;
+    private final FeatureMapper featureMapper;
 
 
-    public CarMapper(CarBrandMapper carBrandMapper, CarImageMapper carImageMapper, LocationMapper locationMapper) {
+    public CarMapper(CarBrandMapper carBrandMapper,
+                     CarImageMapper carImageMapper,
+                     LocationMapper locationMapper,
+                     FeatureMapper featureMapper) {
         this.carBrandMapper = carBrandMapper;
         this.carImageMapper = carImageMapper;
         this.locationMapper = locationMapper;
+        this.featureMapper = featureMapper;
     }
 
     public CarResponse mapToResponse(Car car) {
@@ -34,7 +39,7 @@ public class CarMapper {
                 .description(car.getDescription())
                 .images(car.getImages().stream().map(carImageMapper::mapToResponse).collect(Collectors.toList()))
                 .location(locationMapper.mapToResponse(car.getLocation()))
-//                .features(car.getFeatures().stream().map(feature -> feature.getId()).collect(Collectors.toList()))
+                .features(car.getFeatures().stream().map(featureMapper::mapToResponse).collect(Collectors.toList()))
                 .seats(car.getSeats())
                 .fuelConsumption(car.getFuelConsumption())
                 .pricePer4Hour(car.getPricePer4Hour())

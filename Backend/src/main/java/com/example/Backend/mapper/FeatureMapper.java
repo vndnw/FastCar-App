@@ -5,7 +5,7 @@ import com.example.Backend.model.Feature;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CarFeatureMapper {
+public class FeatureMapper {
     public CarFeatureResponse mapToResponse(Feature feature) {
         return CarFeatureResponse.builder()
                 .id(feature.getId())
