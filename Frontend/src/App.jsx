@@ -23,6 +23,8 @@ import Main from "./components/admin/layout/Main";
 import OwnerCar from './views/OwnerCar/OwnerCar';
 import MyTrips from './views/MyTrips/MyTrips';
 
+import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
+
 
 function App() {
   return (
@@ -35,8 +37,18 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/owner-car" element={<OwnerCar />} />
           <Route path="/my-trips" element={<MyTrips />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={
+            <RedirectIfAuthenticated>
+              <Login />
+            </RedirectIfAuthenticated>
+          }
+          />
+          <Route path="/register" element={
+            <RedirectIfAuthenticated>
+              <Register />
+            </RedirectIfAuthenticated>
+          }
+          />
           <Route path="/xe-co-ngay" element={<CarListing />} />
           <Route path="/car-detail/:carId" element={<CarDetail />} />
         </Route>

@@ -1,8 +1,7 @@
 import apiClient from '../utils/apiClient';
 
 // User API service
-export const userService = {
-    // Get all users with pagination
+export const userService = {    // Get all users with pagination
     getUsers: async (page = 0, size = 10, sort = 'email,asc') => {
         const params = new URLSearchParams({
             page: page.toString(),
@@ -39,6 +38,16 @@ export const userService = {
     // Update user status (activate/deactivate)
     updateUserStatus: async (id, active) => {
         return apiClient.patch(`/user/${id}/status?id=${id}`, { active });
+    },
+
+    // Activate user by email (specific endpoint)
+    activateUser: async (email) => {
+        return apiClient.patch(`/user/${email}/activate`);
+    },
+
+    // Deactivate user by email (specific endpoint)
+    deactivateUser: async (email) => {
+        return apiClient.patch(`/user/${email}/deactivate`);
     },
 
     // Search users

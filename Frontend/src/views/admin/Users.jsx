@@ -1,30 +1,9 @@
-/*!
-=========================================================
-* Muse Ant Design Dashboard - v1.0.0
-=========================================================
-* Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
-* Coded by Creative Tim
-=========================================================
-* The above copyright notice and this permission no        <div className="ant-progress-project">
-          <Progress percent={90} size="small" />
-          <span>
-            <Link to="#" onClick={(e) => e.preventDefault()}>
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>ll be included in all copies or substantial portions of the Software.
-*/
 import {
   Row,
   Col,
   Card,
-  Radio,
   Table,
-  Upload,
   message,
-  Progress,
   Button,
   Avatar,
   Typography,
@@ -37,48 +16,32 @@ import {
   DatePicker,
   InputNumber,
   Popconfirm,
+  Select,
+  Tabs,
 } from "antd";
 
-import { ToTopOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { userService } from "../../services/userService";
+import { roleService } from "../../services/roleService";
 import dayjs from 'dayjs';
+import { Users } from "lucide-react";
 
-// Images
-import ava1 from "../../assets/images/logo-shopify.svg";
-import ava2 from "../../assets/images/logo-atlassian.svg";
-import ava3 from "../../assets/images/logo-slack.svg";
-import ava5 from "../../assets/images/logo-jira.svg";
-import ava6 from "../../assets/images/logo-invision.svg";
-import face from "../../assets/images/face-1.jpg";
-import face2 from "../../assets/images/face-2.jpg";
-import face3 from "../../assets/images/face-3.jpg";
-import face4 from "../../assets/images/face-4.jpg";
-import face5 from "../../assets/images/face-5.jpeg";
-import face6 from "../../assets/images/face-6.jpeg";
-import pencil from "../../assets/images/pencil.svg";
 
 const { Title } = Typography;
 
-const formProps = {
-  name: "file",
-  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
+
+const getRoleDescription = (roleName) => {
+  const descriptions = {
+    'admin': 'Administrator with full system access and management capabilities',
+    'user': 'Regular user with basic access to book and manage personal trips',
+    'driver': 'Driver with access to manage vehicles and accept trip requests',
+    'owner': 'Car owner with access to manage their vehicles and bookings'
+  };
+  return descriptions[roleName.toLowerCase()] || 'Role with specific system permissions';
 };
-// table code start
+
+
 const columns = [
   {
     title: "USER",
@@ -118,252 +81,24 @@ const columns = [
   },
 ];
 
-const data = [];
-// project table start
-const project = [
+
+const roleColumns = [
   {
-    title: "COMPANIES",
+    title: "ROLE NAME",
     dataIndex: "name",
-    width: "32%",
+    key: "name",
+    width: "40%",
   },
   {
-    title: "BUDGET",
-    dataIndex: "age",
-  },
-  {
-    title: "STATUS",
-    dataIndex: "address",
-  },
-  {
-    title: "COMPLETION",
-    dataIndex: "completion",
-  },
-];
-const dataproject = [
-  {
-    key: "1",
-
-    name: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava1} size={25} alt="" />
-          <div className="avatar-info">
-            <Title level={5}>Spotify Version</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$14,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">working</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={30} size="small" />
-          <span>
-            <Link to="#" onClick={(e) => e.preventDefault()}>
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "2",
-    name: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava2} size={25} alt="" />
-          <div className="avatar-info">
-            <Title level={5}>Progress Track</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$3,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">working</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={10} size="small" />
-          <span>
-            <Link to="#" onClick={(e) => e.preventDefault()}>
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "3",
-    name: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava3} size={25} alt="" />
-          <div className="avatar-info">
-            <Title level={5}> Jira Platform Errors</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">Not Set</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">done</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={100} size="small" format={() => "done"} />
-          <span>
-            <Link to="#" onClick={(e) => e.preventDefault()}>
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "4",
-    name: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava5} size={25} alt="" />
-          <div className="avatar-info">
-            <Title level={5}> Launch new Mobile App</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$20,600</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">canceled</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress
-            percent={50}
-            size="small"
-            status="exception"
-            format={() => "50%"}
-          />
-          <span>
-            <Link to="#" onClick={(e) => e.preventDefault()}>
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "5",
-    name: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava5} size={25} alt="" />
-          <div className="avatar-info">
-            <Title level={5}>Web Dev</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$4,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">working</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={80} size="small" />
-          <span>
-            <Link to="#" onClick={(e) => e.preventDefault()}>
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
-  },
-
-  {
-    key: "6",
-    name: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" src={ava6} size={25} alt="" />
-          <div className="avatar-info">
-            <Title level={5}>Redesign Online Store</Title>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    age: (
-      <>
-        <div className="semibold">$2,000</div>
-      </>
-    ),
-    address: (
-      <>
-        <div className="text-sm">canceled</div>
-      </>
-    ),
-    completion: (
-      <>
-        <div className="ant-progress-project">
-          <Progress percent={0} size="small" />
-          <span>
-            <Link to="#" onClick={(e) => e.preventDefault()}>
-              <img src={pencil} alt="" />
-            </Link>
-          </span>
-        </div>
-      </>
-    ),
+    title: "DESCRIPTION",
+    dataIndex: "description",
+    key: "description",
+    width: "60%",
   },
 ];
 
-function Tables() {
+
+function UserPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -374,9 +109,18 @@ function Tables() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [userDetailLoading, setUserDetailLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  // Role management states
+  const [activeTab, setActiveTab] = useState('users');
+  const [roles, setRoles] = useState([]);
+  const [roleLoading, setRoleLoading] = useState(false);
+
   const [form] = Form.useForm();
+  const [createForm] = Form.useForm();
+
   const handleViewUser = async (userId) => {
     try {
       setUserDetailLoading(true);
@@ -405,14 +149,13 @@ function Tables() {
 
       if (result.status === 200) {
         const user = result.data;
-        setSelectedUser(user);
-
-        // Populate form with user data
+        setSelectedUser(user);        // Populate form with user data
         form.setFieldsValue({
           firstName: user.firstName,
           lastName: user.lastName,
           profilePicture: user.profilePicture,
           dateOfBirth: user.dateOfBirth ? dayjs(user.dateOfBirth) : null,
+          roles: user.roles || ['user'],
           address: {
             address: user.address?.address || '',
             street: user.address?.street || '',
@@ -421,11 +164,6 @@ function Tables() {
             city: user.address?.city || '',
             latitude: user.address?.latitude || 0,
             longitude: user.address?.longitude || 0,
-          },
-          bankInformation: {
-            bankName: user.bankInformation?.bankName || '',
-            accountNumber: user.bankInformation?.accountNumber || '',
-            accountHolderName: user.bankInformation?.accountHolderName || '',
           }
         });
 
@@ -447,14 +185,13 @@ function Tables() {
 
   const handleUpdateUser = async (values) => {
     try {
-      setEditLoading(true);
-
-      // Prepare data for API
+      setEditLoading(true);      // Prepare data for API
       const updateData = {
         firstName: values.firstName,
         lastName: values.lastName,
         profilePicture: values.profilePicture,
         dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
+        roles: values.roles || ['user'],
         address: {
           address: values.address?.address || '',
           street: values.address?.street || '',
@@ -463,15 +200,10 @@ function Tables() {
           city: values.address?.city || '',
           latitude: values.address?.latitude || 0,
           longitude: values.address?.longitude || 0,
-        },
-        bankInformation: {
-          bankName: values.bankInformation?.bankName || '',
-          accountNumber: values.bankInformation?.accountNumber || '',
-          accountHolderName: values.bankInformation?.accountHolderName || '',
         }
       };
 
-      const result = await userService.updateUserInfo(selectedUser.id, updateData);
+      const result = await userService.updateUser(selectedUser.id, updateData);
 
       if (result.status === 200) {
         message.success('User updated successfully!');
@@ -508,6 +240,32 @@ function Tables() {
     } catch (error) {
       console.error('Error deleting user:', error);
       message.error(error.message || 'Failed to delete user');
+    }
+  };
+  const handleToggleUserStatus = async (userId, currentStatus, userName, userEmail) => {
+    try {
+      const newStatus = !currentStatus;
+      let result;
+
+      if (newStatus) {
+        // Activate user
+        result = await userService.activateUser(userEmail);
+      } else {
+        // Deactivate user
+        // result = await userService.deactivateUser(userEmail);
+        return;
+      }
+
+      if (result.status === 200) {
+        message.success(`User "${userName}" ${newStatus ? 'activated' : 'deactivated'} successfully!`);
+        // Refresh the users list
+        fetchUsers(pagination.current - 1, pagination.pageSize);
+      } else {
+        message.error('Failed to update user status');
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      message.error(error.message || 'Failed to update user status');
     }
   };
 
@@ -556,11 +314,29 @@ function Tables() {
                 <Tag color="default">USER</Tag>
               )}
             </div>
-          ),
-          status: (
-            <Button type="primary" className={user.active ? "tag-primary" : "tag-badge"}>
-              {user.active ? 'ACTIVE' : 'INACTIVE'}
-            </Button>
+          ), status: (
+            <Popconfirm
+              title={`${user.active ? 'Deactivate' : 'Activate'} User`}
+              description={`Are you sure you want to ${user.active ? 'deactivate' : 'activate'} this user?`}
+              onConfirm={() => handleToggleUserStatus(
+                user.id,
+                user.active,
+                user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.email.split('@')[0],
+                user.email
+              )}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                type="primary"
+                className={user.active ? "tag-primary" : "tag-badge"}
+                style={{ cursor: 'pointer' }}
+              >
+                {user.active ? 'ACTIVE' : 'INACTIVE'}
+              </Button>
+            </Popconfirm>
           ), created: (
             <div className="ant-employed">
               <span>{new Date(user.createdAt).toLocaleDateString()}</span>
@@ -617,79 +393,153 @@ function Tables() {
   useEffect(() => {
     fetchUsers();
   }, []);
-
   const handleTableChange = (pagination) => {
     fetchUsers(pagination.current - 1, pagination.pageSize);
+  };  // Role management functions
+  const fetchRoles = async () => {
+    try {
+      setRoleLoading(true);
+      const result = await roleService.getRoles();
+
+      if (result.status === 200 && result.data) {
+        const roleData = result.data.map(role => ({
+          key: role.id.toString(),
+          name: (
+            <div>
+              <Tag color="blue" style={{ fontSize: '14px', padding: '4px 8px' }}>
+                {role.role.toUpperCase()}
+              </Tag>
+            </div>
+          ),
+          description: getRoleDescription(role.role),
+        }));
+
+        setRoles(roleData);
+      }
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+      // Fallback to mock data if API fails
+      const mockRoles = [
+        {
+          id: 1,
+          name: 'ADMIN',
+          description: 'Administrator with full access',
+        },
+        {
+          id: 2,
+          name: 'USER',
+          description: 'Regular user with basic access',
+        },
+        {
+          id: 3,
+          name: 'DRIVER',
+          description: 'Driver with vehicle management access',
+        },
+        {
+          id: 4,
+          name: 'OWNER',
+          description: 'Car owner with vehicle ownership access',
+        }
+      ];
+
+      const roleData = mockRoles.map(role => ({
+        key: role.id.toString(),
+        name: (
+          <div>
+            <Tag color="blue" style={{ fontSize: '14px', padding: '4px 8px' }}>
+              {role.name}
+            </Tag>
+          </div>
+        ),
+        description: role.description,
+      }));
+
+      setRoles(roleData);
+      message.error('Failed to fetch roles from server, showing mock data');
+    } finally {
+      setRoleLoading(false);
+    }
+  };
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    if (key === 'roles') {
+      fetchRoles();
+    }
   };
 
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
-
   return (
     <>
       <div className="tabled">
         <Row gutter={[24, 0]}>
           <Col xs="24" xl={24}>
-            <Card
-              bordered={false}
-              className="criclebox tablespace mb-24"
-              title="Users Table" extra={
-                <Radio.Group onChange={onChange} defaultValue="a">
-                  <Radio.Button value="a">All</Radio.Button>
-                  <Radio.Button value="b">ACTIVE</Radio.Button>
-                </Radio.Group>
-              }
-            >
-              <div className="table-responsive">
-                <Spin spinning={loading}>                  <Table
-                  columns={columns}
-                  dataSource={users}
-                  pagination={{
-                    ...pagination,
-                    showSizeChanger: true,
-                    showQuickJumper: true,
-                    showTotal: (total, range) =>
-                      `${range[0]}-${range[1]} of ${total} users`,
-                  }}
-                  onChange={handleTableChange}
-                  className="ant-border-space"
-                />
-                </Spin>
-              </div>
-            </Card>
-
-            <Card
-              bordered={false}
-              className="criclebox tablespace mb-24"
-              title="Projects Table"
-              extra={
-                <>
-                  <Radio.Group onChange={onChange} defaultValue="all">
-                    <Radio.Button value="all">All</Radio.Button>
-                    <Radio.Button value="online">ONLINE</Radio.Button>
-                    <Radio.Button value="store">STORES</Radio.Button>
-                  </Radio.Group>
-                </>
-              }
-            >
-              <div className="table-responsive">
-                <Table
-                  columns={project}
-                  dataSource={dataproject}
-                  pagination={false}
-                  className="ant-border-space"
-                />
-              </div>
-              <div className="uploadfile pb-15 shadow-none">
-                <Upload {...formProps}>
-                  <Button
-                    type="dashed"
-                    className="ant-full-box"
-                    icon={<ToTopOutlined />}
-                  >
-                    Click to Upload
-                  </Button>
-                </Upload>
-              </div>            </Card>
+            <Tabs
+              activeKey={activeTab}
+              onChange={handleTabChange}
+              items={[
+                {
+                  key: 'users',
+                  label: 'Users Management',
+                  children: (
+                    <Card
+                      bordered={false}
+                      className="criclebox tablespace mb-24"
+                      title="Users Table"
+                      extra={
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => setCreateModalVisible(true)}
+                          >
+                            Create User
+                          </Button>
+                        </div>
+                      }
+                    >
+                      <div className="table-responsive">
+                        <Spin spinning={loading}>
+                          <Table
+                            columns={columns}
+                            dataSource={users}
+                            pagination={{
+                              ...pagination,
+                              showSizeChanger: true,
+                              showQuickJumper: true,
+                              showTotal: (total, range) =>
+                                `${range[0]}-${range[1]} of ${total} users`,
+                            }}
+                            onChange={handleTableChange}
+                            className="ant-border-space"
+                          />
+                        </Spin>
+                      </div>
+                    </Card>
+                  )
+                },
+                {
+                  key: 'roles',
+                  label: 'Roles',
+                  children: (
+                    <Card
+                      bordered={false}
+                      className="criclebox tablespace mb-24"
+                      title="Roles Table"
+                    >
+                      <div className="table-responsive">
+                        <Spin spinning={roleLoading}>
+                          <Table
+                            columns={roleColumns}
+                            dataSource={roles}
+                            pagination={false}
+                            className="ant-border-space"
+                          />
+                        </Spin>
+                      </div>
+                    </Card>
+                  )
+                }
+              ]} />
           </Col>
         </Row>
       </div>
@@ -855,8 +705,284 @@ function Tables() {
                   format="YYYY-MM-DD"
                 />
               </Form.Item>
+            </Col>          </Row>
+
+          <Form.Item
+            label="User Roles"
+            name="roles"
+            rules={[{ required: true, message: 'Please select at least one role!' }]}
+          >
+            <Select
+              mode="multiple"
+              placeholder="Select user roles"
+              options={[
+                { value: 'user', label: 'User' },
+                { value: 'admin', label: 'Admin' },
+                { value: 'driver', label: 'Driver' },
+                { value: 'owner', label: 'Car Owner' },
+              ]}
+            />
+          </Form.Item>
+
+          <Divider orientation="left">Address Information</Divider>
+
+          <Form.Item
+            label="Full Address"
+            name={['address', 'address']}
+          >
+            <Input.TextArea
+              rows={2}
+              placeholder="Enter full address"
+            />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Street"
+                name={['address', 'street']}
+              >
+                <Input placeholder="Enter street" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Ward"
+                name={['address', 'ward']}
+              >
+                <Input placeholder="Enter ward" />
+              </Form.Item>
             </Col>
           </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="District"
+                name={['address', 'district']}
+              >
+                <Input placeholder="Enter district" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="City"
+                name={['address', 'city']}
+              >
+                <Input placeholder="Enter city" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Latitude"
+                name={['address', 'latitude']}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="Enter latitude"
+                  step={0.000001}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Longitude"
+                name={['address', 'longitude']}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="Enter longitude"
+                  step={0.000001}
+                />
+              </Form.Item>
+            </Col>          </Row>
+
+          <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
+            <Button
+              onClick={handleCloseEditModal}
+              style={{ marginRight: 8 }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={editLoading}
+            >
+              Update User
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Create User Modal */}
+      <Modal
+        title="Create New User"
+        open={createModalVisible}
+        onCancel={() => setCreateModalVisible(false)}
+        footer={null}
+        width={900}
+      >
+        <Form
+          form={createForm}
+          layout="vertical" onFinish={async (values) => {
+            setCreateLoading(true);
+            try {
+              // Prepare data for API
+              const newUser = {
+                lastName: values.lastName,
+                firstName: values.firstName,
+                email: values.email,
+                phone: values.phone || '',
+                password: values.password,
+                address: {
+                  address: values.address?.address || '',
+                  street: values.address?.street || '',
+                  ward: values.address?.ward || '',
+                  district: values.address?.district || '',
+                  city: values.address?.city || '',
+                  latitude: values.address?.latitude || 0.1,
+                  longitude: values.address?.longitude || 0.1,
+                },
+                profilePicture: values.profilePicture || '',
+                dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
+                roles: values.roles || ['user']
+              }; const result = await userService.createUser(newUser);
+
+              if (result.status === 201 || result.status === 200) {
+                message.success('User created successfully!');
+                setCreateModalVisible(false);
+                createForm.resetFields();
+                // Refresh the users list
+                fetchUsers(pagination.current - 1, pagination.pageSize);
+              } else {
+                message.error('Failed to create user');
+              }
+            } catch (error) {
+              console.error('Error creating user:', error);
+              message.error(error.message || 'Failed to create user');
+            } finally {
+              setCreateLoading(false);
+            }
+          }}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="First Name"
+                name="firstName"
+                rules={[{ required: true, message: 'Please input first name!' }]}
+              >
+                <Input placeholder="Enter first name" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Last Name"
+                name="lastName"
+                rules={[{ required: true, message: 'Please input last name!' }]}
+              >
+                <Input placeholder="Enter last name" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: 'Please input email!' },
+                  { type: 'email', message: 'Please enter a valid email!' }
+                ]}
+              >
+                <Input placeholder="Enter email" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Phone"
+                name="phone"
+              >
+                <Input placeholder="Enter phone number" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[{ required: true, message: 'Please input password!' }]}
+              >
+                <Input.Password placeholder="Enter password" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Confirm Password"
+                name="confirmPassword"
+                rules={[
+                  { required: true, message: 'Please confirm password!' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Passwords do not match!'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password placeholder="Confirm password" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Profile Picture URL"
+                name="profilePicture"
+              >
+                <Input placeholder="Enter profile picture URL" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Date of Birth"
+                name="dateOfBirth"
+              >
+                <DatePicker
+                  style={{ width: '100%' }}
+                  placeholder="Select date of birth"
+                  format="YYYY-MM-DD"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            label="User Roles"
+            name="roles"
+            initialValue={['user']}
+            rules={[{ required: true, message: 'Please select at least one role!' }]}
+          >            <Select
+              mode="multiple"
+              placeholder="Select user roles"
+              options={[
+                { value: 'user', label: 'User' },
+                { value: 'admin', label: 'Admin' },
+                { value: 'driver', label: 'Driver' },
+                { value: 'owner', label: 'Car Owner' },
+              ]}
+            />
+          </Form.Item>
 
           <Divider orientation="left">Address Information</Divider>
 
@@ -935,37 +1061,11 @@ function Tables() {
             </Col>
           </Row>
 
-          <Divider orientation="left">Bank Information</Divider>
 
-          <Form.Item
-            label="Bank Name"
-            name={['bankInformation', 'bankName']}
-          >
-            <Input placeholder="Enter bank name" />
-          </Form.Item>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Account Number"
-                name={['bankInformation', 'accountNumber']}
-              >
-                <Input placeholder="Enter account number" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Account Holder Name"
-                name={['bankInformation', 'accountHolderName']}
-              >
-                <Input placeholder="Enter account holder name" />
-              </Form.Item>
-            </Col>
-          </Row>
 
           <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
             <Button
-              onClick={handleCloseEditModal}
+              onClick={() => setCreateModalVisible(false)}
               style={{ marginRight: 8 }}
             >
               Cancel
@@ -973,9 +1073,9 @@ function Tables() {
             <Button
               type="primary"
               htmlType="submit"
-              loading={editLoading}
+              loading={createLoading}
             >
-              Update User
+              Create User
             </Button>
           </Form.Item>
         </Form>
@@ -984,4 +1084,4 @@ function Tables() {
   );
 }
 
-export default Tables;
+export default UserPage;

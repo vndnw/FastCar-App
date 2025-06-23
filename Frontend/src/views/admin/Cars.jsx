@@ -1,9 +1,3 @@
-/*!
-=========================================================
-* Car Management - Admin Dashboard
-* Copyright 2025 BookingACar
-=========================================================
-*/
 import {
     Row,
     Col,
@@ -1529,7 +1523,8 @@ const Cars = () => {
                                             loading={loading}
                                         >
                                             Refresh
-                                        </Button>                                        <Button
+                                        </Button>
+                                        <Button
                                             type="primary"
                                             icon={<PlusOutlined />}
                                             onClick={() => setFeatureCreateModalVisible(true)}

@@ -1,9 +1,3 @@
-/*!
-=========================================================
-* Discount Management - Admin Dashboard
-* Copyright 2025 BookingACar
-=========================================================
-*/
 import {
     Row,
     Col,
