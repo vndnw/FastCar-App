@@ -1,6 +1,5 @@
 package com.example.Backend.service;
 
-
 import com.example.Backend.model.Booking;
 import com.example.Backend.model.ExtraCharge;
 import com.example.Backend.model.Payment;
@@ -12,10 +11,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,7 +37,7 @@ public class EmailService {
 
     @Async
     public void sendOTPEmail(String emailTo, String otp) {
-        try{
+        try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(FROM_EMAIL);
@@ -48,14 +48,15 @@ public class EmailService {
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
             log.info("OTP email sent successfully to: {}", emailTo);
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to send OTP email to {}: {}", emailTo, e.getMessage(), e);
             e.printStackTrace();
         }
     }
+
     @Async
     public void sendMailSuccess(Booking booking, Payment payment) {
-        try{
+        try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(FROM_EMAIL);
@@ -74,14 +75,15 @@ public class EmailService {
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
             log.info("Email sent successfully to: {}", booking.getUser().getEmail());
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to send Email to {}: {}", booking.getUser().getEmail(), e.getMessage(), e);
             e.printStackTrace();
         }
     }
+
     @Async
-    public void sendMailFailed( Booking booking, Payment payment) {
-        try{
+    public void sendMailFailed(Booking booking, Payment payment) {
+        try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(FROM_EMAIL);
@@ -99,14 +101,15 @@ public class EmailService {
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
             log.info("Email sent successfully to: {}", booking.getUser().getEmail());
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to send Email to {}: {}", booking.getUser().getEmail(), e.getMessage(), e);
             e.printStackTrace();
         }
     }
+
     @Async
     public void sendMailRefund(Booking booking, Payment payment) {
-        try{
+        try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(FROM_EMAIL);
@@ -124,15 +127,16 @@ public class EmailService {
 
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
-            log.info("OTP email sent successfully to: {}", booking.getUser().getEmail());
-        }catch (Exception e) {
-            log.error("Failed to send OTP email to {}: {}", booking.getUser().getEmail(), e.getMessage(), e);
+            log.info("Refund email sent successfully to: {}", booking.getUser().getEmail()); // Đã sửa log info
+        } catch (Exception e) {
+            log.error("Failed to send Refund email to {}: {}", booking.getUser().getEmail(), e.getMessage(), e); // Đã sửa log error
             e.printStackTrace();
         }
     }
+
     @Async
     public void sendMailExtra(Booking booking, Payment payment, String paymentUrl) {
-        try{
+        try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(FROM_EMAIL);
@@ -160,19 +164,20 @@ public class EmailService {
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
             log.info("Email sent successfully to: {}", booking.getUser().getEmail());
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to send Email to {}: {}", booking.getUser().getEmail(), e.getMessage(), e);
             e.printStackTrace();
         }
     }
+
     @Async
     public void sendMailCheckIn(Booking booking) {
-        try{
+        try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(FROM_EMAIL);
             mimeMessageHelper.setTo(booking.getUser().getEmail());
-            mimeMessageHelper.setSubject("Thông báo nhân xe thành công");
+            mimeMessageHelper.setSubject("Thông báo nhận xe thành công");
             String htmlContent = loadHtmlTemplate("templates/thongbaonhanxe.html");
 
             htmlContent = htmlContent.replace("${[Tên khách hàng]}", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
@@ -185,14 +190,15 @@ public class EmailService {
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
             log.info("Email sent successfully to: {}", booking.getUser().getEmail());
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to send Email to {}: {}", booking.getUser().getEmail(), e.getMessage(), e);
             e.printStackTrace();
         }
     }
+
     @Async
     public void sendMailCheckOut(Booking booking) {
-        try{
+        try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(FROM_EMAIL);
@@ -210,16 +216,19 @@ public class EmailService {
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
             log.info("Email sent successfully to: {}", booking.getUser().getEmail());
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to send Email to {}: {}", booking.getUser().getEmail(), e.getMessage(), e);
             e.printStackTrace();
         }
     }
 
+    // Phương thức đã được chỉnh sửa để đọc tài nguyên từ InputStream
     private String loadHtmlTemplate(String path) throws IOException {
         ClassPathResource resource = new ClassPathResource(path);
-        byte[] bytes = Files.readAllBytes(resource.getFile().toPath());
-        return new String(bytes, StandardCharsets.UTF_8);
+        try (InputStream inputStream = resource.getInputStream()) {
+            byte[] bytes = FileCopyUtils.copyToByteArray(inputStream);
+            return new String(bytes, StandardCharsets.UTF_8);
+        }
     }
 
 }
