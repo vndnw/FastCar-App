@@ -77,7 +77,36 @@ export const carService = {
                 'Content-Type': 'multipart/form-data',
             },
         });
-    }
+    },
+
+    // lấy xe xịn
+    getCarsSuperLuxury: async () => {
+        const params = new URLSearchParams({
+            carType: "SUPER_LUXURY",
+            page: 0,
+            size: 10
+        });
+        return apiClient.get(`/car/search?${params}`);
+    },
+
+    // lấy xe sang
+    getCarsLuxury: async () => {
+        const params = new URLSearchParams({
+            carType: "LUXURY",
+            page: 0,
+            size: 7
+        });
+        return apiClient.get(`/car/search?${params}`);
+    },
+
+    getCarsStandard: async () => {
+        const params = new URLSearchParams({
+            carType: "STANDARD",
+            page: 0,
+            size: 7
+        });
+        return apiClient.get(`/car/search?${params}`);
+    },
 };
 
 export default carService;

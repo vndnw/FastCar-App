@@ -45,7 +45,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
                 <div style={{ position: 'relative' }}>
                     <img
                         alt={car.name}
-                        src={car.image}
+                        src={car.images[0] || 'https://via.placeholder.com/280x200?text=No+Image'}
                         style={{
                             width: '100%',
                             height: 200,
@@ -109,26 +109,24 @@ const CarCard = ({ car, isInCarousel = false }) => {
                     marginBottom: 12,
                     color: '#666'
                 }}>
-                    {car.location}
+                    {car.location.district}
                 </Text>
 
                 {/* Giá */}
                 <div style={{ marginBottom: 16 }}>
-                    <Text strong style={{ fontSize: 18, color: '#52c41a', fontWeight: '600' }}>
-                        {car.currentPrice}K
+                    <Text strong style={{ fontSize: 16, color: '#52c41a', fontWeight: '600' }}>
+                        {car.pricePer4Hour / 1000}K
                     </Text>
                     <Text style={{ fontSize: 14, color: '#999', marginLeft: 4 }}>
-                        /giờ
+                        / 4 giờ
                     </Text>
-                    {car.originalPrice && (
-                        <Text
-                            delete
-                            type="secondary"
-                            style={{ fontSize: 14, marginLeft: 8 }}
-                        >
-                            {car.originalPrice}K
-                        </Text>
-                    )}
+                    <br />
+                    <Text strong style={{ fontSize: 16, color: '#52c41a', fontWeight: '600' }}>
+                        {car.pricePer24Hour / 1000}K
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#999', marginLeft: 4 }}>
+                        / 24 giờ
+                    </Text>
                 </div>
 
                 {/* Thông tin xe */}
@@ -153,7 +151,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
                         <Space size={4} style={{ display: 'flex', alignItems: 'center' }}>
                             <CarOutlined style={{ color: '#1890ff', fontSize: 14 }} />
                             <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>
-                                {car.fuel}
+                                {car.fuelType}
                             </Text>
                         </Space>
                     </Col>

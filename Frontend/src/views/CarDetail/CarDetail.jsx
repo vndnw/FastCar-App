@@ -4,18 +4,31 @@ import { Row, Col, Button, Badge } from 'antd';
 import { ArrowLeftOutlined, UserOutlined, SettingOutlined, CarOutlined } from '@ant-design/icons';
 import { sampleCars, luxuryCars } from '../../data/sampleCars';
 import './CarDetail.css';
+import carService from '../../services/carService';
+
 
 const CarDetail = () => {
     const { carId } = useParams();
     const navigate = useNavigate();
     const [car, setCar] = useState(null);
 
-    useEffect(() => {
-        const allCars = [...sampleCars, ...luxuryCars];
-        const foundCar = allCars.find(c => c.id === parseInt(carId));
-        setCar(foundCar);
-    }, [carId]);
+    const getCarId = async (id) => {
+        try {
+            const response = await carService.getCarById(id);
+            setCar(response.data);
+            console.log('Car data fetched:', (await response).data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching car by ID:', error);
+            return null;
+        }
+    };
 
+    useEffect(() => {
+        if (carId) {
+            getCarId(carId);
+        }
+    }, [carId]);
     const handleGoBack = () => {
         navigate(-1);
     };
@@ -64,12 +77,8 @@ const CarDetail = () => {
 const CarGallery = ({ car }) => {
     const [activeImage, setActiveImage] = useState(0);
 
-    const images = [
-        car.image,
-        car.image,
-        car.image,
-        car.image
-    ];
+    const images = car.images;
+
 
     return (
         <div className="car-gallery">
@@ -107,32 +116,32 @@ const CarInfo = ({ car }) => {
         <div className="car-info">
             <div className="car-header">
                 <h1 className="car-title">{car.name} {car.year}</h1>
-                <div className="car-badges">
+                {/* <div className="car-badges">
                     {car.available247 && (
                         <Badge count="24/7" style={{ backgroundColor: '#52c41a' }} />
                     )}
                     {car.discount && (
                         <Badge count={`-${car.discount}%`} style={{ backgroundColor: '#ff4d4f' }} />
                     )}
-                </div>
+                </div> */}
             </div>
 
-            <p className="car-location">📍 {car.location}</p>
+            <p className="car-location">📍 {car.location.district}</p>
 
             <div className="car-pricing">
                 <div className="current-price">
                     <span className="price-value">
-                        {(car.currentPrice * 1000).toLocaleString('vi-VN')}K
+                        {(car.pricePerHour).toLocaleString('vi-VN')}K
                     </span>
                     <span className="price-unit">/giờ</span>
                 </div>
                 {car.originalPrice && (
                     <div className="original-price">
                         <span className="original-value">
-                            {(car.originalPrice * 1000).toLocaleString('vi-VN')}K
+                            {(car.pricePerHour).toLocaleString('vi-VN')}K
                         </span>
                         <span className="discount-amount">
-                            Tiết kiệm {((car.originalPrice - car.currentPrice) * 1000).toLocaleString('vi-VN')}K
+                            Tiết kiệm {((car.pricePerHour)).toLocaleString('vi-VN')}K
                         </span>
                     </div>
                 )}
@@ -164,7 +173,7 @@ const CarInfo = ({ car }) => {
                             <CarOutlined className="feature-icon" />
                             <div>
                                 <div className="feature-label">Nhiên liệu</div>
-                                <div className="feature-value">{car.fuel}</div>
+                                <div className="feature-value">{car.fuelType}</div>
                             </div>
                         </div>
                     </Col>
@@ -173,7 +182,7 @@ const CarInfo = ({ car }) => {
                             <CarOutlined className="feature-icon" />
                             <div>
                                 <div className="feature-label">Tiêu hao</div>
-                                <div className="feature-value">8.5L/100Km</div>
+                                <div className="feature-value">{car.fuelConsumption}</div>
                             </div>
                         </div>
                     </Col>
@@ -204,7 +213,7 @@ const BookingForm = ({ car }) => {
             <div className="pickup-location">
                 <h4>🟢 Nhận xe tại vị trí xe</h4>
                 <div className="location-info">
-                    <p>📍 Số 1134 Đường Cách Mạng Tháng Tám, Phường 04, Quận Tân Bình, TP. Hồ Chí Minh</p>
+                    <p>{car.location.address}</p>
                     <p className="location-note">
                         Địa điểm cụ thể sẽ được hiển thị sau khi thanh toán thành công, và thời gian lấy xe 24/24.
                     </p>
@@ -214,17 +223,17 @@ const BookingForm = ({ car }) => {
             <div className="price-summary">
                 <div className="price-row">
                     <span>Đơn giá gốc:</span>
-                    <span>{car.originalPrice || car.currentPrice}K/giờ</span>
+                    <span>{car.pricePerHour || car.pricePerHour}K/giờ</span>
                 </div>
                 {car.discount && (
                     <div className="price-row discount">
                         <span>Khuyến mãi giảm giá:</span>
-                        <span>-{(car.originalPrice - car.currentPrice)}K</span>
+                        <span>-{(car.pricePerHour - car.pricePerHour)}K</span>
                     </div>
                 )}
                 <div className="price-row total">
                     <span>Thành tiền:</span>
-                    <span>{car.currentPrice}K/giờ</span>
+                    <span>{car.pricePerHour}K/giờ</span>
                 </div>
             </div>
 
@@ -246,11 +255,7 @@ const CarDescription = ({ car }) => {
         <div className="car-description">
             <h3>Mô tả</h3>
             <p>
-                {car.name} {car.year} mang đến trải nghiệm lái đẳng cấp với thiết kế sang trọng và khả năng vận hành mượt mà.
-                Xe được trang bị nội thất cao cấp, ghế da chỉnh điện, cửa sổ trời và hệ thống giải trí hiện đại.
-                Động cơ tăng áp mạnh mẽ nhưng vẫn êm ái, phù hợp cho cả đường phố lẫn cao tốc.
-                Hệ thống an toàn tiền tiến như cảnh báo điểm mù, hỗ trợ phanh khẩn cấp giúp hành trình thêm an tâm.
-                Đây là lựa chọn lý tưởng cho những ai cần sự tinh tế và đẳng cấp trong mỗi chuyến đi.
+                {car.description}
             </p>
         </div>
     );
