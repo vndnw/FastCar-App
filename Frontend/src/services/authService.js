@@ -37,6 +37,11 @@ export const authService = {
         return apiClient.post('/auth/verify-email', { token });
     },
 
+    // Verify OTP
+    verifyOTP: async (otpData) => {
+        return apiClient.post('/auth/verify-active-otp', otpData );
+    },
+
     // Get current user profile
     getCurrentUser: async () => {
         return apiClient.get('/auth/me');

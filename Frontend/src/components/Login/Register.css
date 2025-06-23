@@ -1,265 +1,142 @@
-/* Register.css */
+/* Modal background */
+.register-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Lớp mờ đen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+/* Modal container */
 .register-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-
-.register-card {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-  width: 100%;
-  max-width: 28rem;
-}
-
-.register-header {
-  background: linear-gradient(90deg, #16a34a 0%, #2563eb 100%);
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.register-icon {
-  width: 4rem;
-  height: 4rem;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem auto;
-}
-
-.register-icon svg {
-  width: 2rem;
-  height: 2rem;
-  color: white;
-}
-
-.register-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 0.5rem;
-}
-
-.register-subtitle {
-  color: #bbf7d0;
-}
-
-.register-form {
-  padding: 1.5rem;
-}
-
-.form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.25rem;
-}
-
-.input-wrapper {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   position: relative;
 }
 
-.input-icon {
+/* Close button */
+.close-button {
   position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #9ca3af;
-}
-
-.form-input {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-.form-input:focus {
-  outline: none;
-  ring: 2px solid #16a34a;
-  border-color: transparent;
-}
-
-.form-input.error {
-  border-color: #fca5a5;
-}
-
-.form-input-password {
-  padding-right: 3rem;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 10px;
+  right: 10px;
   background: none;
   border: none;
+  font-size: 20px;
   cursor: pointer;
-  padding: 0.25rem;
+  color: #333;
 }
 
-.password-toggle svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #9ca3af;
+.close-button:hover {
+  color: #51c09f;
 }
 
-.error-text {
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: #dc2626;
+/* Form title */
+.register-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #51c09f;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.terms-wrapper {
-  display: flex;
-  flex-direction: column;
+/* Form group */
+.form-group {
+  margin-bottom: 15px;
 }
 
-.terms-checkbox-wrapper {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
 }
 
-.form-checkbox {
-  width: 1rem;
-  height: 1rem;
-  color: #16a34a;
-  border: 1px solid #d1d5db;
-  border-radius: 0.25rem;
-  margin-top: 0.125rem;
-  flex-shrink: 0;
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
 }
 
-.form-checkbox:focus {
-  ring: 2px solid #16a34a;
+.form-group input:focus {
+  border-color: #51c09f;
+  outline: none;
+  box-shadow: 0 0 5px rgba(81, 192, 159, 0.5);
 }
 
-.terms-text {
-  font-size: 0.875rem;
-  color: #4b5563;
-  line-height: 1.4;
-}
-
-.terms-link {
-  color: #16a34a;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.terms-link:hover {
-  color: #15803d;
-}
-
+/* Register button */
 .register-button {
   width: 100%;
-  background: linear-gradient(90deg, #16a34a 0%, #2563eb 100%);
-  color: white;
-  padding: 0.75rem 1rem;
+  background-color: #51c09f;
+  color: #fff;
   border: none;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  font-size: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 1rem;
+  transition: background-color 0.3s ease;
 }
 
-.register-button:hover:not(:disabled) {
-  background: linear-gradient(90deg, #15803d 0%, #1d4ed8 100%);
+.register-button:hover {
+  background-color: #3a9b7a;
 }
 
-.register-button:focus {
-  ring: 4px solid #86efac;
-}
-
-.register-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.login-link-section {
-  margin-top: 1.5rem;
+/* OTP form */
+.otp-form p {
   text-align: center;
+  color: #666;
+  margin-bottom: 15px;
 }
 
-.login-text {
-  font-size: 0.875rem;
-  color: #4b5563;
+.otp-form input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 15px;
 }
 
-.login-link {
-  margin-left: 0.25rem;
-  color: #16a34a;
+/* Đảm bảo checkbox và văn bản nằm ngang */
+.form-group label {
+  display: flex;
+  align-items: center;
+  /* Căn giữa checkbox và văn bản theo chiều dọc */
+  gap: 10px;
+  /* Khoảng cách giữa checkbox và văn bản */
+  font-size: 14px;
+  /* Kích thước chữ */
+  color: #333;
+  /* Màu chữ */
+}
+
+.form-group label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #51c09f;
+  margin-right: 6px;
+  /* Màu chủ đạo cho checkbox */
+}
+
+.form-group label a {
+  color: #51c09f;
+  /* Màu liên kết */
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
 }
 
-.login-link:hover {
-  color: #15803d;
-}
-
-.back-home-section {
-  margin-top: 1rem;
-  text-align: center;
-}
-
-.back-home-link {
-  font-size: 0.875rem;
-  color: #6b7280;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.back-home-link:hover {
-  color: #374151;
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-  .register-container {
-    padding: 0.5rem;
-  }
-  
-  .register-header {
-    padding: 1rem;
-  }
-  
-  .register-form {
-    padding: 1rem;
-  }
-  
-  .terms-checkbox-wrapper {
-    align-items: flex-start;
-  }
-  
-  .terms-text {
-    font-size: 0.8125rem;
-  }
+.form-group label a:hover {
+  text-decoration: underline;
+  /* Gạch chân khi hover */
 }

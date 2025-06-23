@@ -35,8 +35,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/owner-car" element={<OwnerCar />} />
           <Route path="/my-trips" element={<MyTrips />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/login" element={<Login />} /> */}
+          {/* <Route path="/register" element={<Register />} /> */}
           <Route path="/xe-co-ngay" element={<CarListing />} />
           <Route path="/car-detail/:carId" element={<CarDetail />} />
         </Route>
