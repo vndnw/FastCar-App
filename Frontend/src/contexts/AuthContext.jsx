@@ -53,6 +53,35 @@ export const AuthProvider = ({ children }) => {
         initAuth();
     }, []);
 
+    // Register function
+    const register = async (userData) => {
+        try {
+            // Gửi thông tin đăng ký đến API
+            const result = await authService.register(userData);
+            if (result.status === 200) {
+                // Đăng ký thành công, thông báo cho người dùng
+                return { success: true, message: 'Đăng ký thành công! Vui lòng kiểm tra email để nhận mã OTP.' };
+            }
+        } catch (error) {
+            console.error('Register error:', error);
+            return { success: false, error: error.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.' };
+        }
+    };
+
+    // Verify OTP function
+    const verifyOTP = async (otpData) => {
+        try {
+            // Gửi mã OTP đến API để xác thực
+            const result = await authService.verifyOTP(otpData);
+            if (result.status === 200) {
+                return { success: true, message: 'Xác thực OTP thành công!' };
+            }
+        } catch (error) {
+            console.error('Verify OTP error:', error);
+            return { success: false, error: error.response?.data?.message || 'Xác thực OTP thất bại. Vui lòng thử lại.' };
+        }
+    };
+
     // Login function
     const login = async (emailOrPhone, password) => {
         try {
@@ -118,8 +147,10 @@ export const AuthProvider = ({ children }) => {
         token,
         loading,
         isAuthenticated,
+        register,
         login,
         logout,
+        verifyOTP,
         hasRole,
         isAdmin,
         updateTokens,

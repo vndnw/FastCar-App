@@ -1,12 +1,48 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import CarSection from '../../components/CarSection/CarSection';
-import { sampleCars, luxuryCars } from '../../data/sampleCars';
+import { carService } from '../../services/carService';
 
 const Home = () => {
+  const [sampleCars, setSampleCars] = useState([]);
+  const [luxuryCars, setLuxuryCars] = useState([]);
+
+
+  const fetchCarsSuperLuxury = async () => {
+    try {
+      const response = await carService.getCarsSuperLuxury();
+      setLuxuryCars(response.data.content);
+      console.log('Luxury Cars:', response.data.content);
+    } catch (error) {
+      console.error('Error fetching luxury cars:', error);
+    }
+  };
+
+  const fetchAllCars = async () => {
+    try {
+      const [luxuryRes, standardRes] = await Promise.all([
+        carService.getCarsLuxury(),
+        carService.getCarsStandard()
+      ]);
+      // Gộp dữ liệu từ cả hai response
+      const allCars = [...luxuryRes.data.content, ...standardRes.data.content];
+      setSampleCars(allCars);
+    } catch (error) {
+      console.error('Error fetching cars:', error);
+    }
+  };
+
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchCarsSuperLuxury();
+    fetchAllCars();
+  }, []);
+
+  console.log('Sample Cars:', sampleCars);
+  console.log('Luxury Cars:', luxuryCars);
 
   // Xử lý click nút "XEM THÊM XE CÓ NGAY"
   const handleViewMoreRegular = () => {
@@ -15,7 +51,6 @@ const Home = () => {
 
   // Xử lý click nút "XEM THÊM XE XẾ XIN" 
   const handleViewMoreLuxury = () => {
-    // Có thể navigate đến trang riêng cho xe sang hoặc cùng trang với filter
     navigate('/xe-co-ngay?category=luxury');
   };
 
