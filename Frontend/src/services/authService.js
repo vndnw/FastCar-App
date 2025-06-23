@@ -39,7 +39,7 @@ export const authService = {
 
     // Verify OTP
     verifyOTP: async (otpData) => {
-        return apiClient.post('/auth/verify-active-otp', otpData );
+        return apiClient.post('/auth/verify-active-otp', otpData);
     },
 
     // Get current user profile
@@ -55,6 +55,16 @@ export const authService = {
     // Get new access token using refresh token
     refreshAccessToken: async (refreshToken) => {
         return apiClient.post('/auth/refresh', { refreshToken });
+    },
+
+    // Change password by admin
+    changePasswordByAdmin: async (email, newPassword) => {
+        return apiClient.post('/auth/change-password-admin', null, {
+            params: {
+                email,
+                newPassword
+            }
+        });
     }
 };
 

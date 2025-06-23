@@ -34,12 +34,10 @@ export const carService = {
     // Delete car
     deleteCar: async (id) => {
         return apiClient.delete(`/car/${id}`);
-    },
-
-    // Search cars
-    searchCars: async (query, page = 0, size = 10) => {
+    },    // Search cars by name
+    getCarsByName: async (name, page = 0, size = 10) => {
         const params = new URLSearchParams({
-            q: query,
+            name: name,
             page: page.toString(),
             size: size.toString()
         });
@@ -106,6 +104,11 @@ export const carService = {
             size: 7
         });
         return apiClient.get(`/car/search?${params}`);
+    },
+
+    // Update car status
+    updateCarStatus: async (id, status) => {
+        return apiClient.patch(`/car/${id}/update-status/${status}`);
     },
 };
 

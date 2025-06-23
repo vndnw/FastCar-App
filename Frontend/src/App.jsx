@@ -14,8 +14,9 @@ import CarDetail from './views/CarDetail/CarDetail';
 import Dashboard from "./views/admin/Home";
 import Tables from "./views/admin/Tables";
 import Billing from "./views/admin/Billing";
-import Profile from "./views/admin/Profile";
 import Users from "./views/admin/Users";
+import UserDetail from "./views/admin/UserDetail";
+import UserEdit from "./views/admin/UserEdit";
 import Discount from "./views/admin/Discount";
 import CarBrand from "./views/admin/CarBrand";
 import Cars from "./views/admin/Cars";
@@ -62,8 +63,9 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="tables" element={<Tables />} />
           <Route path="billing" element={<Billing />} />
-          <Route path="profile" element={<Profile />} />
           <Route path="users" element={<Users />} />
+          <Route path="users/:userId" element={<UserDetail />} />
+          <Route path="users/edit/:userId" element={<UserEdit />} />
           <Route path="discount" element={<Discount />} />
           <Route path="car-brand" element={<CarBrand />} />
           <Route path="cars" element={<Cars />} />

@@ -20,10 +20,12 @@ import {
   Tabs,
 } from "antd";
 
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, KeyOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { userService } from "../../services/userService";
 import { roleService } from "../../services/roleService";
+import { authService } from "../../services/authService";
 import dayjs from 'dayjs';
 import { Users } from "lucide-react";
 
@@ -99,6 +101,8 @@ const roleColumns = [
 
 
 function UserPage() {
+  const navigate = useNavigate();
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -106,117 +110,25 @@ function UserPage() {
     pageSize: 10,
     total: 0,
   });
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [editModalVisible, setEditModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [userDetailLoading, setUserDetailLoading] = useState(false);
-  const [editLoading, setEditLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
+  const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   // Role management states
   const [activeTab, setActiveTab] = useState('users');
   const [roles, setRoles] = useState([]);
   const [roleLoading, setRoleLoading] = useState(false);
 
-  const [form] = Form.useForm();
   const [createForm] = Form.useForm();
-
-  const handleViewUser = async (userId) => {
-    try {
-      setUserDetailLoading(true);
-      setDetailModalVisible(true);
-      const result = await userService.getUserById(userId);
-
-      if (result.status === 200) {
-        setSelectedUser(result.data);
-      }
-    } catch (error) {
-      console.error('Error fetching user details:', error);
-      message.error(error.message || 'Failed to fetch user details');
-      setDetailModalVisible(false);
-    } finally {
-      setUserDetailLoading(false);
-    }
-  }; const handleCloseModal = () => {
-    setDetailModalVisible(false);
-    setSelectedUser(null);
+  const [changePasswordForm] = Form.useForm(); const handleViewUser = (userId) => {
+    // Navigate to user detail page
+    navigate(`/admin/users/${userId}`);
   };
 
-  const handleEditUser = async (userId) => {
-    try {
-      setUserDetailLoading(true);
-      const result = await userService.getUserById(userId);
-
-      if (result.status === 200) {
-        const user = result.data;
-        setSelectedUser(user);        // Populate form with user data
-        form.setFieldsValue({
-          firstName: user.firstName,
-          lastName: user.lastName,
-          profilePicture: user.profilePicture,
-          dateOfBirth: user.dateOfBirth ? dayjs(user.dateOfBirth) : null,
-          roles: user.roles || ['user'],
-          address: {
-            address: user.address?.address || '',
-            street: user.address?.street || '',
-            ward: user.address?.ward || '',
-            district: user.address?.district || '',
-            city: user.address?.city || '',
-            latitude: user.address?.latitude || 0,
-            longitude: user.address?.longitude || 0,
-          }
-        });
-
-        setEditModalVisible(true);
-      }
-    } catch (error) {
-      console.error('Error fetching user details:', error);
-      message.error(error.message || 'Failed to fetch user details');
-    } finally {
-      setUserDetailLoading(false);
-    }
-  };
-
-  const handleCloseEditModal = () => {
-    setEditModalVisible(false);
-    setSelectedUser(null);
-    form.resetFields();
-  };
-
-  const handleUpdateUser = async (values) => {
-    try {
-      setEditLoading(true);      // Prepare data for API
-      const updateData = {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        profilePicture: values.profilePicture,
-        dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
-        roles: values.roles || ['user'],
-        address: {
-          address: values.address?.address || '',
-          street: values.address?.street || '',
-          ward: values.address?.ward || '',
-          district: values.address?.district || '',
-          city: values.address?.city || '',
-          latitude: values.address?.latitude || 0,
-          longitude: values.address?.longitude || 0,
-        }
-      };
-
-      const result = await userService.updateUser(selectedUser.id, updateData);
-
-      if (result.status === 200) {
-        message.success('User updated successfully!');
-        handleCloseEditModal();
-        // Refresh the users list
-        fetchUsers(pagination.current - 1, pagination.pageSize);
-      }
-    } catch (error) {
-      console.error('Error updating user:', error);
-      message.error(error.message || 'Failed to update user');
-    } finally {
-      setEditLoading(false);
-    }
+  const handleEditUser = (userId) => {
+    // Navigate to edit user page
+    navigate(`/admin/users/edit/${userId}`);
   };
   const handleDeleteUser = async (userId, userName) => {
     try {
@@ -242,6 +154,43 @@ function UserPage() {
       message.error(error.message || 'Failed to delete user');
     }
   };
+
+  // Handle change password functionality
+  const handleChangePassword = async (user) => {
+    setSelectedUser(user);
+    setChangePasswordModalVisible(true);
+    changePasswordForm.resetFields();
+  };
+
+  const handleCloseChangePasswordModal = () => {
+    setChangePasswordModalVisible(false);
+    setSelectedUser(null);
+    changePasswordForm.resetFields();
+  };
+
+  const handleSubmitChangePassword = async (values) => {
+    try {
+      setChangePasswordLoading(true);
+
+      const result = await authService.changePasswordByAdmin(
+        selectedUser.email,
+        values.newPassword
+      );
+
+      if (result.status === 200) {
+        message.success(`Password changed successfully for user "${selectedUser.firstName} ${selectedUser.lastName}"`);
+        handleCloseChangePasswordModal();
+      } else {
+        message.error(result.message || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      message.error(error.response?.data?.message || 'Failed to change password');
+    } finally {
+      setChangePasswordLoading(false);
+    }
+  };
+
   const handleToggleUserStatus = async (userId, currentStatus, userName, userEmail) => {
     try {
       const newStatus = !currentStatus;
@@ -341,38 +290,45 @@ function UserPage() {
             <div className="ant-employed">
               <span>{new Date(user.createdAt).toLocaleDateString()}</span>
               <a href="#pablo" onClick={(e) => e.preventDefault()}>Edit</a>
-            </div>
-          ),
-          actions: (
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <Button
-                type="text"
-                icon={<EyeOutlined />}
-                onClick={() => handleViewUser(user.id)}
-                title="View Details"
-              />
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                onClick={() => handleEditUser(user.id)}
-                title="Edit User"
-              />              <Popconfirm
-                title="Delete User Account"
-                description={`Are you sure you want to permanently delete the account for "${user.firstName} ${user.lastName}"? This action cannot be undone.`}
-                onConfirm={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
-                okText="Yes, Delete"
-                cancelText="Cancel"
-                okType="danger"
-              >
+            </div>), actions: (
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <Button
                   type="text"
-                  icon={<DeleteOutlined />}
-                  title="Delete User"
-                  danger
+                  icon={<InfoCircleOutlined />}
+                  onClick={() => handleViewUser(user.id)}
+                  title="View Details"
+                  style={{ color: '#1890ff' }}
                 />
-              </Popconfirm>
-            </div>
-          ),
+                <Button
+                  type="text"
+                  icon={<EditOutlined />}
+                  onClick={() => handleEditUser(user.id)}
+                  title="Edit User"
+                />
+                <Button
+                  type="text"
+                  icon={<KeyOutlined />}
+                  onClick={() => handleChangePassword(user)}
+                  title="Change Password"
+                  style={{ color: '#fa8c16' }}
+                />
+                <Popconfirm
+                  title="Delete User Account"
+                  description={`Are you sure you want to permanently delete the account for "${user.firstName} ${user.lastName}"? This action cannot be undone.`}
+                  onConfirm={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
+                  okText="Yes, Delete"
+                  cancelText="Cancel"
+                  okType="danger"
+                >
+                  <Button
+                    type="text"
+                    icon={<DeleteOutlined />}
+                    title="Delete User"
+                    danger
+                  />
+                </Popconfirm>
+              </div>
+            ),
         }));
 
         setUsers(userData);
@@ -395,7 +351,8 @@ function UserPage() {
   }, []);
   const handleTableChange = (pagination) => {
     fetchUsers(pagination.current - 1, pagination.pageSize);
-  };  // Role management functions
+  };
+  // Role management functions
   const fetchRoles = async () => {
     try {
       setRoleLoading(true);
@@ -467,7 +424,6 @@ function UserPage() {
     }
   };
 
-  const onChange = (e) => console.log(`radio checked:${e.target.value}`);
   return (
     <>
       <div className="tabled">
@@ -541,282 +497,7 @@ function UserPage() {
                 }
               ]} />
           </Col>
-        </Row>
-      </div>
-
-      {/* User Detail Modal */}
-      <Modal
-        title="User Details"
-        open={detailModalVisible}
-        onCancel={handleCloseModal}
-        footer={[
-          <Button key="close" onClick={handleCloseModal}>
-            Close
-          </Button>
-        ]}
-        width={800}
-      >
-        <Spin spinning={userDetailLoading}>
-          {selectedUser && (
-            <>
-              <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                <Avatar
-                  size={80}
-                  src={selectedUser.profilePicture || `https://ui-avatars.com/api/?name=${selectedUser.firstName || 'U'}+${selectedUser.lastName || 'ser'}&background=random&size=80`}
-                />
-                <Title level={4} style={{ marginTop: 16 }}>
-                  {selectedUser.firstName && selectedUser.lastName
-                    ? `${selectedUser.firstName} ${selectedUser.lastName}`
-                    : selectedUser.email.split('@')[0]
-                  }
-                </Title>
-                <div>
-                  {selectedUser.roles && selectedUser.roles.length > 0 ? (
-                    selectedUser.roles.map((role, idx) => (
-                      <Tag key={idx} color={role === 'admin' ? 'red' : role === 'driver' ? 'blue' : 'green'}>
-                        {role.toUpperCase()}
-                      </Tag>
-                    ))
-                  ) : (
-                    <Tag color="default">USER</Tag>
-                  )}
-                </div>
-              </div>
-
-              <Divider />
-
-              <Descriptions title="Personal Information" bordered column={2}>
-                <Descriptions.Item label="First Name">
-                  {selectedUser.firstName || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Last Name">
-                  {selectedUser.lastName || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Email">
-                  {selectedUser.email}
-                </Descriptions.Item>
-                <Descriptions.Item label="Phone">
-                  {selectedUser.phone || 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Date of Birth">
-                  {selectedUser.dateOfBirth ? new Date(selectedUser.dateOfBirth).toLocaleDateString() : 'N/A'}
-                </Descriptions.Item>
-                <Descriptions.Item label="Status">
-                  <Tag color={selectedUser.active ? 'green' : 'red'}>
-                    {selectedUser.active ? 'ACTIVE' : 'INACTIVE'}
-                  </Tag>
-                </Descriptions.Item>
-                <Descriptions.Item label="Created At" span={2}>
-                  {new Date(selectedUser.createdAt).toLocaleString()}
-                </Descriptions.Item>
-                <Descriptions.Item label="Updated At" span={2}>
-                  {new Date(selectedUser.updatedAt).toLocaleString()}
-                </Descriptions.Item>
-              </Descriptions>
-
-              {selectedUser.address && selectedUser.address.address && (
-                <>
-                  <Divider />
-                  <Descriptions title="Address Information" bordered column={1}>
-                    <Descriptions.Item label="Address">
-                      {selectedUser.address.address}
-                    </Descriptions.Item>
-                    {selectedUser.address.latitude && selectedUser.address.longitude && (
-                      <Descriptions.Item label="Coordinates">
-                        Lat: {selectedUser.address.latitude}, Lng: {selectedUser.address.longitude}
-                      </Descriptions.Item>
-                    )}
-                  </Descriptions>
-                </>
-              )}
-
-              {selectedUser.bankInformation && (selectedUser.bankInformation.bankName || selectedUser.bankInformation.accountNumber) && (
-                <>
-                  <Divider />
-                  <Descriptions title="Bank Information" bordered column={2}>
-                    <Descriptions.Item label="Bank Name">
-                      {selectedUser.bankInformation.bankName || 'N/A'}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Account Number">
-                      {selectedUser.bankInformation.accountNumber || 'N/A'}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Account Holder" span={2}>
-                      {selectedUser.bankInformation.accountHolderName || 'N/A'}
-                    </Descriptions.Item>
-                  </Descriptions>
-                </>
-              )}
-            </>)}
-        </Spin>
-      </Modal>
-
-      {/* Edit User Modal */}
-      <Modal
-        title="Edit User Information"
-        open={editModalVisible}
-        onCancel={handleCloseEditModal}
-        footer={null}
-        width={900}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleUpdateUser}
-          disabled={editLoading}
-        >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="First Name"
-                name="firstName"
-                rules={[{ required: true, message: 'Please input first name!' }]}
-              >
-                <Input placeholder="Enter first name" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Last Name"
-                name="lastName"
-                rules={[{ required: true, message: 'Please input last name!' }]}
-              >
-                <Input placeholder="Enter last name" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Profile Picture URL"
-                name="profilePicture"
-              >
-                <Input placeholder="Enter profile picture URL" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Date of Birth"
-                name="dateOfBirth"
-              >
-                <DatePicker
-                  style={{ width: '100%' }}
-                  placeholder="Select date of birth"
-                  format="YYYY-MM-DD"
-                />
-              </Form.Item>
-            </Col>          </Row>
-
-          <Form.Item
-            label="User Roles"
-            name="roles"
-            rules={[{ required: true, message: 'Please select at least one role!' }]}
-          >
-            <Select
-              mode="multiple"
-              placeholder="Select user roles"
-              options={[
-                { value: 'user', label: 'User' },
-                { value: 'admin', label: 'Admin' },
-                { value: 'driver', label: 'Driver' },
-                { value: 'owner', label: 'Car Owner' },
-              ]}
-            />
-          </Form.Item>
-
-          <Divider orientation="left">Address Information</Divider>
-
-          <Form.Item
-            label="Full Address"
-            name={['address', 'address']}
-          >
-            <Input.TextArea
-              rows={2}
-              placeholder="Enter full address"
-            />
-          </Form.Item>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Street"
-                name={['address', 'street']}
-              >
-                <Input placeholder="Enter street" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Ward"
-                name={['address', 'ward']}
-              >
-                <Input placeholder="Enter ward" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="District"
-                name={['address', 'district']}
-              >
-                <Input placeholder="Enter district" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="City"
-                name={['address', 'city']}
-              >
-                <Input placeholder="Enter city" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Latitude"
-                name={['address', 'latitude']}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="Enter latitude"
-                  step={0.000001}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Longitude"
-                name={['address', 'longitude']}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="Enter longitude"
-                  step={0.000001}
-                />
-              </Form.Item>
-            </Col>          </Row>
-
-          <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
-            <Button
-              onClick={handleCloseEditModal}
-              style={{ marginRight: 8 }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={editLoading}
-            >
-              Update User
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+        </Row>      </div>
 
       {/* Create User Modal */}
       <Modal
@@ -1076,6 +757,72 @@ function UserPage() {
               loading={createLoading}
             >
               Create User
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Change Password Modal */}
+      <Modal
+        title={`Change Password for ${selectedUser?.firstName} ${selectedUser?.lastName}`}
+        open={changePasswordModalVisible}
+        onCancel={handleCloseChangePasswordModal}
+        footer={null}
+        width={400}
+      >
+        <Form
+          form={changePasswordForm}
+          layout="vertical"
+          onFinish={handleSubmitChangePassword}
+          disabled={changePasswordLoading}
+        >
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label="New Password"
+                name="newPassword"
+                rules={[{ required: true, message: 'Please input new password!' }]}
+              >
+                <Input.Password placeholder="Enter new password" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label="Confirm New Password"
+                name="confirmNewPassword"
+                rules={[
+                  { required: true, message: 'Please confirm new password!' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('newPassword') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Passwords do not match!'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password placeholder="Confirm new password" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
+            <Button
+              onClick={handleCloseChangePasswordModal}
+              style={{ marginRight: 8 }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={changePasswordLoading}
+            >
+              Change Password
             </Button>
           </Form.Item>
         </Form>

@@ -68,6 +68,8 @@ public class SecurityConfig {
             "/auth/forgot-password",
             "/auth/verify-password-otp",
             "/auth/reset-password",
+            "/auth/change-password",
+            "/auth/check-email-exists",
             "/test/**",
             "/car/**",
             "/car-brand/**",
