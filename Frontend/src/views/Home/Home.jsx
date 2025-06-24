@@ -46,7 +46,7 @@ const Home = () => {
 
   // Xử lý click nút "XEM THÊM XE CÓ NGAY"
   const handleViewMoreRegular = () => {
-    navigate('/xe-co-ngay');
+    navigate('/xe-co-ngay?category=normal');
   };
 
   // Xử lý click nút "XEM THÊM XE XẾ XIN" 

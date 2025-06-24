@@ -161,8 +161,8 @@ const CarSection = ({
                     size="large"
                     onClick={handleButtonClick}
                     style={{
-                        borderColor: '#52c41a', // Màu xanh lá cây nhạt giống nút TÌM XE
-                        color: '#52c41a',
+                        borderColor: '#51c09f', // Màu xanh lá cây nhạt giống nút TÌM XE
+                        color: '#51c09f',
                         fontWeight: 'normal',
                         height: 40,
                         padding: '0 24px',
