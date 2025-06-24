@@ -26,7 +26,6 @@ public class CarRequest {
     private FuelType fuelType;
     private String color;
     private LocationRequest location;
-    private List<CarImageRequest> carImages;
     private List<Long> carFeatures;
     private String licensePlate;
     private String fuelConsumption;//  fuel_consumption/100km

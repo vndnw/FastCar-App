@@ -26,9 +26,6 @@ public class Image {
     @Column(length = 500)
     private String imageUrl;
 
-    @Enumerated(EnumType.STRING)
-    private CarImageType imageType;
-
     @ManyToOne
     @JoinColumn(name = "car_id")
     private Car car;

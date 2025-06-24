@@ -158,6 +158,15 @@ public class UserService {
         return true; // User activation status updated successfully
     }
 
+    public boolean updateAvatar(String avatar){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setProfilePicture(avatar);
+        userRepository.save(user);
+        return true;
+    }
+
+
     public boolean checkEmailExists(String email) {
         return userRepository.existsByEmail(email);
     }

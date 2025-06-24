@@ -2,6 +2,7 @@ package com.example.Backend.service;
 
 import com.example.Backend.dto.request.CarRequest;
 import com.example.Backend.dto.request.CarSearchCriteriaRequest;
+import com.example.Backend.dto.response.CarDetailsResponse;
 import com.example.Backend.dto.response.CarResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarMapper;
@@ -68,16 +69,6 @@ public class CarService {
         car.setDescription(carRequest.getDescription());
         car.setActive(false);
         car.setStatus(CarStatus.PENDING);
-        List<Image> images = carRequest.getCarImages().stream()
-                .map( image -> {
-                    Image carImage = new Image();
-                    carImage.setImageUrl(image.getImageUrl());
-                    carImage.setImageType(image.getImageType());
-                    carImage.setCar(car);
-                    return carImage;
-                })
-                .toList();
-        car.setImages(images);
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
 
         userService.addRoleToUser(userId, "owner");
@@ -105,17 +96,6 @@ public class CarService {
         car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePer12Hour()));
         car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePer24Hour()));
         car.setDescription(carRequest.getDescription());
-        List<Image> images = carRequest.getCarImages().stream()
-                .map(image -> {
-                    Image carImage = new Image();
-                    carImage.setImageUrl(image.getImageUrl());
-                    carImage.setImageType(image.getImageType());
-                    carImage.setCar(car);
-                    return carImage;
-                })
-                .toList();
-        car.getImages().clear();
-        car.getImages().addAll(images);
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         return carMapper.mapToResponse(carRepository.save(car));
     }
@@ -125,20 +105,15 @@ public class CarService {
         carRepository.delete(car);
     }
 
-    public CarResponse getCarByUserId(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User Not Found"));
-        return carMapper.mapToResponse(carRepository.findCarByUser(user));
-    }
-
-    public List<CarResponse> getAllCarsByUserId(long userId) {
+    public List<CarDetailsResponse> getAllCarsByUserId(long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User Not Found"));
         List<Car> cars = carRepository.findCarsByUser(user);
-        return cars.stream().map(carMapper::mapToResponse).collect(Collectors.toList());
+        return cars.stream().map(carMapper::mapToResponse1).collect(Collectors.toList());
     }
 
-    public CarResponse getCarById(long carId) {
+    public CarDetailsResponse getCarById(long carId) {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
-        return carMapper.mapToResponse(car);
+        return carMapper.mapToResponse1(car);
     }
 
     public Page<CarResponse> getAllCars(Pageable pageable) {
@@ -150,7 +125,6 @@ public class CarService {
         if (car.isActive()) {
             return false; // Car is already active
         }
-        List<Document> document = car.getDocuments();
         boolean hasInactive = car.getDocuments().stream().anyMatch(doc -> !doc.isActive());
         if (hasInactive) {
             throw new RuntimeException("Cannot activate car with inactive documents");
@@ -177,11 +151,11 @@ public class CarService {
         return true;
     }
 
-    public Page<CarResponse> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
+    public Page<CarDetailsResponse> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
         Specification<Car> spec = CarSpecification.findByCriteria(criteria);
 
         Page<Car> carPage = carRepository.findAll(spec, pageable);
 
-        return carPage.map(carMapper::mapToResponse);
+        return carPage.map(carMapper::mapToResponse1);
     }
 }

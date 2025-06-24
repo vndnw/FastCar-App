@@ -1,48 +1,51 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
-import com.example.Backend.dto.request.CarImageRequest;
-import com.example.Backend.dto.request.ListImagesRequest;
-import com.example.Backend.service.CarImageService;
+import com.example.Backend.service.CloudinaryService;
+import com.example.Backend.service.ImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/image")
 public class ImageController {
 
-    private final CarImageService carImageService;
+    private final ImageService imageService;
+    private final CloudinaryService cloudinaryService;
 
-    public  ImageController(CarImageService carImageService) {
-        this.carImageService = carImageService;
+    public  ImageController(ImageService imageService,
+                            CloudinaryService cloudinaryService) {
+        this.imageService = imageService;
+        this.cloudinaryService = cloudinaryService;
     }
 
-    @PreAuthorize("hasRole('owner')")
-    @PostMapping("/upload/car/{carId}/list")
-    public ResponseEntity<?> createCarImage(@PathVariable("carId") long carId, @RequestBody ListImagesRequest listImagesRequest) {
-        try {
-            ResponseData<?> response = ResponseData.builder()
-                    .status(200)
-                    .message("Car images created successfully")
-                    .data(carImageService.createListImages(carId, listImagesRequest))
-                    .build();
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating car image: " + e.getMessage());
-        }
-    }
 
     @PreAuthorize("hasRole('owner')")
     @PostMapping("/upload/car/{carId}")
-    public ResponseEntity<?> createCarImage(@PathVariable("carId") long carId, @RequestBody CarImageRequest carImageRequest) {
+    public ResponseEntity<?> createCarImage(@PathVariable("carId") long carId,@RequestParam("file") List<MultipartFile> files) {
         try {
+            List<String> imageUrls = new ArrayList<>();
+            for (MultipartFile file : files) {
+                String image = cloudinaryService.uploadImage(file); // Gọi hàm upload từng file
+                if (image != null) {
+                    imageUrls.add(image);
+                }
+            }
+
+            if (imageUrls.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No images uploaded successfully");
+            }
+
             ResponseData<?> response = ResponseData.builder()
                     .status(200)
-                    .message("Car image created successfully")
-                    .data(carImageService.createCarImage(carId, carImageRequest))
+                    .message("Car images created successfully")
+                    .data(imageService.createCarImage(carId, imageUrls))
                     .build();
             return ResponseEntity.ok(response);
 
@@ -52,16 +55,15 @@ public class ImageController {
     }
 
     @PreAuthorize("hasRole('admin')")
-    @DeleteMapping("/delete/car/{carId}/list")
+    @DeleteMapping("/delete/car/{carId}")
     public ResponseEntity<?> deleteCarImage(@PathVariable("carId") long carId) {
         try {
-            carImageService.deleteImageByCarId(carId);
+            imageService.deleteImageByCarId(carId);
             ResponseData<?> response = ResponseData.builder()
                     .status(200)
                     .message("Car image deleted successfully")
                     .build();
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting car image: " + e.getMessage());
         }
@@ -71,13 +73,12 @@ public class ImageController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteImageById(@PathVariable("id") long id) {
         try {
-            carImageService.deleteImageById(id);
+            imageService.deleteImageById(id);
             ResponseData<?> response = ResponseData.builder()
                     .status(200)
                     .message("Image deleted successfully")
                     .build();
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting image: " + e.getMessage());
         }

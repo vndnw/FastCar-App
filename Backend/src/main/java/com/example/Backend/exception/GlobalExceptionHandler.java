@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ValidationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -63,6 +64,17 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         return ResponseEntity.status(400).body(errorResponse);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(@NotNull AccessDeniedException e, @NotNull HttpServletRequest request) {
+        ResponseData<?> errorResponse = ResponseData.builder()
+                .status(403)
+                .timestamp(LocalDateTime.now())
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(403).body(errorResponse);
     }
 
     @ExceptionHandler(RefreshTokenExpiredException.class)

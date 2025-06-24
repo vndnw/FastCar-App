@@ -3,10 +3,7 @@ package com.example.Backend.controller;
 import com.example.Backend.dto.ResponseData;
 import com.example.Backend.dto.request.*;
 import com.example.Backend.dto.response.BankInformationResponse;
-import com.example.Backend.service.BankInformationService;
-import com.example.Backend.service.BookingService;
-import com.example.Backend.service.CarService;
-import com.example.Backend.service.UserService;
+import com.example.Backend.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -14,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
@@ -22,15 +20,18 @@ public class UserController {
     private final CarService carService;
     private final BookingService bookingService;
     private final BankInformationService bankInformationService;
+    private final CloudinaryService cloudinaryService;
 
     public UserController(UserService userService,
                           CarService carService,
                           BookingService bookingService,
-                          BankInformationService bankInformationService) {
+                          BankInformationService bankInformationService,
+                          CloudinaryService cloudinaryService) {
         this.userService = userService;
         this.carService = carService;
         this.bookingService = bookingService;
         this.bankInformationService = bankInformationService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @PreAuthorize("hasRole('admin')")
@@ -97,6 +98,25 @@ public class UserController {
                 .data(userService.updateUserInfo(id, userRequest))
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @PatchMapping("/me/update-avatar")
+    public ResponseEntity<?> updateUserAvatar(@RequestParam("avatar") MultipartFile avatar) {
+        String avatarUrl = cloudinaryService.uploadImage(avatar);
+        if(userService.updateAvatar(avatarUrl)){
+            ResponseData<?> responseData = ResponseData.builder()
+                    .status(200)
+                    .message("Successfully updated user avatar")
+                    .build();
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        }
+        else {
+            ResponseData<?> responseData = ResponseData.builder()
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .message("Updated user avatar failse")
+                    .build();
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PreAuthorize("hasRole('admin')")

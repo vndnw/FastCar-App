@@ -25,7 +25,7 @@ public class TestController {
          return ResponseEntity.ok("Test email sent successfully");
      }
      @PostMapping("/uploadImage")
-    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
+     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         String image = cloudinaryService.uploadImage(file);
         return ResponseEntity.ok(image);
      }

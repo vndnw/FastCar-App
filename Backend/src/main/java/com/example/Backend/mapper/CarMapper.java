@@ -1,7 +1,9 @@
 package com.example.Backend.mapper;
 
+import com.example.Backend.dto.response.CarDetailsResponse;
 import com.example.Backend.dto.response.CarResponse;
 import com.example.Backend.model.Car;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -9,25 +11,48 @@ import java.util.stream.Collectors;
 @Service
 public class CarMapper {
     private final CarBrandMapper carBrandMapper;
-    private final CarImageMapper carImageMapper;
+    private final ImageMapper imageMapper;
     private final LocationMapper locationMapper;
     private final FeatureMapper featureMapper;
+    private final UserMapper userMapper;
 
 
     public CarMapper(CarBrandMapper carBrandMapper,
-                     CarImageMapper carImageMapper,
+                     ImageMapper imageMapper,
                      LocationMapper locationMapper,
-                     FeatureMapper featureMapper) {
+                     FeatureMapper featureMapper,
+                     UserMapper userMapper) {
         this.carBrandMapper = carBrandMapper;
-        this.carImageMapper = carImageMapper;
+        this.imageMapper = imageMapper;
         this.locationMapper = locationMapper;
         this.featureMapper = featureMapper;
+        this.userMapper = userMapper;
     }
 
-    public CarResponse mapToResponse(Car car) {
+    public CarResponse mapToResponse(@NotNull Car car) {
         return CarResponse.builder()
                 .id(car.getId())
                 .username(car.getUser().getFirstName() + " " + car.getUser().getLastName())
+                .name(car.getName())
+                .carBrand(carBrandMapper.mapToResponse(car.getBrand()))
+                .fuelType(car.getFuelType())
+                .images(car.getImages().stream().map(imageMapper::mapToResponse).collect(Collectors.toList()))
+                .location(car.getLocation().getDistrict() + ", " + car.getLocation().getCity())
+                .seats(car.getSeats())
+                .fuelConsumption(car.getFuelConsumption())
+                .pricePer4Hour(car.getPricePer4Hour())
+                .pricePer8Hour(car.getPricePer8Hour())
+                .pricePer12Hour(car.getPricePer12Hour())
+                .pricePer24Hour(car.getPricePer24Hour())
+                .pricePerHour(car.getPricePerHour())
+                .transmission(car.getTransmission())
+                .build();
+    }
+
+    public CarDetailsResponse mapToResponse1(@NotNull Car car) {
+        return CarDetailsResponse.builder()
+                .id(car.getId())
+                .user(userMapper.mapToResponse(car.getUser()))
                 .model(car.getModel())
                 .year(car.getYear())
                 .name(car.getName())
@@ -37,7 +62,7 @@ public class CarMapper {
                 .licensePlate(String.valueOf(car.getLicensePlate()))
                 .fuelType(car.getFuelType())
                 .description(car.getDescription())
-                .images(car.getImages().stream().map(carImageMapper::mapToResponse).collect(Collectors.toList()))
+                .images(car.getImages().stream().map(imageMapper::mapToResponse).collect(Collectors.toList()))
                 .location(locationMapper.mapToResponse(car.getLocation()))
                 .features(car.getFeatures().stream().map(featureMapper::mapToResponse).collect(Collectors.toList()))
                 .seats(car.getSeats())

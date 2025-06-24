@@ -38,7 +38,7 @@ public class CarDetailsResponse {
     private CarStatus status;
     private String color;
     private String description;
-    private List<CarImageResponse> images;
+    private List<ImageResponse> images;
     private List<CarFeatureResponse> features;
     private LocationResponse location;
     private LocalDateTime createdAt;

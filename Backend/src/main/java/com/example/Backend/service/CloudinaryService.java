@@ -3,6 +3,7 @@ package com.example.Backend.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,10 +19,10 @@ public class CloudinaryService {
         this.cloudinary = cloudinary;
     }
 
-    public String uploadImage(MultipartFile file) {
+    public String uploadImage(@NotNull MultipartFile file) {
         try{
             Map<String, Object> options = ObjectUtils.asMap(
-                    "transformation", new Transformation().width(500).height(500).crop("fill")
+                    "transformation", new Transformation().width(700).height(500).crop("fill")
             );
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), options);
             return result.get("secure_url").toString(); // Trả về link ảnh
@@ -31,6 +32,5 @@ public class CloudinaryService {
             return null;
         }
     }
-
 
 }
