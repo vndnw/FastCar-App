@@ -59,7 +59,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
                             position: 'absolute',
                             top: 12,
                             left: 12,
-                            backgroundColor: '#52c41a',
+                            backgroundColor: '#2ac1bc',
                             color: 'white',
                             padding: '4px 8px',
                             borderRadius: 12,
@@ -114,14 +114,14 @@ const CarCard = ({ car, isInCarousel = false }) => {
 
                 {/* Giá */}
                 <div style={{ marginBottom: 16 }}>
-                    <Text strong style={{ fontSize: 16, color: '#52c41a', fontWeight: '600' }}>
+                    <Text strong style={{ fontSize: 16, color: '#51c09f', fontWeight: '600' }}>
                         {car.pricePer4Hour / 1000}K
                     </Text>
                     <Text style={{ fontSize: 14, color: '#999', marginLeft: 4 }}>
                         / 4 giờ
                     </Text>
                     <br />
-                    <Text strong style={{ fontSize: 16, color: '#52c41a', fontWeight: '600' }}>
+                    <Text strong style={{ fontSize: 16, color: '#51c09f', fontWeight: '600' }}>
                         {car.pricePer24Hour / 1000}K
                     </Text>
                     <Text style={{ fontSize: 14, color: '#999', marginLeft: 4 }}>
@@ -133,7 +133,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
                 <Row gutter={[8, 8]} style={{ fontSize: 12 }}>
                     <Col span={8}>
                         <Space size={4} style={{ display: 'flex', alignItems: 'center' }}>
-                            <UserOutlined style={{ color: '#1890ff', fontSize: 14 }} />
+                            <UserOutlined style={{ color: '#51c09f', fontSize: 14 }} />
                             <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>
                                 {car.seats} chỗ
                             </Text>
@@ -141,7 +141,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
                     </Col>
                     <Col span={8}>
                         <Space size={4} style={{ display: 'flex', alignItems: 'center' }}>
-                            <SettingOutlined style={{ color: '#1890ff', fontSize: 14 }} />
+                            <SettingOutlined style={{ color: '#51c09f', fontSize: 14 }} />
                             <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>
                                 {car.transmission}
                             </Text>
@@ -149,7 +149,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
                     </Col>
                     <Col span={8}>
                         <Space size={4} style={{ display: 'flex', alignItems: 'center' }}>
-                            <CarOutlined style={{ color: '#1890ff', fontSize: 14 }} />
+                            <CarOutlined style={{ color: '#51c09f', fontSize: 14 }} />
                             <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>
                                 {car.fuelType}
                             </Text>
