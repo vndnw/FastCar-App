@@ -182,6 +182,7 @@ public class UserService {
             throw new IllegalArgumentException("User is not required to change password");
         }
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setRequiredChangePassword(false);
         userRepository.save(user);
         return true;
     }

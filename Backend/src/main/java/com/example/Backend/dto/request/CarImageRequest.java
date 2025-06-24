@@ -11,7 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class CarImageRequest {
-    private long carId;     //có thể dùng hoặc không nếu ko cần thiết ( mà chắc cũng chẳng cần thiết)
     private String imageUrl;
-    private CarImageType imageType;
 }

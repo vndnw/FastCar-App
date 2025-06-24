@@ -30,7 +30,6 @@ public class CarImageService {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
         Image image = new Image();
         image.setImageUrl(carImageRequest.getImageUrl());
-        image.setImageType(carImageRequest.getImageType());
         image.setCar(car);
         return carImageMapper.mapToResponse(carImageRepository.save(image));
     }
@@ -38,7 +37,6 @@ public class CarImageService {
     public Image createCarImageByCar(Car car , CarImageRequest carImageRequest) {
         Image image = new Image();
         image.setImageUrl(carImageRequest.getImageUrl());
-        image.setImageType(carImageRequest.getImageType());
         image.setCar(car);
         return carImageRepository.save(image);
     }
@@ -58,17 +56,12 @@ public class CarImageService {
     public CarImageResponse updateCarImage (long carImageId , CarImageRequest carImageRequest) {
         Image image = carImageRepository.findById(carImageId).orElseThrow(()-> new ResourceNotFoundException("CarImage not found"));
         image.setImageUrl(carImageRequest.getImageUrl());
-        image.setImageType(carImageRequest.getImageType());
         return carImageMapper.mapToResponse(carImageRepository.save(image));
     }
 
     public CarImageResponse getCarImageByCarId (long carId) {
         return carImageMapper.mapToResponse(carImageRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("CarImage not found")));
     }
-
-//    public CarImageResponse getCarImageByImageUrl (String imageUrl) {
-//        return
-//    }
 
     public void deleteCarImageByCarId (long carImageId) {
         carImageRepository.findById(carImageId).orElseThrow(()-> new ResourceNotFoundException("CarImage not found"));
@@ -80,6 +73,6 @@ public class CarImageService {
         if (carImages.getTotalElements() == 0) {
             throw new ResourceNotFoundException("No car images found");
         }
-        return carImages.map(carImage -> carImageMapper.mapToResponse(carImage));
+        return carImages.map(carImageMapper::mapToResponse);
     }
 }

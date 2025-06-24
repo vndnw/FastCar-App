@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 public class CarImageResponse {
     private long id;
     private String imageUrl;
-    private CarImageType imageType;
     private LocalDateTime creationAt;
     private LocalDateTime updateAt;
 }

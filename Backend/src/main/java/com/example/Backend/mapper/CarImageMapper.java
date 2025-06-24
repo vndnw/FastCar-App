@@ -9,7 +9,6 @@ public class CarImageMapper {
     public CarImageResponse mapToResponse(Image image) {
         return CarImageResponse.builder()
                 .id(image.getId())
-                .imageType(image.getImageType())
                 .imageUrl(image.getImageUrl())
                 .creationAt(image.getCreationAt())
                 .updateAt( image.getUpdateAt())

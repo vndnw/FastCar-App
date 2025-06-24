@@ -21,7 +21,7 @@ public class CarRequest {
     private int year;
     private int seats;
     private CarTransmission transmission; // Assuming this is a string representation of CarTransmission enum
-    private CarType type; // Assuming this is an enum representing the type of car
+    private CarType type;
     private long carBrandId;
     private FuelType fuelType;
     private String color;
@@ -29,7 +29,7 @@ public class CarRequest {
     private List<CarImageRequest> carImages;
     private List<Long> carFeatures;
     private String licensePlate;
-    private String fuelConsumption;//  fuel_consumption/100km
+    private String fuelConsumption;
     private double pricePerHour;
     private double pricePer4Hour;
     private double pricePer8Hour;

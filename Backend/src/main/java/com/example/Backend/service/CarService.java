@@ -72,7 +72,6 @@ public class CarService {
                 .map( image -> {
                     Image carImage = new Image();
                     carImage.setImageUrl(image.getImageUrl());
-                    carImage.setImageType(image.getImageType());
                     carImage.setCar(car);
                     return carImage;
                 })
@@ -109,7 +108,6 @@ public class CarService {
                 .map(image -> {
                     Image carImage = new Image();
                     carImage.setImageUrl(image.getImageUrl());
-                    carImage.setImageType(image.getImageType());
                     carImage.setCar(car);
                     return carImage;
                 })
