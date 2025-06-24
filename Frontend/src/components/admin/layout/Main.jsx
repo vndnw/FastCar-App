@@ -38,76 +38,48 @@ function Main() {
   let { pathname } = useLocation();
   pathname = pathname.replace("/admin/", "").replace("/admin", "");
 
-  useEffect(() => {
-    if (pathname === "rtl") {
-      setPlacement("left");
-    } else {
-      setPlacement("right");
-    }
-  }, [pathname]);
-
-  return (
-    <Layout
-      className={`layout-dashboard ${pathname === "profile" ? "layout-profile" : ""
-        } ${pathname === "rtl" ? "layout-dashboard-rtl" : ""}`}
-    >
-      <Drawer
-        title={false}
-        placement={placement === "right" ? "left" : "right"}
-        closable={false}
-        onClose={() => setVisible(false)}
-        visible={visible}
-        key={placement === "right" ? "left" : "right"}
-        width={250}
-        className={`drawer-sidebar ${pathname === "rtl" ? "drawer-sidebar-rtl" : ""
-          } `}
-      >
-        <Layout
-          className={`layout-dashboard ${pathname === "rtl" ? "layout-dashboard-rtl" : ""
+  return (<Layout
+    className={`layout-dashboard ${pathname === "profile" ? "layout-profile" : ""}`}
+  >      <Drawer
+    title={false}
+    placement={placement === "right" ? "left" : "right"}
+    closable={false}
+    onClose={() => setVisible(false)}
+    visible={visible}
+    key={placement === "right" ? "left" : "right"}
+    width={250}
+    className="drawer-sidebar"
+  >        <Layout className="layout-dashboard">
+        <Sider
+          trigger={null}
+          width={250}
+          theme="light"
+          className={`sider-primary ant-layout-sider-primary ${sidenavType === "#fff" ? "active-route" : ""
             }`}
+          style={{ background: sidenavType }}
         >
-          <Sider
-            trigger={null}
-            width={250}
-            theme="light"
-            className={`sider-primary ant-layout-sider-primary ${sidenavType === "#fff" ? "active-route" : ""
-              }`}
-            style={{ background: sidenavType }}
-          >
-            <Sidenav color={sidenavColor} />
-          </Sider>
-        </Layout>
-      </Drawer>
-      <Sider
-        breakpoint="lg"
-        collapsedWidth="0"
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
-        }}
-        trigger={null}
-        width={250}
-        theme="light"
-        className={`sider-primary ant-layout-sider-primary ${sidenavType === "#fff" ? "active-route" : ""
-          }`}
-        style={{ background: sidenavType }}
-      >
-        <Sidenav color={sidenavColor} />
-      </Sider>
-      <Layout>
-        {fixed ? (
-          <Affix>
-            <AntHeader className={`${fixed ? "ant-header-fixed" : ""}`}>
-              <Header
-                onPress={openDrawer}
-                name={pathname}
-                subName={pathname}
-                handleSidenavColor={handleSidenavColor}
-                handleSidenavType={handleSidenavType}
-                handleFixedNavbar={handleFixedNavbar}
-              />
-            </AntHeader>
-          </Affix>
-        ) : (
+          <Sidenav color={sidenavColor} />
+        </Sider>
+      </Layout>
+    </Drawer>
+    <Sider
+      breakpoint="lg"
+      collapsedWidth="0"
+      onCollapse={(collapsed, type) => {
+        console.log(collapsed, type);
+      }}
+      trigger={null}
+      width={250}
+      theme="light"
+      className={`sider-primary ant-layout-sider-primary ${sidenavType === "#fff" ? "active-route" : ""
+        }`}
+      style={{ background: sidenavType }}
+    >
+      <Sidenav color={sidenavColor} />
+    </Sider>
+    <Layout>
+      {fixed ? (
+        <Affix>
           <AntHeader className={`${fixed ? "ant-header-fixed" : ""}`}>
             <Header
               onPress={openDrawer}
@@ -118,13 +90,25 @@ function Main() {
               handleFixedNavbar={handleFixedNavbar}
             />
           </AntHeader>
-        )}
-        <Content className="content-ant">
-          <Outlet />
-        </Content>
-        <Footer />
-      </Layout>
+        </Affix>
+      ) : (
+        <AntHeader className={`${fixed ? "ant-header-fixed" : ""}`}>
+          <Header
+            onPress={openDrawer}
+            name={pathname}
+            subName={pathname}
+            handleSidenavColor={handleSidenavColor}
+            handleSidenavType={handleSidenavType}
+            handleFixedNavbar={handleFixedNavbar}
+          />
+        </AntHeader>
+      )}
+      <Content className="content-ant">
+        <Outlet />
+      </Content>
+      <Footer />
     </Layout>
+  </Layout>
   );
 }
 

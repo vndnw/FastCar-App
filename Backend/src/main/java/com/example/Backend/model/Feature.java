@@ -29,6 +29,6 @@ public class Feature {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @ManyToMany(mappedBy = "features", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "features")
     private List<Car> cars;
 }

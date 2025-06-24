@@ -16,22 +16,28 @@ import {
     Divider,
     Upload,
     Image,
-    Select,
-    InputNumber,
+    Select, InputNumber,
     DatePicker,
-    Tabs
+    Tabs,
+    Checkbox,
+    Dropdown,
+    Menu
 } from "antd";
 
 import {
     PlusOutlined,
     EditOutlined,
     DeleteOutlined,
-    EyeOutlined,
-    CarOutlined,
+    EyeOutlined, CarOutlined,
     UploadOutlined,
     SearchOutlined,
     SettingOutlined,
     ReloadOutlined,
+    DownOutlined,
+    CheckCircleOutlined,
+    ToolOutlined,
+    StopOutlined,
+    ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { carService } from "../../services/carService";
@@ -160,6 +166,7 @@ const Cars = () => {
             }
         } catch (error) {
             console.error('Error fetching car features:', error);
+            message.error('Failed to fetch car features');
             setCarFeatures([]);
         }
     };
@@ -230,9 +237,23 @@ const Cars = () => {
         setFeatureEditModalVisible(true);
     };
 
+    const updateAddressField = (changedFields, allFields, form) => {
+        const street = form.getFieldValue('street') || '';
+        const ward = form.getFieldValue('ward') || '';
+        const district = form.getFieldValue('district') || '';
+        const city = form.getFieldValue('city') || '';
+
+        const addressParts = [street, ward, district, city].filter(part => part.trim() !== '');
+        const fullAddress = addressParts.join(', ');
+
+        form.setFieldsValue({ address: fullAddress });
+    };
+
     const handleCreateCar = async (values) => {
         try {
-            setCreateLoading(true);
+            setCreateLoading(true);            // Generate full address from individual fields
+            const addressParts = [values.street, values.ward, values.district, values.city].filter(part => part && part.trim() !== '');
+            const fullAddress = addressParts.join(', ');
 
             // Prepare car data according to new API structure
             const carData = {
@@ -246,13 +267,13 @@ const Cars = () => {
                 fuelType: values.fuelType, // OIL, GASOLINE, ELECTRIC, HYBRID
                 color: values.color,
                 location: {
-                    address: values.address || '',
+                    address: fullAddress,
                     street: values.street || '',
                     ward: values.ward || '',
                     district: values.district || '',
                     city: values.city || '',
-                    latitude: values.latitude || 0.0,
-                    longitude: values.longitude || 0.0
+                    latitude: values.latitude || 10.8231,  // Default latitude for Ho Chi Minh City
+                    longitude: values.longitude || 106.6297  // Default longitude for Ho Chi Minh City
                 },
                 carImages: [], // Will be handled separately for image uploads
                 carFeatures: values.carFeatures || [], // Array of feature IDs
@@ -264,7 +285,8 @@ const Cars = () => {
                 pricePer12Hour: values.pricePer12Hour,
                 pricePer24Hour: values.pricePer24Hour,
                 description: values.description
-            };
+            };            // Log the carData to debug
+            console.log('Car data being sent:', carData);
 
             // Use the new user-specific endpoint
             const result = await carService.createCarByUser(user.id, carData);
@@ -303,6 +325,10 @@ const Cars = () => {
                 }
             }
 
+            // Generate full address from individual fields
+            const addressParts = [values.street, values.ward, values.district, values.city].filter(part => part && part.trim() !== '');
+            const fullAddress = addressParts.join(', ');
+
             const carData = {
                 name: values.name,
                 model: values.model,
@@ -314,13 +340,13 @@ const Cars = () => {
                 fuelType: values.fuelType, // OIL, GASOLINE, etc.
                 color: values.color,
                 location: {
-                    address: values.address || '',
+                    address: fullAddress,
                     street: values.street || '',
                     ward: values.ward || '',
                     district: values.district || '',
                     city: values.city || '',
-                    latitude: values.latitude || 0.0,
-                    longitude: values.longitude || 0.0
+                    latitude: values.latitude || 10.8231,  // Default latitude for Ho Chi Minh City
+                    longitude: values.longitude || 106.6297  // Default longitude for Ho Chi Minh City
                 },
                 carImages,
                 carFeatures: values.carFeatures || [], // Array of feature IDs
@@ -333,6 +359,9 @@ const Cars = () => {
                 pricePer24Hour: values.pricePer24Hour,
                 description: values.description
             };
+
+            // Log the carData to debug
+            console.log('Car data being sent for update:', carData);
 
             const result = await carService.updateCar(selectedCar.id, carData);
 
@@ -378,11 +407,8 @@ const Cars = () => {
     const handleViewCar = (car) => {
         setSelectedCar(car);
         setViewModalVisible(true);
-    };
-
-    const openEditModal = (car) => {
-        setSelectedCar(car);
-        editForm.setFieldsValue({
+    }; const openEditModal = (car) => {
+        setSelectedCar(car); editForm.setFieldsValue({
             name: car.name,
             carBrandId: car.carBrand?.id,
             model: car.model,
@@ -398,10 +424,16 @@ const Cars = () => {
             pricePer24Hour: car.pricePer24Hour,
             fuelType: car.fuelType,
             fuelConsumption: car.fuelConsumption,
-            status: car.status,
             color: car.color,
-            description: car.description,
-            features: car.features,
+            description: car.description, carFeatures: car.features ? car.features.map(feature => feature.id || feature) : [],
+            latitude: car.location?.latitude || 10.8231,  // Default latitude for Ho Chi Minh City
+            longitude: car.location?.longitude || 106.6297,  // Default longitude for Ho Chi Minh City
+            // Parse address string to individual fields
+            street: car.location?.street || (car.location?.address ? car.location.address.split(',')[0]?.trim() : ''),
+            ward: car.location?.ward || (car.location?.address ? car.location.address.split(',')[1]?.trim() : ''),
+            district: car.location?.district || (car.location?.address ? car.location.address.split(',')[2]?.trim() : ''),
+            city: car.location?.city || (car.location?.address ? car.location.address.split(',')[3]?.trim() : ''),
+            address: car.location?.address || '',
             locationId: car.location?.id,
         });
         setEditModalVisible(true);
@@ -411,7 +443,7 @@ const Cars = () => {
         if (searchText.trim()) {
             try {
                 setLoading(true);
-                const result = await carService.searchCars(searchText, 0, pagination.pageSize);
+                const result = await carService.getCarsByName(searchText, 0, pagination.pageSize);
 
                 if (result.status === 200 && result.data && result.data.content) {
                     const mappedCars = result.data.content.map(car => ({
@@ -441,18 +473,16 @@ const Cars = () => {
             style: 'currency',
             currency: 'VND'
         }).format(amount);
-    };
-
-    const getStatusColor = (status) => {
+    }; const getStatusColor = (status) => {
         switch (status) {
+            case 'PENDING':
+                return 'blue';
             case 'AVAILABLE':
                 return 'green';
-            case 'RENTED':
-                return 'red';
-            case 'MAINTENANCE':
-                return 'orange';
             case 'UNAVAILABLE':
                 return 'gray';
+            case 'MAINTENANCE':
+                return 'red';
             default:
                 return 'blue';
         }
@@ -556,16 +586,69 @@ const Cars = () => {
                     </div>
                 </div>
             ),
-        },
-        {
+        }, {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            width: '10%',
-            render: (status) => (
-                <Tag color={getStatusColor(status)}>
-                    {status}
-                </Tag>
+            width: '12%',
+            render: (status, record) => (
+                <Dropdown
+                    overlay={
+                        <Menu onClick={({ key }) => handleStatusChange(record.id, key)}
+                            items={[
+                                {
+                                    key: 'PENDING',
+                                    label: (
+                                        <span style={{ color: '#1890ff' }}>
+                                            <ExclamationCircleOutlined style={{ marginRight: 8 }} />
+                                            Pending
+                                        </span>
+                                    ),
+                                    disabled: status === 'PENDING'
+                                },
+                                {
+                                    key: 'AVAILABLE',
+                                    label: (
+                                        <span style={{ color: '#52c41a' }}>
+                                            <CheckCircleOutlined style={{ marginRight: 8 }} />
+                                            Available
+                                        </span>
+                                    ),
+                                    disabled: status === 'AVAILABLE'
+                                },
+                                {
+                                    key: 'UNAVAILABLE',
+                                    label: (
+                                        <span style={{ color: '#d9d9d9' }}>
+                                            <StopOutlined style={{ marginRight: 8 }} />
+                                            Unavailable
+                                        </span>
+                                    ),
+                                    disabled: status === 'UNAVAILABLE'
+                                },
+                                {
+                                    key: 'MAINTENANCE',
+                                    label: (
+                                        <span style={{ color: '#ff4d4f' }}>
+                                            <ToolOutlined style={{ marginRight: 8 }} />
+                                            Maintenance
+                                        </span>
+                                    ),
+                                    disabled: status === 'MAINTENANCE'
+                                }
+                            ]}
+                        />
+                    }
+                    trigger={['click']}
+                >
+                    <Tag
+                        color={getStatusColor(status)}
+                        style={{ cursor: 'pointer', userSelect: 'none' }}
+                        title="Click to change status"
+                    >
+                        {status} <DownOutlined style={{ fontSize: 10 }} />
+                    </Tag>
+                </Dropdown>
             ),
         }, {
             title: 'Location',
@@ -659,7 +742,10 @@ const Cars = () => {
                                         <Button
                                             type="primary"
                                             icon={<PlusOutlined />}
-                                            onClick={() => setCreateModalVisible(true)}
+                                            onClick={() => {
+                                                setCreateModalVisible(true);
+                                                fetchCarFeatures(); // Refresh features when opening modal
+                                            }}
                                         >
                                             Add Car
                                         </Button>
@@ -697,13 +783,24 @@ const Cars = () => {
                         footer={null}
                         width={800}
                         destroyOnClose
+                    >                        <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={handleCreateCar}
+                        onFieldsChange={(changedFields, allFields) => updateAddressField(changedFields, allFields, form)}
+                        style={{ marginTop: 16 }}
+                        initialValues={{
+                            latitude: 10.8231,  // Default latitude for Ho Chi Minh City
+                            longitude: 106.6297  // Default longitude for Ho Chi Minh City
+                        }}
                     >
-                        <Form
-                            form={form}
-                            layout="vertical"
-                            onFinish={handleCreateCar}
-                            style={{ marginTop: 16 }}
-                        >
+                            {/* Hidden fields for latitude and longitude */}
+                            <Form.Item name="latitude" style={{ display: 'none' }}>
+                                <InputNumber />
+                            </Form.Item>
+                            <Form.Item name="longitude" style={{ display: 'none' }}>
+                                <InputNumber />
+                            </Form.Item>
                             <Row gutter={16}>
                                 <Col span={12}>
                                     <Form.Item
@@ -926,23 +1023,13 @@ const Cars = () => {
 
                             <Divider>Location Information</Divider>
 
-                            <Row gutter={16}>
-                                <Col span={24}>
-                                    <Form.Item
-                                        label="Full Address"
-                                        name="address"
-                                        rules={[{ required: true, message: 'Please enter full address' }]}
-                                    >
-                                        <Input placeholder="Enter full address" />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
 
                             <Row gutter={16}>
                                 <Col span={6}>
                                     <Form.Item
                                         label="Street"
                                         name="street"
+                                        rules={[{ required: true, message: 'Please enter street' }]}
                                     >
                                         <Input placeholder="Enter street" />
                                     </Form.Item>
@@ -951,6 +1038,7 @@ const Cars = () => {
                                     <Form.Item
                                         label="Ward"
                                         name="ward"
+                                        rules={[{ required: true, message: 'Please enter ward' }]}
                                     >
                                         <Input placeholder="Enter ward" />
                                     </Form.Item>
@@ -959,6 +1047,7 @@ const Cars = () => {
                                     <Form.Item
                                         label="District"
                                         name="district"
+                                        rules={[{ required: true, message: 'Please enter district' }]}
                                     >
                                         <Input placeholder="Enter district" />
                                     </Form.Item>
@@ -967,55 +1056,56 @@ const Cars = () => {
                                     <Form.Item
                                         label="City"
                                         name="city"
+                                        rules={[{ required: true, message: 'Please enter city' }]}
                                     >
                                         <Input placeholder="Enter city" />
                                     </Form.Item>
                                 </Col>
-                            </Row>
-
-                            <Row gutter={16}>
-                                <Col span={12}>
+                            </Row>                            <Row gutter={16}>
+                                <Col span={24}>
                                     <Form.Item
-                                        label="Latitude"
-                                        name="latitude"
+                                        label="Full Address"
+                                        name="address"
                                     >
-                                        <InputNumber
-                                            placeholder="Enter latitude"
-                                            step={0.000001}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item
-                                        label="Longitude"
-                                        name="longitude"
-                                    >
-                                        <InputNumber
-                                            placeholder="Enter longitude"
-                                            step={0.000001}
-                                            style={{ width: '100%' }}
+                                        <Input
+                                            disabled
+                                            style={{ backgroundColor: '#f5f5f5', color: '#666' }}
                                         />
                                     </Form.Item>
                                 </Col>
                             </Row>
 
-                            <Row gutter={16}>
-                                <Col span={12}>
+                            <Divider>Features & Description</Divider><Row gutter={16}>
+                                <Col span={20}>
                                     <Form.Item
-                                        label="Features"
+                                        label="Car Features"
                                         name="carFeatures"
                                     >
-                                        <Select
-                                            mode="multiple"
-                                            placeholder="Select car features"
+                                        <Checkbox.Group
+                                            style={{ width: '100%' }}
                                         >
-                                            {carFeatures.map(feature => (
-                                                <Option key={feature.id} value={feature.id}>
-                                                    {feature.name}
-                                                </Option>
-                                            ))}
-                                        </Select>
+                                            <Row gutter={[16, 8]}>
+                                                {carFeatures.map(feature => (
+                                                    <Col span={8} key={feature.id}>
+                                                        <Checkbox value={feature.id}>
+                                                            {feature.name}
+                                                        </Checkbox>
+                                                    </Col>
+                                                ))}
+                                            </Row>                                        </Checkbox.Group>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={4}>
+                                    <Form.Item label=" " style={{ marginTop: 30 }}>
+                                        <Button
+                                            type="dashed"
+                                            icon={<PlusOutlined />}
+                                            onClick={() => setFeatureCreateModalVisible(true)}
+                                            size="small"
+                                            title="Add new feature"
+                                        >
+                                            Add Feature
+                                        </Button>
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -1069,13 +1159,20 @@ const Cars = () => {
                         footer={null}
                         width={800}
                         destroyOnClose
+                    >                        <Form
+                        form={editForm}
+                        layout="vertical"
+                        onFinish={handleEditCar}
+                        onFieldsChange={(changedFields, allFields) => updateAddressField(changedFields, allFields, editForm)}
+                        style={{ marginTop: 16 }}
                     >
-                        <Form
-                            form={editForm}
-                            layout="vertical"
-                            onFinish={handleEditCar}
-                            style={{ marginTop: 16 }}
-                        >
+                            {/* Hidden fields for latitude and longitude */}
+                            <Form.Item name="latitude" style={{ display: 'none' }}>
+                                <InputNumber />
+                            </Form.Item>
+                            <Form.Item name="longitude" style={{ display: 'none' }}>
+                                <InputNumber />
+                            </Form.Item>
                             <Row gutter={16}>
                                 <Col span={12}>
                                     <Form.Item
@@ -1297,30 +1394,96 @@ const Cars = () => {
                                 </Col>
                             </Row>
 
+                            <Divider>Location Information</Divider>
+
                             <Row gutter={16}>
-                                <Col span={12}>
+                                <Col span={6}>
                                     <Form.Item
-                                        label="Status"
-                                        name="status"
-                                        initialValue="AVAILABLE"
+                                        label="Street"
+                                        name="street"
+                                        rules={[{ required: true, message: 'Please enter street' }]}
                                     >
-                                        <Select>
-                                            <Option value="AVAILABLE">Available</Option>
-                                            <Option value="RENTED">Rented</Option>
-                                            <Option value="MAINTENANCE">Maintenance</Option>
-                                            <Option value="UNAVAILABLE">Unavailable</Option>
-                                        </Select>
+                                        <Input placeholder="Enter street" />
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col span={6}>
                                     <Form.Item
-                                        label="Features"
-                                        name="features"
+                                        label="Ward"
+                                        name="ward"
+                                        rules={[{ required: true, message: 'Please enter ward' }]}
                                     >
-                                        <Input placeholder="e.g., GPS, Air Conditioning, Bluetooth" />
+                                        <Input placeholder="Enter ward" />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={6}>
+                                    <Form.Item
+                                        label="District"
+                                        name="district"
+                                        rules={[{ required: true, message: 'Please enter district' }]}
+                                    >
+                                        <Input placeholder="Enter district" />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={6}>
+                                    <Form.Item
+                                        label="City"
+                                        name="city"
+                                        rules={[{ required: true, message: 'Please enter city' }]}
+                                    >
+                                        <Input placeholder="Enter city" />
                                     </Form.Item>
                                 </Col>
                             </Row>
+
+                            <Row gutter={16}>
+                                <Col span={24}>
+                                    <Form.Item
+                                        label="Full Address"
+                                        name="address"
+                                    >
+                                        <Input
+                                            disabled
+                                            style={{ backgroundColor: '#f5f5f5', color: '#666' }}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
+                            <Divider>Features & Location</Divider>
+
+                            <Row gutter={16}>
+                                <Col span={20}>
+                                    <Form.Item
+                                        label="Car Features"
+                                        name="carFeatures"
+                                    >
+                                        <Checkbox.Group
+                                            style={{ width: '100%' }}
+                                        >
+                                            <Row gutter={[16, 8]}>
+                                                {carFeatures.map(feature => (
+                                                    <Col span={8} key={feature.id}>
+                                                        <Checkbox value={feature.id}>
+                                                            {feature.name}
+                                                        </Checkbox>
+                                                    </Col>
+                                                ))}
+                                            </Row>
+                                        </Checkbox.Group>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={4}>                                    <Form.Item label=" " style={{ marginTop: 30 }}>
+                                    <Button
+                                        type="dashed"
+                                        icon={<PlusOutlined />}
+                                        onClick={() => setFeatureCreateModalVisible(true)}
+                                        size="small"
+                                        title="Add new feature"
+                                    >
+                                        Add Feature
+                                    </Button>
+                                </Form.Item>
+                                </Col>                            </Row>
 
                             <Row gutter={16}>
                                 <Col span={24}>
@@ -1429,9 +1592,8 @@ const Cars = () => {
                                             <div><strong>Seats:</strong> {selectedCar.seats}</div>
                                             <div><strong>Color:</strong> {selectedCar.color}</div>
                                             <div><strong>Fuel Type:</strong> {selectedCar.fuelType}</div>
-                                            <div><strong>Fuel Consumption:</strong> {selectedCar.fuelConsumption}</div>
-                                            {selectedCar.features && (
-                                                <div><strong>Features:</strong> {selectedCar.features}</div>
+                                            <div><strong>Fuel Consumption:</strong> {selectedCar.fuelConsumption}</div>                                            {selectedCar.features && selectedCar.features.length > 0 && (
+                                                <div><strong>Features:</strong> {selectedCar.features.map(feature => feature.name).join(', ')}</div>
                                             )}
                                         </div>
                                     </Col>
@@ -1560,7 +1722,23 @@ const Cars = () => {
                 </div>
             ),
         },
-    ]; return (
+    ]; const handleStatusChange = async (carId, newStatus) => {
+        try {
+            const result = await carService.updateCarStatus(carId, newStatus);
+
+            if (result.status === 200) {
+                message.success(`Car status updated to ${newStatus}`);
+                fetchCars(pagination.current, pagination.pageSize);
+            } else {
+                message.error('Failed to update car status');
+            }
+        } catch (error) {
+            console.error('Error updating car status:', error);
+            message.error('Failed to update car status');
+        }
+    };
+
+    return (
         <>
             <Tabs defaultActiveKey="all" items={tabItems} />
 

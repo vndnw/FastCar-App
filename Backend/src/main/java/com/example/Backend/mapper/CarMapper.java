@@ -1,6 +1,5 @@
 package com.example.Backend.mapper;
 
-import com.example.Backend.dto.response.CarDetailsResponse;
 import com.example.Backend.dto.response.CarResponse;
 import com.example.Backend.model.Car;
 import org.springframework.stereotype.Service;
@@ -13,46 +12,22 @@ public class CarMapper {
     private final CarImageMapper carImageMapper;
     private final LocationMapper locationMapper;
     private final FeatureMapper featureMapper;
-    private final UserMapper userMapper;
 
 
     public CarMapper(CarBrandMapper carBrandMapper,
                      CarImageMapper carImageMapper,
                      LocationMapper locationMapper,
-                     FeatureMapper featureMapper,
-                     UserMapper userMapper) {
+                     FeatureMapper featureMapper) {
         this.carBrandMapper = carBrandMapper;
         this.carImageMapper = carImageMapper;
         this.locationMapper = locationMapper;
         this.featureMapper = featureMapper;
-        this.userMapper = userMapper;
     }
 
     public CarResponse mapToResponse(Car car) {
         return CarResponse.builder()
                 .id(car.getId())
-                .name(car.getName())
-                .carType(car.getCarType())
-                .carBrand(carBrandMapper.mapToResponse(car.getBrand()))
-                .fuelType(car.getFuelType())
-                .images(car.getImages().stream().map(carImageMapper::mapToResponse).collect(Collectors.toList()))
-                .location(car.getLocation().getDistrict() + ", " + car.getLocation().getCity())
-                .seats(car.getSeats())
-                .fuelConsumption(car.getFuelConsumption())
-                .pricePer4Hour(car.getPricePer4Hour())
-                .pricePer8Hour(car.getPricePer8Hour())
-                .pricePer12Hour(car.getPricePer12Hour())
-                .pricePer24Hour(car.getPricePer24Hour())
-                .pricePerHour(car.getPricePerHour())
-                .transmission(car.getTransmission())
-                .status(car.getStatus())
-                .build();
-    }
-
-    public CarDetailsResponse mapToResponse1(Car car) {
-        return CarDetailsResponse.builder()
-                .id(car.getId())
-                .user(userMapper.mapToResponse(car.getUser()))
+                .username(car.getUser().getFirstName() + " " + car.getUser().getLastName())
                 .model(car.getModel())
                 .year(car.getYear())
                 .name(car.getName())

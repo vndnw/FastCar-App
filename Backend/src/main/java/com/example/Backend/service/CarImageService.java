@@ -1,7 +1,6 @@
 package com.example.Backend.service;
 
 import com.example.Backend.dto.request.CarImageRequest;
-import com.example.Backend.dto.request.ListImagesRequest;
 import com.example.Backend.dto.response.CarImageResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarImageMapper;
@@ -12,8 +11,6 @@ import com.example.Backend.repository.CarRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CarImageService {
@@ -33,29 +30,15 @@ public class CarImageService {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
         Image image = new Image();
         image.setImageUrl(carImageRequest.getImageUrl());
+        image.setImageType(carImageRequest.getImageType());
         image.setCar(car);
         return carImageMapper.mapToResponse(carImageRepository.save(image));
-    }
-
-    public boolean createListImages (long carId , ListImagesRequest listImagesRequest) {
-        try {
-            Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
-            listImagesRequest.getImageUrls().forEach(imageUrl -> {
-                Image image = new Image();
-                image.setImageUrl(imageUrl);
-                image.setCar(car);
-                carImageRepository.save(image);
-            });
-            return true;
-        }
-        catch (Exception e) {
-            throw new ResourceNotFoundException("Error creating car images: " + e.getMessage());
-        }
     }
 
     public Image createCarImageByCar(Car car , CarImageRequest carImageRequest) {
         Image image = new Image();
         image.setImageUrl(carImageRequest.getImageUrl());
+        image.setImageType(carImageRequest.getImageType());
         image.setCar(car);
         return carImageRepository.save(image);
     }
@@ -75,6 +58,7 @@ public class CarImageService {
     public CarImageResponse updateCarImage (long carImageId , CarImageRequest carImageRequest) {
         Image image = carImageRepository.findById(carImageId).orElseThrow(()-> new ResourceNotFoundException("CarImage not found"));
         image.setImageUrl(carImageRequest.getImageUrl());
+        image.setImageType(carImageRequest.getImageType());
         return carImageMapper.mapToResponse(carImageRepository.save(image));
     }
 
@@ -82,19 +66,13 @@ public class CarImageService {
         return carImageMapper.mapToResponse(carImageRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("CarImage not found")));
     }
 
-    public void deleteImageById (long carImageId) {
+//    public CarImageResponse getCarImageByImageUrl (String imageUrl) {
+//        return
+//    }
+
+    public void deleteCarImageByCarId (long carImageId) {
         carImageRepository.findById(carImageId).orElseThrow(()-> new ResourceNotFoundException("CarImage not found"));
         carImageRepository.deleteById(carImageId);
-    }
-
-    public void deleteImageByCarId (long carId) {
-        List<Image> carImages = carImageRepository.findAllByCarId(carId);
-        if (carImages.isEmpty()) {
-            throw new ResourceNotFoundException("No images found for car with ID: " + carId);
-        }
-        carImages.forEach(image -> {
-            carImageRepository.deleteById(image.getId());
-        });
     }
 
     public Page<CarImageResponse> getAllCarImages (Pageable pageable) {
@@ -102,6 +80,6 @@ public class CarImageService {
         if (carImages.getTotalElements() == 0) {
             throw new ResourceNotFoundException("No car images found");
         }
-        return carImages.map(carImageMapper::mapToResponse);
+        return carImages.map(carImage -> carImageMapper.mapToResponse(carImage));
     }
 }

@@ -30,6 +30,16 @@ export const userService = {    // Get all users with pagination
         return apiClient.put(`/user/${id}/update-info-user`, userInfo);
     },
 
+    // Create bank info by admin
+    createBankUserInfo: async (id, userInfo) => {
+        return apiClient.post(`/user/${id}/bank-information`, userInfo);
+    },
+
+    // Update bank info by admin
+    updateBankUserInfo: async (id, userInfo) => {
+        return apiClient.put(`/user/${id}/bank-information`, userInfo);
+    },
+
     // Delete user
     deleteUser: async (id) => {
         return apiClient.delete(`/user/${id}?id=${id}`);
