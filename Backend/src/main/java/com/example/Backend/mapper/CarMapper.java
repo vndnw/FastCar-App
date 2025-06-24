@@ -32,27 +32,7 @@ public class CarMapper {
     public CarResponse mapToResponse(@NotNull Car car) {
         return CarResponse.builder()
                 .id(car.getId())
-                .username(car.getUser().getFirstName() + " " + car.getUser().getLastName())
-                .name(car.getName())
-                .carBrand(carBrandMapper.mapToResponse(car.getBrand()))
-                .fuelType(car.getFuelType())
-                .images(car.getImages().stream().map(imageMapper::mapToResponse).collect(Collectors.toList()))
-                .location(car.getLocation().getDistrict() + ", " + car.getLocation().getCity())
-                .seats(car.getSeats())
-                .fuelConsumption(car.getFuelConsumption())
-                .pricePer4Hour(car.getPricePer4Hour())
-                .pricePer8Hour(car.getPricePer8Hour())
-                .pricePer12Hour(car.getPricePer12Hour())
-                .pricePer24Hour(car.getPricePer24Hour())
-                .pricePerHour(car.getPricePerHour())
-                .transmission(car.getTransmission())
-                .build();
-    }
-
-    public CarDetailsResponse mapToResponse1(@NotNull Car car) {
-        return CarDetailsResponse.builder()
-                .id(car.getId())
-                .user(userMapper.mapToResponse(car.getUser()))
+                .emailOwner(car.getUser().getEmail())
                 .model(car.getModel())
                 .year(car.getYear())
                 .name(car.getName())

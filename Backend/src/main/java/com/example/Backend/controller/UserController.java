@@ -100,6 +100,7 @@ public class UserController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('user')")
     @PatchMapping("/me/update-avatar")
     public ResponseEntity<?> updateUserAvatar(@RequestParam("avatar") MultipartFile avatar) {
         String avatarUrl = cloudinaryService.uploadImage(avatar);

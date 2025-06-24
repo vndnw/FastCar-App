@@ -105,15 +105,15 @@ public class CarService {
         carRepository.delete(car);
     }
 
-    public List<CarDetailsResponse> getAllCarsByUserId(long userId) {
+    public List<CarResponse> getAllCarsByUserId(long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User Not Found"));
         List<Car> cars = carRepository.findCarsByUser(user);
-        return cars.stream().map(carMapper::mapToResponse1).collect(Collectors.toList());
+        return cars.stream().map(carMapper::mapToResponse).collect(Collectors.toList());
     }
 
-    public CarDetailsResponse getCarById(long carId) {
+    public CarResponse getCarById(long carId) {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
-        return carMapper.mapToResponse1(car);
+        return carMapper.mapToResponse(car);
     }
 
     public Page<CarResponse> getAllCars(Pageable pageable) {
@@ -151,11 +151,9 @@ public class CarService {
         return true;
     }
 
-    public Page<CarDetailsResponse> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
+    public Page<CarResponse> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
         Specification<Car> spec = CarSpecification.findByCriteria(criteria);
-
         Page<Car> carPage = carRepository.findAll(spec, pageable);
-
-        return carPage.map(carMapper::mapToResponse1);
+        return carPage.map(carMapper::mapToResponse);
     }
 }
