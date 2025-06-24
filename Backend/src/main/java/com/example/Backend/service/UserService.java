@@ -74,8 +74,8 @@ public class UserService {
         return userMapper.mapToResponse(userRepository.save(user));
     }
 
-    public UserResponse updateUserInfo(long id, @NotNull UpdateInfoRequest userRequest) {
-        User user = userRepository.findById(id)
+    public UserResponse updateUserInfo(String email, @NotNull UpdateInfoRequest userRequest) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
@@ -173,6 +173,18 @@ public class UserService {
         user.getRoles().add(role);
         userRepository.save(user);
         return true; // Role added successfully
+    }
+
+    public boolean addRolesToUser(long userId, List<String> roleNames) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        List<Role> roles = roleNames.stream()
+                .map(roleName -> roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName)))
+                .toList();
+        roles.forEach(role -> user.getRoles().add(role));
+        userRepository.save(user);
+        return true;
     }
 
     public boolean changePassword(String email, String newPassword) {

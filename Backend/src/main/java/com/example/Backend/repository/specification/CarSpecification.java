@@ -10,14 +10,20 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CarSpecification {
+
     public static Specification<Car> findByCriteria(CarSearchCriteriaRequest criteria) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            Join<Car, Location> locationJoin = root.join("location");
+            // Sử dụng LEFT JOIN cho location để đảm bảo tất cả xe đều được xem xét,
+            // kể cả khi location có thể bị null (tùy thuộc vào thiết kế DB)
+            // Nếu Car luôn có Location, INNER JOIN mặc định là đủ.
+            // Tuy nhiên, việc LEFT JOIN thường linh hoạt hơn trong Spec.
+            Join<Car, Location> locationJoin = root.join("location", JoinType.LEFT);
 
             // --- Điều kiện cơ bản ---
             predicates.add(criteriaBuilder.equal(root.get("active"), true));
@@ -28,6 +34,8 @@ public class CarSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("brand").get("id"), criteria.getBrandId()));
             }
             if (StringUtils.hasText(criteria.getName())) {
+                // Tối ưu: Nếu có thể, hãy dùng LIKE 'value%' thay vì '%value%'
+                // Nếu cần tìm kiếm toàn văn bản, hãy cân nhắc Full-Text Search hoặc pg_trgm (PostgreSQL)
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + criteria.getName().toLowerCase() + "%"));
             }
             if (StringUtils.hasText(criteria.getCarType())) {
@@ -48,10 +56,15 @@ public class CarSpecification {
 
             // --- Lọc theo ngày có sẵn (Availability) ---
             if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-                assert query != null;
+                // IMPORTANT: Đảm bảo bảng Booking có các chỉ mục trên car_id, pickupTime, returnTime, status
+                // Ví dụ: CREATE INDEX idx_booking_car_time_status ON booking (car_id, pickup_time, return_time, status);
+
+                LocalDateTime searchStartTime = criteria.getStartDate().atStartOfDay();
+                LocalDateTime searchEndTime = criteria.getEndDate().atTime(23, 59, 59);
+
                 Subquery<Long> subquery = query.subquery(Long.class);
                 Root<Booking> bookingRoot = subquery.from(Booking.class);
-                subquery.select(bookingRoot.get("car").get("id"));
+                subquery.select(bookingRoot.get("car").get("id")); // Chọn ID của xe
 
                 // Các trạng thái booking được coi là "đã chiếm chỗ"
                 Predicate statusMatch = bookingRoot.get("status").in(
@@ -59,31 +72,57 @@ public class CarSpecification {
 
                 // Điều kiện khoảng thời gian đặt bị trùng lặp
                 Predicate overlap = criteriaBuilder.or(
-                        criteriaBuilder.between(bookingRoot.get("pickupTime"), criteria.getStartDate().atStartOfDay(), criteria.getEndDate().atTime(23, 59, 59)),
-                        criteriaBuilder.between(bookingRoot.get("returnTime"), criteria.getStartDate().atStartOfDay(), criteria.getEndDate().atTime(23, 59, 59)),
+                        // Booking bắt đầu trong khoảng tìm kiếm
+                        criteriaBuilder.between(bookingRoot.get("pickupTime"), searchStartTime, searchEndTime),
+                        // Booking kết thúc trong khoảng tìm kiếm
+                        criteriaBuilder.between(bookingRoot.get("returnTime"), searchStartTime, searchEndTime),
+                        // Khoảng tìm kiếm nằm hoàn toàn trong booking hiện có
                         criteriaBuilder.and(
-                                criteriaBuilder.lessThan(bookingRoot.get("pickupTime"), criteria.getStartDate().atStartOfDay()),
-                                criteriaBuilder.greaterThan(bookingRoot.get("returnTime"), criteria.getEndDate().atTime(23, 59, 59))
+                                criteriaBuilder.lessThan(bookingRoot.get("pickupTime"), searchStartTime),
+                                criteriaBuilder.greaterThan(bookingRoot.get("returnTime"), searchEndTime)
                         )
                 );
 
-                subquery.where(criteriaBuilder.equal(bookingRoot.get("car"), root), statusMatch, overlap);
+                subquery.where(
+                        criteriaBuilder.equal(bookingRoot.get("car"), root), // Booking thuộc về xe đang xét
+                        statusMatch, // Trạng thái booking bị trùng lặp
+                        overlap      // Khoảng thời gian bị trùng lặp
+                );
+
+                // Thêm điều kiện NOT EXISTS: Chỉ lấy xe mà KHÔNG CÓ booking nào thỏa mãn subquery
                 predicates.add(criteriaBuilder.not(criteriaBuilder.exists(subquery)));
             }
 
             // --- Lọc địa điểm (Xử lý theo thứ tự ưu tiên) ---
             if (criteria.getLatitude() != null && criteria.getLongitude() != null) {
                 // ƯU TIÊN 1: TÌM THEO BÁN KÍNH
+                // Để tối ưu, bạn nên đánh chỉ mục trên latitude và longitude của bảng Location.
+                // Đối với hiệu suất cao hơn nữa, hãy cân nhắc sử dụng Spatial Extensions của DB (PostGIS, MySQL Spatial).
+
                 double radius = criteria.getRadiusInKm() != null ? criteria.getRadiusInKm() : 10.0; // Mặc định 10km
+
+                // Thêm Bounding Box Predicate để lọc sơ bộ, giảm số lượng bản ghi cần tính toán Haversine đầy đủ
+                double latDeg = criteria.getLatitude();
+                double lonDeg = criteria.getLongitude();
+
+                // Ước lượng delta độ dựa trên bán kính (1 độ vĩ độ ~ 111 km)
+                // Lon delta phức tạp hơn do cos(latitude)
+                double latDelta = radius / 111.0;
+                double lonDelta = radius / (111.0 * Math.cos(Math.toRadians(latDeg)));
+
+                predicates.add(criteriaBuilder.between(locationJoin.get("latitude"), latDeg - latDelta, latDeg + latDelta));
+                predicates.add(criteriaBuilder.between(locationJoin.get("longitude"), lonDeg - lonDelta, lonDeg + lonDelta));
+
+                // Sau đó mới tính toán khoảng cách Haversine chính xác
                 Expression<Double> distanceInKm = createDistanceExpression(criteriaBuilder, locationJoin, criteria.getLatitude(), criteria.getLongitude());
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(distanceInKm, radius));
 
                 // Sắp xếp kết quả theo khoảng cách gần nhất
-                assert query != null;
                 query.orderBy(criteriaBuilder.asc(distanceInKm));
 
             } else if (StringUtils.hasText(criteria.getCity()) || StringUtils.hasText(criteria.getDistrict())) {
                 // ƯU TIÊN 2: TÌM THEO CITY/DISTRICT
+                // Đảm bảo có chỉ mục trên các cột city và district của bảng Location.
                 if (StringUtils.hasText(criteria.getCity())) {
                     predicates.add(criteriaBuilder.like(criteriaBuilder.lower(locationJoin.get("city")), "%" + criteria.getCity().toLowerCase() + "%"));
                 }
@@ -92,6 +131,8 @@ public class CarSpecification {
                 }
             } else if (StringUtils.hasText(criteria.getLocation())) {
                 // ƯU TIÊN 3: TÌM THEO TEXT CHUNG
+                // Như đã nói ở trên, LIKE %...% không hiệu quả với chỉ mục B-tree thông thường.
+                // Cân nhắc Full-Text Search hoặc pg_trgm nếu tìm kiếm này chậm.
                 String pattern = "%" + criteria.getLocation().toLowerCase() + "%";
                 predicates.add(criteriaBuilder.or(
                         criteriaBuilder.like(criteriaBuilder.lower(locationJoin.get("city")), pattern),
@@ -105,6 +146,8 @@ public class CarSpecification {
     }
 
     // Hàm private để tạo biểu thức tính khoảng cách Haversine
+    // Lưu ý: Việc gọi các hàm toán học này trên DB có thể chậm.
+    // Ưu tiên sử dụng Spatial Extensions của database nếu có thể.
     private static Expression<Double> createDistanceExpression(CriteriaBuilder cb, Join<Car, Location> locationJoin, double lat, double lon) {
         Expression<Double> carLatRad = cb.function("radians", Double.class, locationJoin.get("latitude"));
         Expression<Double> carLonRad = cb.function("radians", Double.class, locationJoin.get("longitude"));

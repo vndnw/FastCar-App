@@ -18,18 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class CarController {
 
     private final CarService carService;
-    private final ReviewCarService reviewCarService;
     private final DocumentService documentService;
-    private final BookingService bookingService;
 
     public CarController(CarService carService,
-                         ReviewCarService reviewCarService,
-                         DocumentService documentService,
-                         BookingService bookingService) {
+                         DocumentService documentService) {
         this.carService = carService;
-        this.reviewCarService = reviewCarService;
         this.documentService = documentService;
-        this.bookingService = bookingService;
     }
 
     @GetMapping

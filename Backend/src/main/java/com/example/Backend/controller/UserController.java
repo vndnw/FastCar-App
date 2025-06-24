@@ -13,7 +13,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -89,12 +92,23 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('user')")
-    @PutMapping("/{id}/update-info-user")
-    public ResponseEntity<?> updateUserInfo(@PathVariable long id, @RequestBody UpdateInfoRequest userRequest) {
+    @PutMapping("/me/update-info-user")
+    public ResponseEntity<?> updateUserInfo(@RequestBody UpdateInfoRequest userRequest) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Successfully updated user information")
-                .data(userService.updateUserInfo(id, userRequest))
+                .data(userService.updateUserInfo(email, userRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/addRole")
+    public ResponseEntity<?> addRoleToUser(@PathVariable long id, @RequestBody List<String> addRoleRequest) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Successfully added role to user")
+                .data(userService.addRolesToUser(id, addRoleRequest))
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -131,6 +145,7 @@ public class UserController {
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
     @PreAuthorize("hasRole('user')")
     @PutMapping("/{id}/bank-information")
