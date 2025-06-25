@@ -1,0 +1,45 @@
+/* CarFeatures.css */
+
+.car-features-extended {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.car-features-extended h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #333;
+    border-bottom: 2px solid #52c41a;
+    padding-bottom: 8px;
+}
+
+.feature-item-extended {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.feature-item-extended:hover {
+    background: #e6f7ff;
+    border-color: #1890ff;
+    transform: translateY(-1px);
+}
+
+.feature-emoji {
+    font-size: 16px;
+}
+
+.feature-text {
+    font-weight: 500;
+}

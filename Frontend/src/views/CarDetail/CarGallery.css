@@ -1,0 +1,77 @@
+/* CarGallery.css */
+
+.car-gallery {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.main-image {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.main-car-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.main-car-image:hover {
+    transform: scale(1.02);
+}
+
+.view-all-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+.view-all-btn {
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: none !important;
+    color: white !important;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 6px 12px;
+    height: auto;
+    border-radius: 4px !important;
+}
+
+.view-all-btn:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.thumbnail-gallery {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.thumbnail {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+    border-color: #1890ff;
+    transform: scale(1.05);
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

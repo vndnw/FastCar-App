@@ -1,0 +1,52 @@
+/* CarTerms.css */
+
+.car-terms {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.car-terms h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #333;
+    border-bottom: 2px solid #ff4d4f;
+    padding-bottom: 8px;
+}
+
+.terms-content p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.terms-content ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.terms-content li {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 6px;
+    padding-left: 16px;
+    position: relative;
+}
+
+.terms-content li:before {
+    content: "•";
+    color: #ff4d4f;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.terms-content li:hover {
+    color: #333;
+}
