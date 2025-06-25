@@ -27,57 +27,60 @@ import OwnerCar from './views/OwnerCar/OwnerCar';
 import MyTrips from './views/MyTrips/MyTrips';
 
 import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
+import { BookingProvider } from './contexts/BookingContext';
 
 
 function App() {
   return (
     <AuthProvider>
-      <Routes>
+      <BookingProvider>
+        <Routes>
 
-        {/* Layout cho trang người dùng */}
-        <Route element={<UserLayout />}>
-          <Route path="/" element={<><HeroSection /><Home /></>} />
-          <Route path="/about" element={<About />} />
-          <Route path="/owner-car" element={<OwnerCar />} />
-          <Route path="/booking/:carId" element={<Booking />} />
-          <Route path="/my-trips" element={<MyTrips />} />
-          <Route path="/login" element={
-            <RedirectIfAuthenticated>
-              <Login />
-            </RedirectIfAuthenticated>
-          }
-          />
-          <Route path="/register" element={
-            <RedirectIfAuthenticated>
-              <Register />
-            </RedirectIfAuthenticated>
-          }
-          />
-          <Route path="/xe-co-ngay" element={<CarListing />} />
-          <Route path="/car-detail/:carId" element={<CarDetail />} />
-        </Route>
-        {/* Layout cho trang admin */}
-        <Route path="/admin" element={
-          <ProtectedRoute requireAdmin={true}>
-            <Main />
-          </ProtectedRoute>
-        }>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="tables" element={<Tables />} />
-          <Route path="billing" element={<Billing />} />
-          <Route path="users" element={<Users />} />
-          <Route path="users/:userId" element={<UserDetail />} />
-          <Route path="users/edit/:userId" element={<UserEdit />} />
-          <Route path="discount" element={<Discount />} />
-          <Route path="car-brand" element={<CarBrand />} />
-          <Route path="cars" element={<Cars />} />
-          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-        </Route>
+          {/* Layout cho trang người dùng */}
+          <Route element={<UserLayout />}>
+            <Route path="/" element={<><HeroSection /><Home /></>} />
+            <Route path="/about" element={<About />} />
+            <Route path="/owner-car" element={<OwnerCar />} />
+            <Route path="/booking/:carId" element={<Booking />} />
+            <Route path="/my-trips" element={<MyTrips />} />
+            <Route path="/login" element={
+              <RedirectIfAuthenticated>
+                <Login />
+              </RedirectIfAuthenticated>
+            }
+            />
+            <Route path="/register" element={
+              <RedirectIfAuthenticated>
+                <Register />
+              </RedirectIfAuthenticated>
+            }
+            />
+            <Route path="/xe-co-ngay" element={<CarListing />} />
+            <Route path="/car-detail/:carId" element={<CarDetail />} />
+          </Route>
+          {/* Layout cho trang admin */}
+          <Route path="/admin" element={
+            <ProtectedRoute requireAdmin={true}>
+              <Main />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="tables" element={<Tables />} />
+            <Route path="billing" element={<Billing />} />
+            <Route path="users" element={<Users />} />
+            <Route path="users/:userId" element={<UserDetail />} />
+            <Route path="users/edit/:userId" element={<UserEdit />} />
+            <Route path="discount" element={<Discount />} />
+            <Route path="car-brand" element={<CarBrand />} />
+            <Route path="cars" element={<Cars />} />
+            <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+          </Route>
 
-        {/* Fallback nếu route không khớp */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Fallback nếu route không khớp */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BookingProvider>
     </AuthProvider>
   );
 }

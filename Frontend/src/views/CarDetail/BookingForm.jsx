@@ -2,15 +2,33 @@ import React, { useState } from 'react';
 import { Button, Modal, DatePicker, message } from 'antd';
 import dayjs from 'dayjs';
 import './BookingForm.css';
+import { useNavigate } from 'react-router-dom';
 
 const BookingForm = ({ car }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [endTime, setEndTime] = useState(null);
     const [durationHours, setDurationHours] = useState(0);
+    const navigate = useNavigate();
 
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => setIsModalOpen(false);
+
+    const handleRentCar = () => {
+        if (!startTime || !endTime || durationHours <= 0) {
+            message.error('Vui lòng chọn thời gian thuê hợp lệ!');
+            return;
+        }
+        const bookingDetails = {
+            startTime: startTime.toISOString(),
+            endTime: endTime.toISOString(),
+            rentalDuration: durationHours,
+            totalPrice: totalPrice,
+        };
+        navigate(`/booking/${car.id}`, {
+            state: { car, bookingDetails }
+        });
+    };
 
     const handleOk = () => {
         if (!startTime || !endTime) {
@@ -115,7 +133,7 @@ const BookingForm = ({ car }) => {
                 )}
             </div>
 
-            <Button type="primary" size="large" className="rent-button" block>
+            <Button type="primary" size="large" className="rent-button" block onClick={handleRentCar}>
                 THUÊ XE
             </Button>
 
