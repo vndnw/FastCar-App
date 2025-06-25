@@ -9,6 +9,8 @@ import Login from './components/Login/Login';
 import Register from './components/Login/Register';
 import CarListing from './views/CarListing/CarListing';
 import CarDetail from './views/CarDetail/CarDetail';
+import Booking from './views/Booking/Booking';
+
 
 // Admin
 import Dashboard from "./views/admin/Home";
@@ -37,6 +39,7 @@ function App() {
           <Route path="/" element={<><HeroSection /><Home /></>} />
           <Route path="/about" element={<About />} />
           <Route path="/owner-car" element={<OwnerCar />} />
+          <Route path="/booking/:carId" element={<Booking />} />
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/login" element={
             <RedirectIfAuthenticated>

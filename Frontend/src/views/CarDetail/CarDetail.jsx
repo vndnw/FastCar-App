@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Row, Col, Button, Badge } from 'antd';
 import { ArrowLeftOutlined, UserOutlined, SettingOutlined, CarOutlined } from '@ant-design/icons';
-import { sampleCars, luxuryCars } from '../../data/sampleCars';
+// import { sampleCars, luxuryCars } from '../../data/sampleCars';
 import './CarDetail.css';
 import carService from '../../services/carService';
 
@@ -194,6 +194,19 @@ const CarInfo = ({ car }) => {
 
 // Form đặt xe
 const BookingForm = ({ car }) => {
+
+    const navigate = useNavigate();
+
+    const handleBooking = () => {
+        const bookingDetails = {
+            startTime: '00h00, 28/05/2025',
+            endTime: '04h00, 30/05/2025',
+            totalPrice: car.pricePerHour * 4,
+        };
+
+        navigate(`/booking/${car.id}`, { state: { car, bookingDetails } });
+    };
+
     return (
         <div className="booking-form">
             <h3>Thời gian thuê</h3>
@@ -242,6 +255,7 @@ const BookingForm = ({ car }) => {
                 size="large"
                 className="rent-button"
                 block
+                onClick={handleBooking}
             >
                 THUÊ XE
             </Button>
