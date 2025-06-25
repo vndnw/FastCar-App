@@ -132,6 +132,17 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('admin')")
+    @PatchMapping("/{email}/in-activate")
+    public ResponseEntity<?> inActivateUser(@PathVariable String email) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Successfully activated user")
+                .data(userService.inActiveUser(email))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable long id) {
         userService.deleteUser(id);

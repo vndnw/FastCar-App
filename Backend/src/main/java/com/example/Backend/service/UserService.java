@@ -158,6 +158,14 @@ public class UserService {
         return true; // User activation status updated successfully
     }
 
+    public boolean inActiveUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setActive(false);
+        userRepository.save(user);
+        return true;
+    }
+
     public boolean updateAvatar(String avatar){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
