@@ -1,0 +1,125 @@
+/* BookingForm.css */
+
+.booking-form {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 100px;
+}
+
+.booking-form h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.time-selection {
+    margin-bottom: 24px;
+}
+
+.time-input label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.datetime-input {
+    padding: 12px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.datetime-input:hover {
+    border-color: #1890ff;
+}
+
+.time-note {
+    font-size: 12px;
+    color: #ff4d4f;
+    margin: 0;
+    background: rgba(255, 77, 79, 0.05);
+    padding: 6px;
+    border-radius: 4px;
+}
+
+.pickup-location {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    border-left: 4px solid #51c09f;
+}
+
+.pickup-location h4 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.location-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.location-note {
+    font-size: 12px !important;
+    color: #666 !important;
+    margin-top: 8px !important;
+}
+
+.price-summary {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.price-row.discount {
+    color: #ff4d4f;
+}
+
+.price-row.total {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    border-top: 1px solid #e8e8e8;
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+.rent-button {
+    background: #51c09f !important;
+    border-color: #51c09f !important;
+    height: 48px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.rent-button:hover {
+    background: #51c09f !important;
+    border-color: #51c09f !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+}
