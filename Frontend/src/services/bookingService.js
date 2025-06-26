@@ -43,6 +43,10 @@ export const bookingService = {
         return apiClient.patch(`/bookings/${id}/complete`);
     },
 
+    getSchedulesByCar: async (carId) => {
+        return apiClient.get(`/booking/car/${carId}/schedule`);
+    },
+
     // Get user bookings
     getUserBookings: async (userId, page = 0, size = 10) => {
         const params = new URLSearchParams({

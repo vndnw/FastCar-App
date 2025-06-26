@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^5.25.1",
+    "antd": "^5.26.2",
     "axios": "^1.10.0",
     "dayjs": "^1.11.13",
     "lucide-react": "^0.514.0",

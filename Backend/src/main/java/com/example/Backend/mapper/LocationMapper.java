@@ -10,10 +10,12 @@ public class LocationMapper {
         return LocationResponse.builder()
                 .id(location.getId())
                 .address(location.getAddress())
+                .street(location.getStreet())
+                .ward(location.getWard())
+                .district(location.getDistrict())
+                .city(location.getCity())
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
-                .createdAt(location.getCreatedAt())
-                .updatedAt(location.getUpdatedAt())
                 .build();
 
     }

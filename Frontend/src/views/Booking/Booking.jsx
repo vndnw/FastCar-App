@@ -1,75 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Row, Col, Button, Card, Descriptions, message, Spin } from 'antd';
+import { Button, Card, Divider, Spin, message, Input } from 'antd';
+import { CalendarOutlined, EnvironmentOutlined, UserOutlined, PhoneOutlined, CheckCircleFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
-
-// 1. Import hook từ BookingContext
 import { useBooking } from '../../contexts/BookingContext';
-
 import './Booking.css';
 
-// --- HELPER FUNCTION: Định dạng ngày giờ ---
 const formatDateTime = (isoString) => {
     if (!isoString) return 'N/A';
     return dayjs(isoString).format('HH:mm, DD/MM/YYYY');
 };
 
-// --- SUB-COMPONENT 1: Tóm tắt thông tin xe ---
-const CarSummary = ({ car }) => {
-    return (
-        <Card title="Thông tin xe" bordered={false} className="booking-card">
-            <div className="booking-car-image-wrapper">
-                <img
-                    src={car.images && car.images.length > 0 ? car.images[0] : '/placeholder-image.png'}
-                    alt={car.name}
-                    className="booking-car-image"
-                />
-            </div>
-            <Descriptions column={1} layout="horizontal" bordered>
-                <Descriptions.Item label="Tên xe">{`${car.name} (${car.year})`}</Descriptions.Item>
-                <Descriptions.Item label="Địa chỉ">{car.location.address}</Descriptions.Item>
-                <Descriptions.Item label="Giá thuê">
-                    <strong>{car.pricePerHour.toLocaleString('vi-VN')}K / giờ</strong>
-                </Descriptions.Item>
-            </Descriptions>
-        </Card>
-    );
-};
-
-// --- SUB-COMPONENT 2: Chi tiết đặt xe ---
-const BookingSummary = ({ bookingDetails, carLocation }) => {
-    return (
-        <Card title="Chi tiết đặt xe" bordered={false} className="booking-card">
-            <Descriptions column={1} layout="vertical" bordered>
-                <Descriptions.Item label="Thời gian nhận xe">
-                    {formatDateTime(bookingDetails.startTime)}
-                </Descriptions.Item>
-                <Descriptions.Item label="Thời gian trả xe">
-                    {formatDateTime(bookingDetails.endTime)}
-                </Descriptions.Item>
-                <Descriptions.Item label="Tổng thời gian thuê">
-                    {bookingDetails.rentalDuration} giờ
-                </Descriptions.Item>
-                <Descriptions.Item label="Địa điểm nhận xe">
-                    {carLocation}
-                </Descriptions.Item>
-                <Descriptions.Item label="Tổng tiền thanh toán">
-                    <span className="total-price">
-                        {bookingDetails.totalPrice.toLocaleString('vi-VN')} VNĐ
-                    </span>
-                </Descriptions.Item>
-            </Descriptions>
-        </Card>
-    );
-};
-
-// --- MAIN COMPONENT: Trang xác nhận đặt xe ---
 const Booking = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { carId } = useParams();
     const { bookCar, loading } = useBooking();
     const { car, bookingDetails } = location.state || {};
+
+    const [description, setDescription] = useState('');
 
     if (!car || !bookingDetails) {
         return (
@@ -82,6 +31,26 @@ const Booking = () => {
         );
     }
 
+    const {
+        startTime,
+        endTime,
+        totalPrice,
+        discount = 0,
+        VAT = 0,
+        giuCho = 0,
+        cocXe = 0,
+        coupon = '',
+        couponPercent = 0,
+    } = bookingDetails;
+
+    console.log('Booking Details:', bookingDetails);
+
+    const tongCong = totalPrice - discount + VAT;
+    const tienThue = tongCong;
+    const tienTheChap = cocXe;
+    const tienGiuCho = giuCho;
+    const tienThanhToanKhiNhanXe = tongCong + cocXe - giuCho;
+
     const handleConfirmBooking = async () => {
         const pickupLocationPayload = {
             address: car.location.address || "Không xác định",
@@ -93,14 +62,20 @@ const Booking = () => {
             longitude: car.location.longitude || 0.0,
         };
 
+        const pickupLocationPayload1 = {
+            address: bookingDetails.deliveryAddress || "Không xác định",
+            latitude: car.location.latitude || 0.0,
+            longitude: car.location.longitude || 0.0,
+        };
+
         const payload = {
             carId: parseInt(carId, 10),
             type: "VEHICLE",
-            pickupLocation: pickupLocationPayload,
+            pickupLocation: bookingDetails.deliveryAddress === "" ? pickupLocationPayload : pickupLocationPayload1,
             pickupTime: bookingDetails.startTime,
             returnTime: bookingDetails.endTime,
-            discountCode: "",
-            description: "Khách hàng xác nhận đặt xe."
+            discountCode: coupon || "",
+            description: description || "Khách hàng xác nhận đặt xe."
         };
 
         const result = await bookCar(payload);
@@ -124,17 +99,113 @@ const Booking = () => {
 
     return (
         <Spin spinning={loading} tip="Đang xử lý...">
-            <div className="booking-page">
-                <h1 className="booking-title">Xác nhận thông tin đặt xe</h1>
-                <Row gutter={[32, 32]}>
-                    <Col xs={24} md={12}>
-                        <CarSummary car={car} />
-                    </Col>
-                    <Col xs={24} md={12}>
-                        <BookingSummary bookingDetails={bookingDetails} carLocation={car.location.address} />
-                    </Col>
-                </Row>
-                <div className="booking-actions">
+            <div className="booking-page" style={{ background: '#f7faf9', minHeight: '100vh', padding: 0 }}>
+                {/* Header tiến trình */}
+                <div style={{ display: 'flex', alignItems: 'center', padding: '24px 0 0 24px', gap: 16 }}>
+                    <Button type="link" onClick={() => navigate(-1)} style={{ fontSize: 18, padding: 0 }}>
+                        &lt; Quay lại
+                    </Button>
+                    
+                </div>
+
+                
+
+                {/* Thông tin đơn hàng */}
+                <Card bordered={false} style={{ margin: '24px auto', maxWidth: 600, borderRadius: 16 }}>
+                    <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 16 }}>Thông tin đơn hàng</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#1890ff', marginBottom: 8 }}>
+                        <CalendarOutlined />
+                        <span style={{ fontWeight: 500 }}>Thời gian thuê</span>
+                    </div>
+                    <div style={{ marginLeft: 28, marginBottom: 8 }}>
+                        <b>{formatDateTime(startTime)} đến {formatDateTime(endTime)}</b>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#1890ff', marginBottom: 8 }}>
+                        <EnvironmentOutlined />
+                        <span style={{ fontWeight: 500 }}>Nhận xe tại vị trí của xe</span>
+                    </div>
+                    <div style={{ marginLeft: 28, marginBottom: 16 }}>
+                        <b>{bookingDetails.deliveryAddress ? bookingDetails.deliveryAddress : car.location.address}</b>
+                    </div>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <span>Phí thuê xe <span style={{ color: '#aaa' }}>ⓘ</span></span>
+                        <span>{totalPrice?.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                    {coupon && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                            <span>
+                                Giảm giá <br />
+                                <span style={{ color: '#888', fontSize: 13 }}>{coupon} {couponPercent ? `- ${couponPercent}%` : ''}</span>
+                            </span>
+                            <span style={{ color: '#fa541c' }}>-{discount?.toLocaleString('vi-VN')}đ</span>
+                        </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <span>Thuế VAT</span>
+                        <span>{VAT?.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, marginBottom: 8 }}>
+                        <span>Tổng cộng tiền thuê</span>
+                        <span>{tongCong?.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <div style={{ fontWeight: 700, marginBottom: 8 }}>Các bước thanh toán</div>
+                    {/* Bước 1 */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+                        <StepCircle number={1} active />
+                        <span style={{ fontWeight: 500, marginLeft: 8 }}>Thanh toán giữ chỗ qua VNPAY</span>
+                        <span style={{ flex: 1 }} />
+                        <span style={{ fontWeight: 700 }}>{tienGiuCho?.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                    <div style={{ color: '#888', fontSize: 13, marginLeft: 36, marginBottom: 12 }}>
+                        Tiền này để xác nhận đơn thuê và giữ xe, sẽ được trừ vào tiền thế chấp khi nhận xe
+                    </div>
+                    {/* Bước 2 */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+                        <StepCircle number={2} active />
+                        <span style={{ fontWeight: 500, marginLeft: 8 }}>Thanh toán khi nhận xe</span>
+                        <span style={{ flex: 1 }} />
+                        <span style={{ fontWeight: 700 }}>{tienThanhToanKhiNhanXe?.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                    <div style={{ marginLeft: 36 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>Tiền thuê</span>
+                            <span>{tienThue?.toLocaleString('vi-VN')}đ</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>Tiền thế chấp</span>
+                            <span>
+                                {giuCho > 0 && (
+                                    <span style={{ textDecoration: 'line-through', color: '#bbb', marginRight: 8 }}>
+                                        {(tienTheChap)?.toLocaleString('vi-VN')}đ
+                                    </span>
+                                )}
+                                {tienTheChap? (tienTheChap - tienGiuCho).toLocaleString('vi-VN') : 0}đ
+                            </span>
+                        </div>
+                        <div style={{ color: '#888', fontSize: 13 }}>
+                            Sẽ hoàn lại khi trả xe
+                        </div>
+                    </div>
+                    <Divider style={{ margin: '12px 0' }} />
+
+                    {/* Thêm ô nhập mô tả ở đây */}
+                    <div style={{ marginBottom: 16 }}>
+                        <Input.TextArea
+                            rows={3}
+                            placeholder="Ghi chú cho chủ xe (ví dụ: yêu cầu đặc biệt, thời gian liên hệ, v.v.)"
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                            maxLength={300}
+                        />
+                    </div>
+
+                    <div>
+                        Lưu ý : khi bấm xác nhận thanh toán thì sẽ chuyển hướng đến cổng thanh toán của VNPAY để thanh toán tiền giữ chỗ. Sau khi thanh toán thành công, bạn sẽ nhận được thông tin chi tiết về đơn hàng qua email và SMS.
+                    </div>
+                </Card>
+                <div className="booking-actions" style={{ maxWidth: 600, margin: '0 auto 24px', display: 'flex', gap: 16 }}>
                     <Button size="large" onClick={() => navigate(-1)} disabled={loading}>
                         Quay lại
                     </Button>
@@ -151,5 +222,45 @@ const Booking = () => {
         </Spin>
     );
 };
+
+// Component hiển thị số bước
+function StepCircle({ number, active }) {
+    return (
+        <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            background: active ? '#13c2c2' : '#eee',
+            color: active ? '#fff' : '#888',
+            fontWeight: 700,
+            fontSize: 16,
+        }}>
+            {number}
+        </span>
+    );
+}
+
+// Component hiển thị tiến trình
+function Step({ active, label }) {
+    return (
+        <span style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            color: active ? '#13c2c2' : '#bbb',
+            fontWeight: active ? 700 : 400,
+            fontSize: 15,
+        }}>
+            {active && <CheckCircleFilled style={{ color: '#13c2c2', fontSize: 18 }} />}
+            <span>{label}</span>
+            <span style={{
+                width: 36, height: 2, background: '#eee', margin: '0 8px', display: 'inline-block'
+            }} />
+        </span>
+    );
+}
 
 export default Booking;

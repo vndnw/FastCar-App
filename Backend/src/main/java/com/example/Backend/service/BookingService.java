@@ -110,7 +110,7 @@ public class BookingService {
                 .type(PaymentType.RENTAL)
                 .build());
         Payment paymentDeposit = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
-                .amount(booking.getDepositAmount())
+                .amount(booking.getDepositAmount().subtract(booking.getReservationFee()))
                 .type(PaymentType.DEPOSIT)
                 .build());
         List<Long> transactionIds = List.of(paymentRental.getId(), paymentDeposit.getId());
@@ -298,6 +298,15 @@ public class BookingService {
 
         Page<Booking> bookings = bookingRepository.findAll(pageable);
         return bookings.map(bookingMapper::mapToResponse);
+    }
+
+    public List<CarBookingScheduleResponse> getCarBookingSchedule(Long carId) {
+        carRepository.findById(carId)
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found with ID: " + carId));
+        List<Booking> bookings = bookingRepository.findByCarId(carId);
+        return bookings.stream()
+                .map(b -> new CarBookingScheduleResponse(b.getPickupTime(), b.getReturnTime()))
+                .toList();
     }
 
     public Page<BookingResponse> getBookingsByStatus(BookingStatus status, Pageable pageable) {

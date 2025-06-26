@@ -44,20 +44,14 @@ export const discountService = {
     },
 
     // Get active discounts
-    getActiveDiscounts: async (page = 0, size = 10) => {
-        const params = new URLSearchParams({
-            page: page.toString(),
-            size: size.toString(),
-            active: 'true'
-        });
-
-        return apiClient.get(`/discount/active?${params}`);
+    getActiveDiscounts: async () => {
+        return apiClient.get(`/discount/get-discounts-active`);
     },
 
-    // Apply discount to order
-    applyDiscount: async (code, orderValue) => {
-        return apiClient.post('/discount/apply', { code, orderValue });
+    updateStatusDiscount: async (id, status) => {
+        return apiClient.patch(`/discount/${id}/status`, { status });
     },
+
 
     // Get discount usage statistics
     getDiscountStats: async (id) => {

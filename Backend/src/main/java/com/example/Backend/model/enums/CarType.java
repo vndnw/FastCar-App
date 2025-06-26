@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 @Getter
 public enum CarType {
-    STANDARD("Xe thường", new BigDecimal("2000000")),
+    STANDARD("Xe thường", new BigDecimal("5000000")),
     LUXURY("Xe sang", new BigDecimal("10000000")),
     SUPER_LUXURY("Xe siêu sang", new BigDecimal("20000000"));
 

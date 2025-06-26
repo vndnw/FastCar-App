@@ -75,3 +75,51 @@
     height: 100%;
     object-fit: cover;
 }
+
+/* Thêm vào CarGallery.css */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.modal-content {
+    position: relative;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+.modal-image {
+    max-width: 80vw;
+    max-height: 80vh;
+    display: block;
+}
+.close-modal {
+    position: absolute;
+    top: 5px; right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+/* Thêm vào CarGallery.css */
+.modal-prev, .modal-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    padding: 0 15px;
+    cursor: pointer;
+    z-index: 2;
+}
+.modal-prev { left: 10px; }
+.modal-next { right: 10px; }

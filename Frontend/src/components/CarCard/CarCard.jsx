@@ -36,8 +36,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
     };
 
     return (
-        <Card
-            hoverable
+        <Card hoverable
             onClick={handleCardClick}
             style={cardStyle}
             bodyStyle={{ padding: '16px' }}
@@ -45,12 +44,13 @@ const CarCard = ({ car, isInCarousel = false }) => {
                 <div style={{ position: 'relative' }}>
                     <img
                         alt={car.name}
-                        src={car.images[0] || 'https://via.placeholder.com/280x200?text=No+Image'}
+                        src={car.images && car.images[0] && car.images[0].imageUrl ? car.images[0].imageUrl : '/default-car.png'}
                         style={{
                             width: '100%',
                             height: 200,
                             objectFit: 'cover'
                         }}
+                        onError={e => { e.target.onerror = null; e.target.src = '/default-car.png'; }}
                     />
 
                     {/* Badge 24/7 */}

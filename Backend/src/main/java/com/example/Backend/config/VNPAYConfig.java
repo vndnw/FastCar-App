@@ -1,6 +1,7 @@
 package com.example.Backend.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
@@ -14,7 +15,7 @@ import java.util.*;
 @Component
 public class VNPAYConfig {
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://127.0.0.1:5501/";
+    public static String vnp_ReturnUrl = "http://localhost/:3000/payment-callback";
     public static String vnp_IpnUrl  = "https://devtutorial.io.vn/api/v1/payment/vnpay-ipn";
     public static String vnp_TmnCode = "ZSL37MVY";
     public static String secretKey = "MRSD1LDTLY7TVD1I6AY00K8YMP80H6RS";
@@ -66,7 +67,7 @@ public class VNPAYConfig {
         while (itr.hasNext()) {
             String fieldName = (String) itr.next();
             String fieldValue = (String) fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
                 sb.append(fieldName);
                 sb.append("=");
                 sb.append(fieldValue);

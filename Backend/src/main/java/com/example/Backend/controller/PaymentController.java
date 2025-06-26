@@ -6,14 +6,18 @@ import com.example.Backend.dto.request.PaymentRequest;
 import com.example.Backend.service.PaymentService;
 import com.example.Backend.service.VNPAYService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
@@ -26,11 +30,13 @@ public class PaymentController {
         this.vnpayService = vnpayService;
     }
 
-    @GetMapping("/vnpay-payment-return")
+
+    @PostMapping("/callback")
     public ResponseEntity<String> paymentReturn(HttpServletRequest request) {
         Map<String, String> fields = vnpayService.extractVnpParams(request);
 
         String vnp_SecureHash = fields.remove("vnp_SecureHash");
+
         String signValue = VNPAYConfig.hashAllFields(fields); // custom function
 
         if (!signValue.equalsIgnoreCase(vnp_SecureHash)) {
@@ -52,7 +58,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/vnpay-ipn")
+    @PostMapping("/vnpay-ipn")
     public ResponseEntity<?> vnpayIpn(HttpServletRequest request) {
         Map<String, String> fields = vnpayService.extractVnpParams(request);
 
