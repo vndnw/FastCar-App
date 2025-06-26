@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import './Login.css';
 import { message } from 'antd';
-import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'; // Import icon từ Ant Design
+import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onClose }) => {
   const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     emailOrPhone: '',
     password: '',
@@ -53,9 +56,17 @@ const Login = ({ onClose }) => {
     }
   };
 
+  // Hàm này vẫn dùng cho nút 'X' để đóng modal hoặc quay lại trang trước
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      navigate(-1);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -63,9 +74,11 @@ const Login = ({ onClose }) => {
 
     try {
       const result = await login(formData.emailOrPhone, formData.password);
+
       if (result.success) {
         message.success('Đăng nhập thành công!');
-        onClose();
+        // SỬA ĐỔI TẠI ĐÂY: Luôn điều hướng về trang chủ sau khi thành công
+        navigate('/');
       } else {
         setErrors({
           general: result.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
@@ -84,7 +97,7 @@ const Login = ({ onClose }) => {
   return (
     <div className="login-modal">
       <div className="login-container">
-        <button className="close-button" onClick={onClose}>
+        <button className="close-button" onClick={handleClose}>
           &times;
         </button>
         <form className="login-form" onSubmit={handleSubmit}>
