@@ -28,7 +28,9 @@ public class VNPAYService {
     public String generatePayUrl(HttpServletRequest request, @NotNull BigDecimal amount, String vnp_TxnRef) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
-        String vnp_IpAddr = VNPAYConfig.getIpAddress(request);
+//        String vnp_IpAddr = VNPAYConfig.getIpAddress(request);
+        String vnp_IpAddr = "127.0.0.1";
+        log.info("vnp_IpAddr: {}", vnp_IpAddr);
         String vnp_TmnCode = VNPAYConfig.vnp_TmnCode;
         String vnp_Amount = String.valueOf(amount.multiply(new BigDecimal(100)).longValue());
         String vnp_CurrCode = "VND";
@@ -55,7 +57,7 @@ public class VNPAYService {
         vnp_Params.put("vnp_Locale", vnp_Locale);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
         vnp_Params.put("vnp_ReturnUrl", vnp_ReturnUrl);
-        vnp_Params.put("vnp_IpnUrl", vnp_IpnUrl);
+//        vnp_Params.put("vnp_IpnUrl", vnp_IpnUrl);
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
