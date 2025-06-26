@@ -10,6 +10,9 @@ import Register from './components/Login/Register';
 import CarListing from './views/CarListing/CarListing';
 import CarDetail from './views/CarDetail/CarDetail';
 import Booking from './views/Booking/Booking';
+import PaymentCallback from './views/PaymentStatus/PaymentCallback';
+import PaymentSuccess from './views/PaymentStatus/PaymentSuccess';
+import PaymentFailure from './views/PaymentStatus/PaymentFailure';
 
 
 // Admin
@@ -42,6 +45,9 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/owner-car" element={<OwnerCar />} />
             <Route path="/booking/:carId" element={<Booking />} />
+            <Route path="/payment-callback" element={<PaymentCallback />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-failure" element={<PaymentFailure />} />
             <Route path="/my-trips" element={<MyTrips />} />
             <Route path="/login" element={
               <RedirectIfAuthenticated>
