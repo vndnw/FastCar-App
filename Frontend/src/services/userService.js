@@ -57,7 +57,7 @@ export const userService = {    // Get all users with pagination
 
     // Deactivate user by email (specific endpoint)
     deactivateUser: async (email) => {
-        return apiClient.patch(`/user/${email}/deactivate`);
+        return apiClient.patch(`/user/${email}/in-activate`);
     },
 
     // Search users
@@ -75,6 +75,17 @@ export const userService = {    // Get all users with pagination
         return apiClient.post(`/user/${userId}/book-car`, payload, {
             headers: { Authorization: `Bearer ${token}` }
         });
+    },
+
+    // Create car for user
+    createACar: async (userId, carData) => {
+        // apiClient sẽ tự động thêm "Authorization: Bearer <token>"
+        return apiClient.post(`/user/${userId}/create-car`, carData);
+    },
+
+     getUserCars: async (userId) => {
+        // apiClient sẽ tự động đính kèm token xác thực
+        return apiClient.get(`/user/${userId}/list-car`); // Giả sử đây là endpoint của bạn
     },
 
     // Get users by role

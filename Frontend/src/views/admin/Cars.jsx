@@ -40,9 +40,11 @@ import {
     ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { carService } from "../../services/carService";
 import { carBrandService } from "../../services/carBrandService";
 import { featureService } from "../../services/featureService";
+import { imageService } from "../../services/imageService";
 import { useAuth } from "../../contexts/AuthContext";
 import FeatureDisplay from "../../components/FeatureDisplay";
 import dayjs from 'dayjs';
@@ -53,17 +55,14 @@ const { Option } = Select;
 
 const Cars = () => {
     const { user } = useAuth(); // Get current user from auth context
+    const navigate = useNavigate();
     const [cars, setCars] = useState([]);
     const [carBrands, setCarBrands] = useState([]);
     const [loading, setLoading] = useState(true);
     const [createModalVisible, setCreateModalVisible] = useState(false);
-    const [editModalVisible, setEditModalVisible] = useState(false);
-    const [viewModalVisible, setViewModalVisible] = useState(false);
     const [selectedCar, setSelectedCar] = useState(null);
     const [createLoading, setCreateLoading] = useState(false);
-    const [editLoading, setEditLoading] = useState(false);
     const [form] = Form.useForm();
-    const [editForm] = Form.useForm();
     const [searchText, setSearchText] = useState('');
 
     // Pagination state
@@ -88,6 +87,13 @@ const Cars = () => {
         fetchCars();
         fetchCarBrands();
         fetchCarFeatures();
+
+        // Cleanup function to clear search timeout
+        return () => {
+            if (window.searchTimeout) {
+                clearTimeout(window.searchTimeout);
+            }
+        };
     }, []);
 
     const fetchCars = async (page = 1, pageSize = 10) => {
@@ -101,6 +107,7 @@ const Cars = () => {
                     id: car.id,
                     key: car.id,
                     name: car.name,
+                    emailOwner: car.emailOwner,
                     username: car.username,
                     carBrand: car.carBrand,
                     model: car.model,
@@ -251,11 +258,13 @@ const Cars = () => {
 
     const handleCreateCar = async (values) => {
         try {
-            setCreateLoading(true);            // Generate full address from individual fields
+            setCreateLoading(true);
+
+            // Generate full address from individual fields
             const addressParts = [values.street, values.ward, values.district, values.city].filter(part => part && part.trim() !== '');
             const fullAddress = addressParts.join(', ');
 
-            // Prepare car data according to new API structure
+            // Prepare car data without images first
             const carData = {
                 name: values.name,
                 model: values.model,
@@ -275,80 +284,6 @@ const Cars = () => {
                     latitude: values.latitude || 10.8231,  // Default latitude for Ho Chi Minh City
                     longitude: values.longitude || 106.6297  // Default longitude for Ho Chi Minh City
                 },
-                carImages: [], // Will be handled separately for image uploads
-                carFeatures: values.carFeatures || [], // Array of feature IDs
-                licensePlate: values.licensePlate,
-                fuelConsumption: values.fuelConsumption,
-                pricePerHour: values.pricePerHour,
-                pricePer4Hour: values.pricePer4Hour,
-                pricePer8Hour: values.pricePer8Hour,
-                pricePer12Hour: values.pricePer12Hour,
-                pricePer24Hour: values.pricePer24Hour,
-                description: values.description
-            };            // Log the carData to debug
-            console.log('Car data being sent:', carData);
-
-            // Use the new user-specific endpoint
-            const result = await carService.createCarByUser(user.id, carData);
-
-            if (result.status === 201 || result.status === 200) {
-                message.success('Car created successfully');
-                setCreateModalVisible(false);
-                form.resetFields();
-                fetchCars(pagination.current, pagination.pageSize);
-            } else {
-                message.error('Failed to create car');
-            }
-        } catch (error) {
-            console.error('Error creating car:', error);
-            message.error('Failed to create car');
-        } finally {
-            setCreateLoading(false);
-        }
-    };
-
-    const handleEditCar = async (values) => {
-        try {
-            setEditLoading(true);
-
-            // Parse carImages from textarea (array of { url })
-            let carImages = [];
-            if (values.carImages) {
-                if (Array.isArray(values.carImages)) {
-                    carImages = values.carImages;
-                } else if (typeof values.carImages === 'string') {
-                    carImages = values.carImages
-                        .split('\n')
-                        .map(url => url.trim())
-                        .filter(url => url)
-                        .map(url => ({ imageUrl: url, imageType: 'FRONT' }));
-                }
-            }
-
-            // Generate full address from individual fields
-            const addressParts = [values.street, values.ward, values.district, values.city].filter(part => part && part.trim() !== '');
-            const fullAddress = addressParts.join(', ');
-
-            const carData = {
-                name: values.name,
-                model: values.model,
-                year: values.year,
-                seats: values.seats,
-                transmission: values.transmission, // AUTO or MANUAL
-                type: values.carType, // STANDARD, LUXURY, etc.
-                carBrandId: values.carBrandId,
-                fuelType: values.fuelType, // OIL, GASOLINE, etc.
-                color: values.color,
-                location: {
-                    address: fullAddress,
-                    street: values.street || '',
-                    ward: values.ward || '',
-                    district: values.district || '',
-                    city: values.city || '',
-                    latitude: values.latitude || 10.8231,  // Default latitude for Ho Chi Minh City
-                    longitude: values.longitude || 106.6297  // Default longitude for Ho Chi Minh City
-                },
-                carImages,
                 carFeatures: values.carFeatures || [], // Array of feature IDs
                 licensePlate: values.licensePlate,
                 fuelConsumption: values.fuelConsumption,
@@ -360,25 +295,36 @@ const Cars = () => {
                 description: values.description
             };
 
-            // Log the carData to debug
-            console.log('Car data being sent for update:', carData);
+            // First create the car without images
+            const result = await carService.createCarByUser(user.id, carData);
 
-            const result = await carService.updateCar(selectedCar.id, carData);
+            if (result.status === 201 || result.status === 200) {
+                const createdCarId = result.data?.id;
 
-            if (result.status === 200) {
-                message.success('Car updated successfully');
-                setEditModalVisible(false);
-                editForm.resetFields();
-                setSelectedCar(null);
+                // If car created successfully and there are images, upload them separately
+                if (createdCarId && values.carImages) {
+                    try {
+                        await imageService.uploadCarImages(createdCarId, values.carImages);
+                        message.success('Car created successfully with images');
+                    } catch (imageError) {
+                        console.error('Error uploading images:', imageError);
+                        message.warning('Car created successfully, but failed to upload some images');
+                    }
+                } else {
+                    message.success('Car created successfully');
+                }
+
+                setCreateModalVisible(false);
+                form.resetFields();
                 fetchCars(pagination.current, pagination.pageSize);
             } else {
-                message.error('Failed to update car');
+                message.error('Failed to create car');
             }
         } catch (error) {
-            console.error('Error updating car:', error);
-            message.error('Failed to update car');
+            console.error('Error creating car:', error);
+            message.error('Failed to create car');
         } finally {
-            setEditLoading(false);
+            setCreateLoading(false);
         }
     };
 
@@ -405,50 +351,48 @@ const Cars = () => {
     };
 
     const handleViewCar = (car) => {
-        setSelectedCar(car);
-        setViewModalVisible(true);
-    }; const openEditModal = (car) => {
-        setSelectedCar(car); editForm.setFieldsValue({
-            name: car.name,
-            carBrandId: car.carBrand?.id,
-            model: car.model,
-            year: car.year,
-            seats: car.seats,
-            transmission: car.transmission,
-            carType: car.carType,
-            licensePlate: car.licensePlate,
-            pricePerHour: car.pricePerHour,
-            pricePer4Hour: car.pricePer4Hour,
-            pricePer8Hour: car.pricePer8Hour,
-            pricePer12Hour: car.pricePer12Hour,
-            pricePer24Hour: car.pricePer24Hour,
-            fuelType: car.fuelType,
-            fuelConsumption: car.fuelConsumption,
-            color: car.color,
-            description: car.description, carFeatures: car.features ? car.features.map(feature => feature.id || feature) : [],
-            latitude: car.location?.latitude || 10.8231,  // Default latitude for Ho Chi Minh City
-            longitude: car.location?.longitude || 106.6297,  // Default longitude for Ho Chi Minh City
-            // Parse address string to individual fields
-            street: car.location?.street || (car.location?.address ? car.location.address.split(',')[0]?.trim() : ''),
-            ward: car.location?.ward || (car.location?.address ? car.location.address.split(',')[1]?.trim() : ''),
-            district: car.location?.district || (car.location?.address ? car.location.address.split(',')[2]?.trim() : ''),
-            city: car.location?.city || (car.location?.address ? car.location.address.split(',')[3]?.trim() : ''),
-            address: car.location?.address || '',
-            locationId: car.location?.id,
-        });
-        setEditModalVisible(true);
+        navigate(`/admin/cars/${car.id}`);
     };
 
-    const handleSearch = async () => {
-        if (searchText.trim()) {
+    const openEditModal = (car) => {
+        navigate(`/admin/cars/edit/${car.id}`);
+    };
+
+    const handleSearch = async (searchValue = searchText) => {
+        if (searchValue.trim()) {
             try {
                 setLoading(true);
-                const result = await carService.getCarsByName(searchText, 0, pagination.pageSize);
+                const result = await carService.getCarsByName(searchValue, 0, pagination.pageSize);
 
                 if (result.status === 200 && result.data && result.data.content) {
                     const mappedCars = result.data.content.map(car => ({
-                        ...car,
+                        id: car.id,
                         key: car.id,
+                        name: car.name,
+                        emailOwner: car.emailOwner,
+                        username: car.username,
+                        carBrand: car.carBrand,
+                        model: car.model,
+                        year: car.year,
+                        seats: car.seats,
+                        transmission: car.transmission,
+                        carType: car.carType,
+                        licensePlate: car.licensePlate,
+                        pricePerHour: car.pricePerHour,
+                        pricePer4Hour: car.pricePer4Hour,
+                        pricePer8Hour: car.pricePer8Hour,
+                        pricePer12Hour: car.pricePer12Hour,
+                        pricePer24Hour: car.pricePer24Hour,
+                        fuelType: car.fuelType,
+                        fuelConsumption: car.fuelConsumption,
+                        status: car.status,
+                        color: car.color,
+                        description: car.description,
+                        images: car.images || [],
+                        features: car.features,
+                        location: car.location,
+                        createdAt: car.createdAt,
+                        updatedAt: car.updatedAt,
                     }));
                     setCars(mappedCars);
                     setPagination(prev => ({
@@ -466,6 +410,22 @@ const Cars = () => {
         } else {
             fetchCars(1, pagination.pageSize);
         }
+    };
+
+    // Handle search input change with debounce
+    const handleSearchInputChange = (e) => {
+        const value = e.target.value;
+        setSearchText(value);
+
+        // Clear previous timeout
+        if (window.searchTimeout) {
+            clearTimeout(window.searchTimeout);
+        }
+
+        // Set new timeout for debounced search
+        window.searchTimeout = setTimeout(() => {
+            handleSearch(value);
+        }, 500); // 500ms delay
     };
 
     const formatCurrency = (amount) => {
@@ -529,7 +489,7 @@ const Cars = () => {
                             <Image
                                 width={60}
                                 height={60}
-                                src={record.images[0]}
+                                src={record.images[0].imageUrl || record.images[0]}
                                 style={{ borderRadius: 8 }}
                                 fallback={<ImagePlaceholder />}
                             />
@@ -546,6 +506,17 @@ const Cars = () => {
                             {record.licensePlate}
                         </div>
                     </div>
+                </div>
+            ),
+        },
+        {
+            title: 'Owner',
+            dataIndex: 'emailOwner',
+            key: 'emailOwner',
+            width: '15%',
+            render: (email) => (
+                <div style={{ fontSize: 12 }}>
+                    <div style={{ color: '#666' }}>{email}</div>
                 </div>
             ),
         },
@@ -729,13 +700,13 @@ const Cars = () => {
                                         <Input
                                             placeholder="Search cars..."
                                             value={searchText}
-                                            onChange={(e) => setSearchText(e.target.value)}
-                                            onPressEnter={handleSearch}
+                                            onChange={handleSearchInputChange}
+                                            onPressEnter={() => handleSearch()}
                                             style={{ width: 200 }}
                                             suffix={
                                                 <SearchOutlined
                                                     style={{ cursor: 'pointer' }}
-                                                    onClick={handleSearch}
+                                                    onClick={() => handleSearch()}
                                                 />
                                             }
                                         />
@@ -1141,524 +1112,7 @@ const Cars = () => {
                             </Form.Item>
                         </Form>
                     </Modal>
-
-                    {/* Edit Car Modal */}
-                    <Modal
-                        title={
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <EditOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-                                Edit Car
-                            </div>
-                        }
-                        open={editModalVisible}
-                        onCancel={() => {
-                            setEditModalVisible(false);
-                            editForm.resetFields();
-                            setSelectedCar(null);
-                        }}
-                        footer={null}
-                        width={800}
-                        destroyOnClose
-                    >                        <Form
-                        form={editForm}
-                        layout="vertical"
-                        onFinish={handleEditCar}
-                        onFieldsChange={(changedFields, allFields) => updateAddressField(changedFields, allFields, editForm)}
-                        style={{ marginTop: 16 }}
-                    >
-                            {/* Hidden fields for latitude and longitude */}
-                            <Form.Item name="latitude" style={{ display: 'none' }}>
-                                <InputNumber />
-                            </Form.Item>
-                            <Form.Item name="longitude" style={{ display: 'none' }}>
-                                <InputNumber />
-                            </Form.Item>
-                            <Row gutter={16}>
-                                <Col span={12}>
-                                    <Form.Item
-                                        label="Car Name"
-                                        name="name"
-                                        rules={[{ required: true, message: 'Please enter car name' }]}
-                                    >
-                                        <Input placeholder="Enter car name" />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item
-                                        label="Car Brand"
-                                        name="carBrandId"
-                                        rules={[{ required: true, message: 'Please select car brand' }]}
-                                    >
-                                        <Select placeholder="Select car brand">
-                                            {carBrands.map(brand => (
-                                                <Option key={brand.id} value={brand.id}>
-                                                    {brand.name}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Model"
-                                        name="model"
-                                        rules={[{ required: true, message: 'Please enter model' }]}
-                                    >
-                                        <Input placeholder="Enter model" />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Year"
-                                        name="year"
-                                        rules={[{ required: true, message: 'Please enter year' }]}
-                                    >
-                                        <InputNumber
-                                            placeholder="Enter year"
-                                            min={1990}
-                                            max={new Date().getFullYear() + 1}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Seats"
-                                        name="seats"
-                                        rules={[{ required: true, message: 'Please enter number of seats' }]}
-                                    >
-                                        <InputNumber
-                                            placeholder="Number of seats"
-                                            min={2}
-                                            max={50}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Transmission"
-                                        name="transmission"
-                                        rules={[{ required: true, message: 'Please select transmission' }]}
-                                    >
-                                        <Select placeholder="Select transmission">
-                                            <Option value="AUTO">Automatic</Option>
-                                            <Option value="MANUAL">Manual</Option>
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Car Type"
-                                        name="carType"
-                                        rules={[{ required: true, message: 'Please select car type' }]}
-                                    >
-                                        <Select placeholder="Select car type">
-                                            <Option value="ECONOMY">Economy</Option>
-                                            <Option value="STANDARD">Standard</Option>
-                                            <Option value="PREMIUM">Premium</Option>
-                                            <Option value="LUXURY">Luxury</Option>
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="License Plate"
-                                        name="licensePlate"
-                                        rules={[{ required: true, message: 'Please enter license plate' }]}
-                                    >
-                                        <Input placeholder="Enter license plate" />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Divider>Pricing Information</Divider>
-
-                            <Row gutter={16}>
-                                <Col span={12}>
-                                    <Form.Item
-                                        label="Price per Hour"
-                                        name="pricePerHour"
-                                        rules={[{ required: true, message: 'Please enter hourly price' }]}
-                                    >
-                                        <InputNumber
-                                            placeholder="Price per hour"
-                                            min={0}
-                                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                            parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item
-                                        label="Price per 4 Hours"
-                                        name="pricePer4Hour"
-                                    >
-                                        <InputNumber
-                                            placeholder="Price per 4 hours"
-                                            min={0}
-                                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                            parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Price per 8 Hours"
-                                        name="pricePer8Hour"
-                                    >
-                                        <InputNumber
-                                            placeholder="Price per 8 hours"
-                                            min={0}
-                                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                            parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Price per 12 Hours"
-                                        name="pricePer12Hour"
-                                    >
-                                        <InputNumber
-                                            placeholder="Price per 12 hours"
-                                            min={0}
-                                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                            parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Price per Day"
-                                        name="pricePer24Hour"
-                                        rules={[{ required: true, message: 'Please enter daily price' }]}
-                                    >
-                                        <InputNumber
-                                            placeholder="Price per day"
-                                            min={0}
-                                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                            parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Divider>Vehicle Details</Divider>
-
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Fuel Type"
-                                        name="fuelType"
-                                        rules={[{ required: true, message: 'Please select fuel type' }]}
-                                    >
-                                        <Select placeholder="Select fuel type">
-                                            <Option value="GASOLINE">Gasoline</Option>
-                                            <Option value="DIESEL">Diesel</Option>
-                                            <Option value="ELECTRIC">Electric</Option>
-                                            <Option value="HYBRID">Hybrid</Option>
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Fuel Consumption"
-                                        name="fuelConsumption"
-                                    >
-                                        <Input placeholder="e.g., 7 L/100km" />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        label="Color"
-                                        name="color"
-                                        rules={[{ required: true, message: 'Please enter color' }]}
-                                    >
-                                        <Input placeholder="Enter color" />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Divider>Location Information</Divider>
-
-                            <Row gutter={16}>
-                                <Col span={6}>
-                                    <Form.Item
-                                        label="Street"
-                                        name="street"
-                                        rules={[{ required: true, message: 'Please enter street' }]}
-                                    >
-                                        <Input placeholder="Enter street" />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={6}>
-                                    <Form.Item
-                                        label="Ward"
-                                        name="ward"
-                                        rules={[{ required: true, message: 'Please enter ward' }]}
-                                    >
-                                        <Input placeholder="Enter ward" />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={6}>
-                                    <Form.Item
-                                        label="District"
-                                        name="district"
-                                        rules={[{ required: true, message: 'Please enter district' }]}
-                                    >
-                                        <Input placeholder="Enter district" />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={6}>
-                                    <Form.Item
-                                        label="City"
-                                        name="city"
-                                        rules={[{ required: true, message: 'Please enter city' }]}
-                                    >
-                                        <Input placeholder="Enter city" />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Row gutter={16}>
-                                <Col span={24}>
-                                    <Form.Item
-                                        label="Full Address"
-                                        name="address"
-                                    >
-                                        <Input
-                                            disabled
-                                            style={{ backgroundColor: '#f5f5f5', color: '#666' }}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Divider>Features & Location</Divider>
-
-                            <Row gutter={16}>
-                                <Col span={20}>
-                                    <Form.Item
-                                        label="Car Features"
-                                        name="carFeatures"
-                                    >
-                                        <Checkbox.Group
-                                            style={{ width: '100%' }}
-                                        >
-                                            <Row gutter={[16, 8]}>
-                                                {carFeatures.map(feature => (
-                                                    <Col span={8} key={feature.id}>
-                                                        <Checkbox value={feature.id}>
-                                                            {feature.name}
-                                                        </Checkbox>
-                                                    </Col>
-                                                ))}
-                                            </Row>
-                                        </Checkbox.Group>
-                                    </Form.Item>
-                                </Col>
-                                <Col span={4}>                                    <Form.Item label=" " style={{ marginTop: 30 }}>
-                                    <Button
-                                        type="dashed"
-                                        icon={<PlusOutlined />}
-                                        onClick={() => setFeatureCreateModalVisible(true)}
-                                        size="small"
-                                        title="Add new feature"
-                                    >
-                                        Add Feature
-                                    </Button>
-                                </Form.Item>
-                                </Col>                            </Row>
-
-                            <Row gutter={16}>
-                                <Col span={24}>
-                                    <Form.Item
-                                        label="Car Images"
-                                        name="carImages"
-                                        extra="Nhập URL ảnh, mỗi dòng một ảnh"
-                                    >
-                                        <Input.TextArea
-                                            rows={3}
-                                            placeholder="https://example.com/image1.jpg\nhttps://example.com/image2.jpg"
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Form.Item
-                                label="Description"
-                                name="description"
-                            >
-                                <TextArea
-                                    rows={3}
-                                    placeholder="Enter car description"
-                                />
-                            </Form.Item>
-
-                            <Form.Item style={{ marginTop: 24, textAlign: 'right' }}>
-                                <Space>
-                                    <Button
-                                        onClick={() => {
-                                            setEditModalVisible(false);
-                                            editForm.resetFields();
-                                            setSelectedCar(null);
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        type="primary"
-                                        htmlType="submit"
-                                        loading={editLoading}
-                                    >
-                                        Update Car
-                                    </Button>
-                                </Space>
-                            </Form.Item>
-                        </Form>
-                    </Modal>
-
-                    {/* View Car Modal */}
-                    <Modal
-                        title={
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <EyeOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-                                Car Details
-                            </div>
-                        }
-                        open={viewModalVisible}
-                        onCancel={() => {
-                            setViewModalVisible(false);
-                            setSelectedCar(null);
-                        }}
-                        footer={[
-                            <Button key="close" onClick={() => setViewModalVisible(false)}>
-                                Close
-                            </Button>
-                        ]}
-                        width={700}
-                    >
-                        {selectedCar && (
-                            <div style={{ padding: '16px 0' }}>
-                                <Row gutter={16}>
-                                    <Col span={24}>
-                                        <div style={{
-                                            backgroundColor: '#f5f5f5',
-                                            padding: 16,
-                                            borderRadius: 8,
-                                            marginBottom: 16
-                                        }}>
-                                            <Title level={4} style={{ margin: 0, marginBottom: 8 }}>
-                                                {selectedCar.name}
-                                            </Title>
-                                            <Text style={{ fontSize: 16, color: '#666' }}>
-                                                {selectedCar.carBrand?.name} {selectedCar.model} ({selectedCar.year})
-                                            </Text>
-                                            <div style={{ marginTop: 8 }}>
-                                                <Tag color={getStatusColor(selectedCar.status)}>
-                                                    {selectedCar.status}
-                                                </Tag>
-                                                <Tag color={getTransmissionColor(selectedCar.transmission)}>
-                                                    {selectedCar.transmission}
-                                                </Tag>
-                                                <Tag color={getCarTypeColor(selectedCar.carType)}>
-                                                    {selectedCar.carType}
-                                                </Tag>
-                                            </div>
-                                        </div>
-                                    </Col>
-                                </Row>
-
-                                <Row gutter={16}>
-                                    <Col span={12}>
-                                        <Title level={5}>Vehicle Information</Title>
-                                        <div style={{ marginBottom: 16 }}>
-                                            <div><strong>License Plate:</strong> {selectedCar.licensePlate}</div>
-                                            <div><strong>Seats:</strong> {selectedCar.seats}</div>
-                                            <div><strong>Color:</strong> {selectedCar.color}</div>
-                                            <div><strong>Fuel Type:</strong> {selectedCar.fuelType}</div>
-                                            <div><strong>Fuel Consumption:</strong> {selectedCar.fuelConsumption}</div>                                            {selectedCar.features && selectedCar.features.length > 0 && (
-                                                <div><strong>Features:</strong> {selectedCar.features.map(feature => feature.name).join(', ')}</div>
-                                            )}
-                                        </div>
-                                    </Col>
-                                    <Col span={12}>
-                                        <Title level={5}>Pricing</Title>
-                                        <div style={{ marginBottom: 16 }}>
-                                            <div><strong>Per Hour:</strong> {formatCurrency(selectedCar.pricePerHour)}</div>
-                                            {selectedCar.pricePer4Hour && (
-                                                <div><strong>Per 4 Hours:</strong> {formatCurrency(selectedCar.pricePer4Hour)}</div>
-                                            )}
-                                            {selectedCar.pricePer8Hour && (
-                                                <div><strong>Per 8 Hours:</strong> {formatCurrency(selectedCar.pricePer8Hour)}</div>
-                                            )}
-                                            {selectedCar.pricePer12Hour && (
-                                                <div><strong>Per 12 Hours:</strong> {formatCurrency(selectedCar.pricePer12Hour)}</div>
-                                            )}
-                                            <div><strong>Per Day:</strong> {formatCurrency(selectedCar.pricePer24Hour)}</div>
-                                        </div>
-                                    </Col>
-                                </Row>
-
-                                {selectedCar.location && (
-                                    <div style={{ marginBottom: 16 }}>
-                                        <Title level={5}>Location</Title>
-                                        <div>{selectedCar.location.address}</div>
-                                        <div style={{ color: '#666', fontSize: 12 }}>
-                                            Coordinates: {selectedCar.location.latitude}, {selectedCar.location.longitude}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {selectedCar.description && (
-                                    <div style={{ marginBottom: 16 }}>
-                                        <Title level={5}>Description</Title>
-                                        <div style={{ color: '#666' }}>{selectedCar.description}</div>
-                                    </div>
-                                )}
-
-                                <div style={{ marginBottom: 16 }}>
-                                    <Title level={5}>Timestamps</Title>
-                                    <div style={{ fontSize: 12, color: '#999' }}>
-                                        <div>Created: {dayjs(selectedCar.createdAt).format('DD/MM/YYYY HH:mm')}</div>
-                                        <div>Updated: {dayjs(selectedCar.updatedAt).format('DD/MM/YYYY HH:mm')}</div>
-                                    </div>
-                                </div>
-
-                                {selectedCar.images && selectedCar.images.length > 0 && (
-                                    <div>
-                                        <Title level={5}>Images</Title>
-                                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                                            {selectedCar.images.map((image, index) => (
-                                                <Image
-                                                    key={index}
-                                                    width={100}
-                                                    height={100}
-                                                    src={image}
-                                                    style={{ borderRadius: 8 }}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </Modal>                </div>
+                </div>
             ),
         },
         {

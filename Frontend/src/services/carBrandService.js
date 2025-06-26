@@ -50,3 +50,5 @@ export const carBrandService = {
         return apiClient.patch(`/carbrand/${id}/status`, { isActive });
     }
 };
+
+export default carBrandService;
