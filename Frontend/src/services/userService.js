@@ -71,6 +71,12 @@ export const userService = {    // Get all users with pagination
         return apiClient.get(`/user/search?${params}`);
     },
 
+    bookCar: async (userId, payload, token) => {
+        return apiClient.post(`/user/${userId}/book-car`, payload, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+    },
+
     // Get users by role
     getUsersByRole: async (role, page = 0, size = 10) => {
         const params = new URLSearchParams({

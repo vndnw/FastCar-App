@@ -65,7 +65,7 @@ export const authService = {
                 newPassword
             }
         });
-    }
+    },
 };
 
 export default authService;
