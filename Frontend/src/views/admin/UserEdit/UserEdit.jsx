@@ -23,9 +23,9 @@ import {
     SaveOutlined,
     BankOutlined
 } from "@ant-design/icons";
-import { userService } from "../../services/userService";
-import { roleService } from "../../services/roleService";
-import { bankInformationService } from "../../services/bankInformationService";
+import { userService } from "../../../services/userService";
+import { roleService } from "../../../services/roleService";
+import { bankInformationService } from "../../../services/bankInformationService";
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;

@@ -33,7 +33,8 @@ import {
     CarOutlined,
     HistoryOutlined
 } from "@ant-design/icons";
-import { userService } from "../../services/userService";
+import { userService } from "../../../services/userService";
+import { carService } from "../../../services/carService";
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -107,20 +108,19 @@ function UserDetail() {
     const fetchUserCars = async () => {
         try {
             setLoadingCars(true);
-            // Mock data - replace with actual API call
-            const mockCars = [
-                {
-                    id: 1,
-                    name: 'BMW X5 2023',
-                    brand: 'BMW',
-                    licensePlate: '30A-12345',
-                    status: 'available',
-                    totalBookings: 15
-                }
-            ];
-            setUserCars(mockCars);
+            const result = await carService.getCarsByUserId(userId);
+
+            if (result.status === 200 && result.data) {
+                // Handle both array response and paginated response
+                const cars = Array.isArray(result.data) ? result.data : result.data.content || [];
+                setUserCars(cars);
+            } else {
+                setUserCars([]);
+            }
         } catch (error) {
             console.error('Error fetching user cars:', error);
+            message.error('Failed to fetch user cars');
+            setUserCars([]);
         } finally {
             setLoadingCars(false);
         }
@@ -147,7 +147,14 @@ function UserDetail() {
             'completed': 'green',
             'pending': 'orange',
             'cancelled': 'red',
-            'active': 'blue'
+            'active': 'blue',
+            'AVAILABLE': 'green',
+            'PENDING': 'orange',
+            'UNAVAILABLE': 'red',
+            'MAINTENANCE': 'red',
+            'available': 'green',
+            'unavailable': 'red',
+            'maintenance': 'red'
         };
         return colors[status] || 'default';
     };
@@ -387,16 +394,36 @@ function UserDetail() {
                                 renderItem={(car) => (
                                     <List.Item>
                                         <List.Item.Meta
-                                            title={car.name}
+                                            title={
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <span>{car.name}</span>
+                                                    <Button
+                                                        type="link"
+                                                        size="small"
+                                                        onClick={() => navigate(`/admin/cars/${car.id}`)}
+                                                    >
+                                                        View Details
+                                                    </Button>
+                                                </div>
+                                            }
                                             description={
                                                 <div>
                                                     <Text type="secondary">
-                                                        {car.brand} • {car.licensePlate}
+                                                        {car.carBrand?.name || car.brand} {car.model} • {car.licensePlate}
                                                     </Text>
                                                     <br />
-                                                    <Text>Total bookings: {car.totalBookings}</Text>
+                                                    <Text type="secondary">
+                                                        {car.year} • {car.seats} seats • {car.transmission}
+                                                    </Text>
+                                                    <br />
+                                                    <Text>
+                                                        Price: {car.pricePerHour ? new Intl.NumberFormat('vi-VN', {
+                                                            style: 'currency',
+                                                            currency: 'VND'
+                                                        }).format(car.pricePerHour) : 'N/A'}/hour
+                                                    </Text>
                                                     <Tag color={getStatusColor(car.status)} style={{ marginLeft: '8px' }}>
-                                                        {car.status.toUpperCase()}
+                                                        {car.status ? car.status.toUpperCase() : 'UNKNOWN'}
                                                     </Tag>
                                                 </div>
                                             }

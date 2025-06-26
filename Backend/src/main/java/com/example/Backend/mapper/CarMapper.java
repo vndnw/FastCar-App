@@ -14,19 +14,16 @@ public class CarMapper {
     private final ImageMapper imageMapper;
     private final LocationMapper locationMapper;
     private final FeatureMapper featureMapper;
-    private final UserMapper userMapper;
 
 
     public CarMapper(CarBrandMapper carBrandMapper,
                      ImageMapper imageMapper,
                      LocationMapper locationMapper,
-                     FeatureMapper featureMapper,
-                     UserMapper userMapper) {
+                     FeatureMapper featureMapper) {
         this.carBrandMapper = carBrandMapper;
         this.imageMapper = imageMapper;
         this.locationMapper = locationMapper;
         this.featureMapper = featureMapper;
-        this.userMapper = userMapper;
     }
 
     public CarResponse mapToResponse(@NotNull Car car) {
@@ -42,7 +39,7 @@ public class CarMapper {
                 .licensePlate(String.valueOf(car.getLicensePlate()))
                 .fuelType(car.getFuelType())
                 .description(car.getDescription())
-                .images(car.getImages().stream().map(imageMapper::mapToResponse).collect(Collectors.toList()))
+                .images(car.getImages() == null ? null : car.getImages().stream().map(imageMapper::mapToResponse).collect(Collectors.toList()))
                 .location(locationMapper.mapToResponse(car.getLocation()))
                 .features(car.getFeatures().stream().map(featureMapper::mapToResponse).collect(Collectors.toList()))
                 .seats(car.getSeats())

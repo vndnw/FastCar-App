@@ -16,6 +16,11 @@ export const carService = {
     // Get car by ID
     getCarById: async (id) => {
         return apiClient.get(`/car/${id}`);
+    },
+
+    // Get cars by user ID
+    getCarsByUserId: async (userId) => {
+        return apiClient.get(`/user/${userId}/list-car`);
     },    // Create new car
     createCar: async (carData) => {
         return apiClient.post('/car', carData);
