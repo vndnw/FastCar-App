@@ -201,8 +201,7 @@ function UserPage() {
         result = await userService.activateUser(userEmail);
       } else {
         // Deactivate user
-        // result = await userService.deactivateUser(userEmail);
-        return;
+        result = await userService.deactivateUser(userEmail);
       }
 
       if (result.status === 200) {

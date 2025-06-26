@@ -1,560 +1,683 @@
-/*!
-  =========================================================
-  * Muse Ant Design Dashboard - v1.0.0
-  =========================================================
-  * Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
-  * Copyright 2021 Creative Tim (https://www.creative-tim.com)
-  * Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
-  * Coded by Creative Tim
-  =========================================================
-  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Col,
   Row,
   Typography,
-  Tooltip,
-  Progress,
-  Upload,
-  message,
+  Spin,
+  Modal,
+  Table,
+  Tag,
+  Space,
+  Image,
   Button,
-  Timeline,
-  Radio,
+  Statistic,
+  Avatar,
+  Progress,
+  Badge,
+  Divider,
 } from "antd";
 import {
-  ToTopOutlined,
-  MenuUnfoldOutlined,
-  RightOutlined,
+  EyeOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  CarOutlined,
+  UserOutlined,
+  CalendarOutlined,
+  DollarCircleOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
+  RiseOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
 } from "@ant-design/icons";
-import Paragraph from "antd/lib/typography/Paragraph";
+import { message } from "antd";
 
 import Echart from "../../components/admin/chart/EChart";
 import LineChart from "../../components/admin/chart/LineChart";
-
-import ava1 from "../../assets/images/logo-shopify.svg";
-import ava2 from "../../assets/images/logo-atlassian.svg";
-import ava3 from "../../assets/images/logo-slack.svg";
-import ava4 from "../../assets/images/logo-spotify.svg";
-import ava5 from "../../assets/images/logo-jira.svg";
-import ava6 from "../../assets/images/logo-invision.svg";
-import team1 from "../../assets/images/team-1.jpg";
-import team2 from "../../assets/images/team-2.jpg";
-import team3 from "../../assets/images/team-3.jpg";
-import team4 from "../../assets/images/team-4.jpg";
-import card from "../../assets/images/info-card-1.jpg";
+import { adminService } from "../../services/adminService";
 
 function Home() {
   const { Title, Text } = Typography;
+  const navigate = useNavigate();
 
-  const onChange = (e) => console.log(`radio checked:${e.target.value}`);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [pendingCarsModalVisible, setPendingCarsModalVisible] = useState(false);
+  const [pendingCars, setPendingCars] = useState([]);
+  const [pendingCarsLoading, setPendingCarsLoading] = useState(false);
+  const [newUsersData, setNewUsersData] = useState(null);
 
-  const [reverse, setReverse] = useState(false);
-
-  const dollor = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        d="M8.43338 7.41784C8.58818 7.31464 8.77939 7.2224 9 7.15101L9.00001 8.84899C8.77939 8.7776 8.58818 8.68536 8.43338 8.58216C8.06927 8.33942 8 8.1139 8 8C8 7.8861 8.06927 7.66058 8.43338 7.41784Z"
-        fill="#fff"
-      ></path>
-      <path
-        d="M11 12.849L11 11.151C11.2206 11.2224 11.4118 11.3146 11.5666 11.4178C11.9308 11.6606 12 11.8861 12 12C12 12.1139 11.9308 12.3394 11.5666 12.5822C11.4118 12.6854 11.2206 12.7776 11 12.849Z"
-        fill="#fff"
-      ></path>
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 5C11 4.44772 10.5523 4 10 4C9.44772 4 9 4.44772 9 5V5.09199C8.3784 5.20873 7.80348 5.43407 7.32398 5.75374C6.6023 6.23485 6 7.00933 6 8C6 8.99067 6.6023 9.76515 7.32398 10.2463C7.80348 10.5659 8.37841 10.7913 9.00001 10.908L9.00002 12.8492C8.60902 12.7223 8.31917 12.5319 8.15667 12.3446C7.79471 11.9275 7.16313 11.8827 6.74599 12.2447C6.32885 12.6067 6.28411 13.2382 6.64607 13.6554C7.20855 14.3036 8.05956 14.7308 9 14.9076L9 15C8.99999 15.5523 9.44769 16 9.99998 16C10.5523 16 11 15.5523 11 15L11 14.908C11.6216 14.7913 12.1965 14.5659 12.676 14.2463C13.3977 13.7651 14 12.9907 14 12C14 11.0093 13.3977 10.2348 12.676 9.75373C12.1965 9.43407 11.6216 9.20873 11 9.09199L11 7.15075C11.391 7.27771 11.6808 7.4681 11.8434 7.65538C12.2053 8.07252 12.8369 8.11726 13.254 7.7553C13.6712 7.39335 13.7159 6.76176 13.354 6.34462C12.7915 5.69637 11.9405 5.26915 11 5.09236V5Z"
-        fill="#fff"
-      ></path>
-    </svg>,
-  ];
-  const profile = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        d="M9 6C9 7.65685 7.65685 9 6 9C4.34315 9 3 7.65685 3 6C3 4.34315 4.34315 3 6 3C7.65685 3 9 4.34315 9 6Z"
-        fill="#fff"
-      ></path>
-      <path
-        d="M17 6C17 7.65685 15.6569 9 14 9C12.3431 9 11 7.65685 11 6C11 4.34315 12.3431 3 14 3C15.6569 3 17 4.34315 17 6Z"
-        fill="#fff"
-      ></path>
-      <path
-        d="M12.9291 17C12.9758 16.6734 13 16.3395 13 16C13 14.3648 12.4393 12.8606 11.4998 11.6691C12.2352 11.2435 13.0892 11 14 11C16.7614 11 19 13.2386 19 16V17H12.9291Z"
-        fill="#fff"
-      ></path>
-      <path
-        d="M6 11C8.76142 11 11 13.2386 11 16V17H1V16C1 13.2386 3.23858 11 6 11Z"
-        fill="#fff"
-      ></path>
-    </svg>,
-  ];
-  const heart = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3.17157 5.17157C4.73367 3.60948 7.26633 3.60948 8.82843 5.17157L10 6.34315L11.1716 5.17157C12.7337 3.60948 15.2663 3.60948 16.8284 5.17157C18.3905 6.73367 18.3905 9.26633 16.8284 10.8284L10 17.6569L3.17157 10.8284C1.60948 9.26633 1.60948 6.73367 3.17157 5.17157Z"
-        fill="#fff"
-      ></path>
-    </svg>,
-  ];
-  const cart = [
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key={0}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M10 2C7.79086 2 6 3.79086 6 6V7H5C4.49046 7 4.06239 7.38314 4.00612 7.88957L3.00612 16.8896C2.97471 17.1723 3.06518 17.455 3.25488 17.6669C3.44458 17.8789 3.71556 18 4 18H16C16.2844 18 16.5554 17.8789 16.7451 17.6669C16.9348 17.455 17.0253 17.1723 16.9939 16.8896L15.9939 7.88957C15.9376 7.38314 15.5096 7 15 7H14V6C14 3.79086 12.2091 2 10 2ZM12 7V6C12 4.89543 11.1046 4 10 4C8.89543 4 8 4.89543 8 6V7H12ZM6 10C6 9.44772 6.44772 9 7 9C7.55228 9 8 9.44772 8 10C8 10.5523 7.55228 11 7 11C6.44772 11 6 10.5523 6 10ZM13 9C12.4477 9 12 9.44772 12 10C12 10.5523 12.4477 11 13 11C13.5523 11 14 10.5523 14 10C14 9.44772 13.5523 9 13 9Z"
-        fill="#fff"
-      ></path>
-    </svg>,
-  ];
-  const count = [
-    {
-      today: "Today’s Sales",
-      title: "$53,000",
-      persent: "+30%",
-      icon: dollor,
-      bnb: "bnb2",
-    },
-    {
-      today: "Today’s Users",
-      title: "3,200",
-      persent: "+20%",
-      icon: profile,
-      bnb: "bnb2",
-    },
-    {
-      today: "New Clients",
-      title: "+1,200",
-      persent: "-20%",
-      icon: heart,
-      bnb: "redtext",
-    },
-    {
-      today: "New Orders",
-      title: "$13,200",
-      persent: "10%",
-      icon: cart,
-      bnb: "bnb2",
-    },
-  ];
-
-  const list = [
-    {
-      img: ava1,
-      Title: "Soft UI Shopify Version",
-      bud: "$14,000",
-      progress: <Progress percent={60} size="small" />,
-      member: (
-        <div className="avatar-group mt-2">
-          <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Alexander Smith">
-            <img className="tootip-img" src={team3} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Jessica Doe">
-            <img className="tootip-img" src={team4} alt="" />
-          </Tooltip>
-        </div>
-      ),
-    },
-    {
-      img: ava2,
-      Title: "Progress Track",
-      bud: "$3,000",
-      progress: <Progress percent={10} size="small" />,
-      member: (
-        <div className="avatar-group mt-2">
-          <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
-          </Tooltip>
-        </div>
-      ),
-    },
-    {
-      img: ava3,
-      Title: "Fix Platform Errors",
-      bud: "Not Set",
-      progress: <Progress percent={100} size="small" status="active" />,
-      member: (
-        <div className="avatar-group mt-2">
-          <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team1} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Alexander Smith">
-            <img className="tootip-img" src={team3} alt="" />
-          </Tooltip>
-        </div>
-      ),
-    },
-    {
-      img: ava4,
-      Title: "Launch new Mobile App",
-      bud: "$20,600",
-      progress: <Progress percent={100} size="small" status="active" />,
-      member: (
-        <div className="avatar-group mt-2">
-          <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
-          </Tooltip>
-        </div>
-      ),
-    },
-    {
-      img: ava5,
-      Title: "Add the New Landing Page",
-      bud: "$4,000",
-      progress: <Progress percent={80} size="small" />,
-      member: (
-        <div className="avatar-group mt-2">
-          <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Alexander Smith">
-            <img className="tootip-img" src={team3} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Jessica Doe">
-            <img className="tootip-img" src={team4} alt="" />
-          </Tooltip>
-        </div>
-      ),
-    },
-
-    {
-      img: ava6,
-      Title: "Redesign Online Store",
-      bud: "$2,000",
-      progress: (
-        <Progress
-          percent={100}
-          size="small"
-          status="exception"
-          format={() => "Cancel"}
-        />
-      ),
-      member: (
-        <div className="avatar-group mt-2">
-          <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
-          </Tooltip>
-          <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
-          </Tooltip>
-        </div>
-      ),
-    },
-  ];
-
-  const timelineList = [
-    {
-      title: "$2,400 - Redesign store",
-      time: "09 JUN 7:20 PM",
-      color: "green",
-    },
-    {
-      title: "New order #3654323",
-      time: "08 JUN 12:20 PM",
-      color: "green",
-    },
-    {
-      title: "Company server payments",
-      time: "04 JUN 3:10 PM",
-    },
-    {
-      title: "New card added for order #4826321",
-      time: "02 JUN 2:45 PM",
-    },
-    {
-      title: "Unlock folders for development",
-      time: "18 MAY 1:30 PM",
-    },
-    {
-      title: "New order #46282344",
-      time: "14 MAY 3:30 PM",
-      color: "gray",
-    },
-  ];
-
-  const uploadProps = {
-    name: "file",
-    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-    headers: {
-      authorization: "authorization-text",
-    },
-    onChange(info) {
-      if (info.file.status !== "uploading") {
-        console.log(info.file, info.fileList);
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const response = await adminService.getDashboard();
+        setDashboardData(response);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        message.error('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
       }
-      if (info.file.status === "done") {
-        message.success(`${info.file.name} file uploaded successfully`);
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
+    };
+
+    const fetchNewUsersData = async () => {
+      try {
+        const response = await adminService.getNewUsersInLast7Days();
+        setNewUsersData(response);
+      } catch (error) {
+        console.error('Error fetching new users data:', error);
       }
-    },
+    };
+
+    fetchDashboardData();
+    fetchNewUsersData();
+  }, []);
+
+  // Fetch pending cars
+  const fetchPendingCars = async () => {
+    try {
+      setPendingCarsLoading(true);
+      const result = await adminService.getCarsPendingApproval();
+      if (result.content) {
+        setPendingCars(result.content);
+      } else {
+        setPendingCars([]);
+      }
+    } catch (error) {
+      console.error('Error fetching pending cars:', error);
+      message.error('Failed to load pending cars');
+      setPendingCars([]);
+    } finally {
+      setPendingCarsLoading(false);
+    }
   };
 
+  // Handle car approval
+  const handleApproveCar = async (carId) => {
+    try {
+      const result = await adminService.approveCar(carId);
+      if (result.status === 200) {
+        message.success('Car approved successfully');
+        fetchPendingCars();
+        const dashboardResponse = await adminService.getDashboard();
+        setDashboardData(dashboardResponse);
+      } else {
+        message.error('Failed to approve car');
+      }
+    } catch (error) {
+      console.error('Error approving car:', error);
+      message.error('Failed to approve car');
+    }
+  };
+
+  // Handle car rejection
+  const handleRejectCar = async (carId) => {
+    try {
+      const result = await adminService.rejectCar(carId);
+      if (result.status === 200) {
+        message.success('Car rejected successfully');
+        fetchPendingCars();
+        const dashboardResponse = await adminService.getDashboard();
+        setDashboardData(dashboardResponse);
+      } else {
+        message.error('Failed to reject car');
+      }
+    } catch (error) {
+      console.error('Error rejecting car:', error);
+      message.error('Failed to reject car');
+    }
+  };
+
+  // Show pending cars modal
+  const showPendingCarsModal = () => {
+    setPendingCarsModalVisible(true);
+    fetchPendingCars();
+  };
+
+  // Statistics data with improved styling
+  const statisticsData = [
+    {
+      title: "Total Users",
+      value: dashboardData?.totalUsers || 0,
+      prefix: <UserOutlined style={{ color: '#1890ff' }} />,
+      suffix: "users",
+      trend: dashboardData?.userGrowth || "+0%",
+      trendUp: dashboardData?.userGrowth ? dashboardData.userGrowth.startsWith('+') : true,
+      backgroundColor: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      iconColor: "#1890ff"
+    },
+    {
+      title: "Total Cars",
+      value: dashboardData?.totalCars || 0,
+      prefix: <CarOutlined style={{ color: '#52c41a' }} />,
+      suffix: "vehicles",
+      trend: dashboardData?.carGrowth || "+0%",
+      trendUp: dashboardData?.carGrowth ? dashboardData.carGrowth.startsWith('+') : true,
+      backgroundColor: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+      iconColor: "#52c41a"
+    },
+    {
+      title: "Total Bookings",
+      value: dashboardData?.totalBookings || 0,
+      prefix: <CalendarOutlined style={{ color: '#fa8c16' }} />,
+      suffix: "bookings",
+      trend: dashboardData?.bookingGrowth || "+0%",
+      trendUp: dashboardData?.bookingGrowth ? dashboardData.bookingGrowth.startsWith('+') : true,
+      backgroundColor: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+      iconColor: "#fa8c16"
+    },
+    {
+      title: "Total Revenue",
+      value: dashboardData?.totalRevenue ? (dashboardData.totalRevenue / 1000000).toFixed(1) : 0,
+      prefix: <DollarCircleOutlined style={{ color: '#722ed1' }} />,
+      suffix: "M USD",
+      trend: dashboardData?.revenueGrowth || "+0%",
+      trendUp: dashboardData?.revenueGrowth ? dashboardData.revenueGrowth.startsWith('+') : true,
+      backgroundColor: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+      iconColor: "#722ed1"
+    }
+  ];
+
+  // Pending items data
+  const pendingItems = [
+    {
+      title: "Cars Pending Approval",
+      count: dashboardData?.carsPendingApproval || 0,
+      icon: <CarOutlined />,
+      color: "#fa8c16",
+      onClick: showPendingCarsModal,
+      clickable: true
+    },
+    {
+      title: "Documents Pending",
+      count: dashboardData?.documentsPendingApproval || 0,
+      icon: <FileTextOutlined />,
+      color: "#1890ff",
+      clickable: false
+    },
+    {
+      title: "Bookings Awaiting Action",
+      count: dashboardData?.bookingsAwaitingAction || 0,
+      icon: <ClockCircleOutlined />,
+      color: "#f5222d",
+      clickable: false
+    }
+  ];
+
   return (
-    <>
-      <div className="layout-content">
-        <Row className="rowgap-vbox" gutter={[24, 0]}>
-          {count.map((c, index) => (
-            <Col
-              key={index}
-              xs={24}
-              sm={24}
-              md={12}
-              lg={6}
-              xl={6}
-              className="mb-24"
-            >
-              <Card bordered={false} className="criclebox ">
-                <div className="number">
-                  <Row align="middle" gutter={[24, 0]}>
-                    <Col xs={18}>
-                      <span>{c.today}</span>
-                      <Title level={3}>
-                        {c.title} <small className={c.bnb}>{c.persent}</small>
-                      </Title>
+    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
+      {loading ? (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '60vh',
+          flexDirection: 'column'
+        }}>
+          <Spin size="large" />
+          <Text style={{ marginTop: 16, fontSize: 16 }}>Loading dashboard...</Text>
+        </div>
+      ) : (
+        <>
+          {/* Header Section */}
+          <div style={{ marginBottom: 32 }}>
+            <Title level={2} style={{ margin: 0, color: '#1f2937' }}>
+              Admin Dashboard
+            </Title>
+            <Text style={{ color: '#6b7280', fontSize: 16 }}>
+              Welcome back! Here's what's happening with your car rental platform.
+            </Text>
+          </div>
+
+          {/* Statistics Cards */}
+          <Row gutter={[24, 24]} style={{ marginBottom: 32 }}>
+            {statisticsData.map((stat, index) => (
+              <Col xs={24} sm={12} lg={6} key={index}>
+                <Card
+                  hoverable
+                  style={{
+                    background: stat.backgroundColor,
+                    border: 'none',
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    height: 160,
+                  }}
+                  bodyStyle={{ padding: 24 }}
+                >
+                  <div style={{ position: 'relative', height: '100%' }}>
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      opacity: 0.2,
+                      fontSize: 48
+                    }}>
+                      {stat.prefix}
+                    </div>
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      <Text style={{ color: 'white', fontSize: 14, opacity: 0.9 }}>
+                        {stat.title}
+                      </Text>
+                      <div style={{ marginTop: 8 }}>
+                        <Statistic
+                          value={stat.value}
+                          suffix={stat.suffix}
+                          valueStyle={{
+                            color: 'white',
+                            fontSize: 28,
+                            fontWeight: 'bold'
+                          }}
+                        />
+                      </div>
+                      <div style={{
+                        marginTop: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}>
+                        {stat.trendUp ? (
+                          <ArrowUpOutlined style={{ color: '#10b981', fontSize: 12 }} />
+                        ) : (
+                          <ArrowDownOutlined style={{ color: '#ef4444', fontSize: 12 }} />
+                        )}
+                        <Text style={{ color: 'white', fontSize: 12, opacity: 0.9 }}>
+                          {stat.trend} vs last month
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
+          {/* Pending Actions Section */}
+          <Row gutter={[24, 24]} style={{ marginBottom: 32 }}>
+            <Col xs={24}>
+              <Card
+                title={
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <ClockCircleOutlined style={{ color: '#fa8c16' }} />
+                    <span>Pending Actions</span>
+                  </div>
+                }
+                style={{ borderRadius: 12 }}
+                headStyle={{
+                  borderBottom: '1px solid #f0f0f0',
+                  fontSize: 18,
+                  fontWeight: 600
+                }}
+              >
+                <Row gutter={[16, 16]}>
+                  {pendingItems.map((item, index) => (
+                    <Col xs={24} sm={8} key={index}>
+                      <Card
+                        hoverable={item.clickable}
+                        onClick={item.clickable ? item.onClick : undefined}
+                        style={{
+                          borderRadius: 12,
+                          border: `1px solid ${item.color}20`,
+                          backgroundColor: `${item.color}08`,
+                          cursor: item.clickable ? 'pointer' : 'default',
+                          transition: 'all 0.3s ease',
+                        }}
+                        bodyStyle={{ padding: 20, textAlign: 'center' }}
+                        className={item.clickable ? 'pending-card-hover' : ''}
+                      >
+                        <Badge count={item.count} offset={[10, -10]} color={item.color}>
+                          <Avatar
+                            size={48}
+                            style={{
+                              backgroundColor: `${item.color}20`,
+                              color: item.color,
+                              border: `2px solid ${item.color}40`
+                            }}
+                            icon={item.icon}
+                          />
+                        </Badge>
+                        <div style={{ marginTop: 16 }}>
+                          <Text style={{
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                            color: item.color,
+                            display: 'block'
+                          }}>
+                            {item.count}
+                          </Text>
+                          <Text style={{ color: '#6b7280', fontSize: 14 }}>
+                            {item.title}
+                          </Text>
+                          {item.clickable && (
+                            <div style={{
+                              marginTop: 8,
+                              fontSize: 12,
+                              color: item.color,
+                              opacity: 0.8
+                            }}>
+                              Click to manage
+                            </div>
+                          )}
+                        </div>
+                      </Card>
                     </Col>
-                    <Col xs={6}>
-                      <div className="icon-box">{c.icon}</div>
-                    </Col>
-                  </Row>
-                </div>
+                  ))}
+                </Row>
               </Card>
             </Col>
-          ))}
-        </Row>
+          </Row>
 
-        <Row gutter={[24, 0]}>
-          <Col xs={24} sm={24} md={12} lg={12} xl={10} className="mb-24">
-            <Card bordered={false} className="criclebox h-full">
-              <Echart />
-            </Card>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} xl={14} className="mb-24">
-            <Card bordered={false} className="criclebox h-full">
-              <LineChart />
-            </Card>
-          </Col>
-        </Row>
-
-        <Row gutter={[24, 0]}>
-          <Col xs={24} sm={24} md={12} lg={12} xl={16} className="mb-24">
-            <Card bordered={false} className="criclebox cardbody h-full">
-              <div className="project-ant">
-                <div>
-                  <Title level={5}>Projects</Title>
-                  <Paragraph className="lastweek">
-                    done this month<span className="blue">40%</span>
-                  </Paragraph>
-                </div>
-                <div className="ant-filtertabs">
-                  <div className="antd-pro-pages-dashboard-analysis-style-salesExtra">
-                    <Radio.Group onChange={onChange} defaultValue="a">
-                      <Radio.Button value="a">ALL</Radio.Button>
-                      <Radio.Button value="b">ONLINE</Radio.Button>
-                      <Radio.Button value="c">STORES</Radio.Button>
-                    </Radio.Group>
+          {/* Recent Users Section */}
+          <Row gutter={[24, 24]}>
+            <Col xs={24}>
+              <Card
+                title={
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <UserOutlined style={{ color: '#722ed1' }} />
+                    <span>Recent Users (Last 7 Days)</span>
+                    <Badge
+                      count={newUsersData?.totalElements || 0}
+                      style={{ backgroundColor: '#722ed1' }}
+                    />
                   </div>
-                </div>
-              </div>
-              <div className="ant-list-box table-responsive">
-                <table className="width-100">
-                  <thead>
-                    <tr>
-                      <th>COMPANIES</th>
-                      <th>MEMBERS</th>
-                      <th>BUDGET</th>
-                      <th>COMPLETION</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {list.map((d, index) => (
-                      <tr key={index}>
-                        <td>
-                          <h6>
-                            <img
-                              src={d.img}
-                              alt=""
-                              className="avatar-sm mr-10"
-                            />{" "}
-                            {d.Title}
-                          </h6>
-                        </td>
-                        <td>{d.member}</td>
-                        <td>
-                          <span className="text-xs font-weight-bold">
-                            {d.bud}{" "}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="percent-progress">{d.progress}</div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="uploadfile shadow-none">
-                <Upload {...uploadProps}>
-                  <Button
-                    type="dashed"
-                    className="ant-full-box"
-                    icon={<ToTopOutlined />}
-                  >
-                    <span className="click">Click to Upload</span>
+                }
+                style={{ borderRadius: 12 }}
+                headStyle={{ borderBottom: '1px solid #f0f0f0' }}
+                extra={
+                  <Button type="primary" ghost onClick={() => navigate('/admin/users')}>
+                    View All Users
                   </Button>
-                </Upload>
-              </div>
-            </Card>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} xl={8} className="mb-24">
-            <Card bordered={false} className="criclebox h-full">
-              <div className="timeline-box">
-                <Title level={5}>Orders History</Title>
-                <Paragraph className="lastweek" style={{ marginBottom: 24 }}>
-                  this month <span className="bnb2">20%</span>
-                </Paragraph>
-
-                <Timeline
-                  pending="Recording..."
-                  className="timelinelist"
-                  reverse={reverse}
-                >
-                  {timelineList.map((t, index) => (
-                    <Timeline.Item color={t.color} key={index}>
-                      <Title level={5}>{t.title}</Title>
-                      <Text>{t.time}</Text>
-                    </Timeline.Item>
-                  ))}
-                </Timeline>
-                <Button
-                  type="primary"
-                  className="width-100"
-                  onClick={() => setReverse(!reverse)}
-                >
-                  {<MenuUnfoldOutlined />} REVERSE
-                </Button>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row gutter={[24, 0]}>
-          <Col xs={24} md={12} sm={24} lg={12} xl={14} className="mb-24">
-            <Card bordered={false} className="criclebox h-full">
-              <Row gutter>
-                <Col
-                  xs={24}
-                  md={12}
-                  sm={24}
-                  lg={12}
-                  xl={14}
-                  className="mobile-24"
-                >
-                  <div className="h-full col-content p-20">
-                    <div className="ant-muse">
-                      <Text>Built by developers</Text>
-                      <Title level={5}>Muse Dashboard for Ant Design</Title>
-                      <Paragraph className="lastweek mb-36">
-                        From colors, cards, typography to complex elements, you
-                        will find the full documentation.
-                      </Paragraph>
-                    </div>
-                    <div className="card-footer">
-                      <a className="icon-move-right" href="#pablo">
-                        Read More
-                        {<RightOutlined />}
-                      </a>
-                    </div>
+                }
+              >
+                {newUsersData?.content && newUsersData.content.length > 0 ? (
+                  <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+                    <Table
+                      dataSource={newUsersData.content}
+                      pagination={false}
+                      size="small"
+                      rowKey="id"
+                      style={{ backgroundColor: 'transparent' }}
+                      onRow={(record) => ({
+                        onClick: () => navigate(`/admin/users/${record.id}`),
+                        style: { cursor: 'pointer' }
+                      })}
+                      columns={[
+                        {
+                          title: 'User',
+                          key: 'user',
+                          width: '40%',
+                          render: (_, record) => (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              <Avatar
+                                size={40}
+                                src={record.profilePicture}
+                                style={{
+                                  backgroundColor: record.profilePicture ? 'transparent' : '#1890ff',
+                                  border: '2px solid #f0f0f0'
+                                }}
+                              >
+                                {record.firstName?.[0] || record.email[0]}
+                              </Avatar>
+                              <div>
+                                <Text style={{ fontWeight: 500, display: 'block' }}>
+                                  {record.firstName && record.lastName
+                                    ? `${record.firstName} ${record.lastName}`
+                                    : record.email?.split('@')[0]
+                                  }
+                                </Text>
+                                <Text style={{ color: '#6b7280', fontSize: 12 }}>
+                                  {record.email}
+                                </Text>
+                                {record.phone && (
+                                  <Text style={{ color: '#9ca3af', fontSize: 11, display: 'block' }}>
+                                    {record.phone}
+                                  </Text>
+                                )}
+                              </div>
+                            </div>
+                          ),
+                        },
+                        {
+                          title: 'Status',
+                          key: 'status',
+                          width: '20%',
+                          render: (_, record) => (
+                            <div>
+                              <Tag
+                                color={record.active ? 'green' : 'red'}
+                                style={{ marginBottom: 4 }}
+                              >
+                                {record.active ? 'Active' : 'Inactive'}
+                              </Tag>
+                              <br />
+                              <Tag color="blue" size="small">
+                                {record.roles?.[0]?.toUpperCase() || 'USER'}
+                              </Tag>
+                            </div>
+                          ),
+                        },
+                        {
+                          title: 'Address',
+                          key: 'address',
+                          width: '25%',
+                          render: (_, record) => (
+                            <Text style={{ fontSize: 12, color: '#6b7280' }}>
+                              {record.address?.address || 'No address provided'}
+                            </Text>
+                          ),
+                        },
+                        {
+                          title: 'Joined',
+                          dataIndex: 'createdAt',
+                          key: 'createdAt',
+                          width: '15%',
+                          render: (date) => (
+                            <div>
+                              <Text style={{ fontSize: 13, display: 'block' }}>
+                                {new Date(date).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </Text>
+                              <Text style={{ color: '#6b7280', fontSize: 11 }}>
+                                {new Date(date).toLocaleTimeString('en-US', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </Text>
+                            </div>
+                          ),
+                        },
+                      ]}
+                    />
                   </div>
-                </Col>
-                <Col
-                  xs={24}
-                  md={12}
-                  sm={24}
-                  lg={12}
-                  xl={10}
-                  className="col-img"
-                >
-                  <div className="ant-cret text-right">
-                    <img src={card} alt="" className="border10" />
+                ) : (
+                  <div style={{ textAlign: 'center', padding: 40 }}>
+                    <UserOutlined style={{ fontSize: 48, color: '#d1d5db', marginBottom: 16 }} />
+                    <Text style={{ color: '#6b7280', display: 'block' }}>
+                      No new users in the last 7 days
+                    </Text>
                   </div>
-                </Col>
-              </Row>
-            </Card>
-          </Col>
+                )}
+              </Card>
+            </Col>
+          </Row>
+        </>
+      )}
 
-          <Col xs={24} md={12} sm={24} lg={12} xl={10} className="mb-24">
-            <Card bordered={false} className="criclebox card-info-2 h-full">
-              <div className="gradent h-full col-content">
-                <div className="card-content">
-                  <Title level={5}>Work with the best</Title>
-                  <p>
-                    Wealth creation is an evolutionarily recent positive-sum
-                    game. It is all about who take the opportunity first.
-                  </p>
+      {/* Pending Cars Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <CarOutlined style={{ color: '#fa8c16' }} />
+            <span>Cars Pending Approval</span>
+          </div>
+        }
+        open={pendingCarsModalVisible}
+        onCancel={() => setPendingCarsModalVisible(false)}
+        width={1200}
+        footer={null}
+        style={{ top: 20 }}
+      >
+        <Table
+          dataSource={pendingCars}
+          loading={pendingCarsLoading}
+          rowKey="id"
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} cars`,
+          }}
+          columns={[
+            {
+              title: 'Car Information',
+              key: 'carInfo',
+              width: '30%',
+              render: (_, record) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 60, height: 60, borderRadius: 8, overflow: 'hidden' }}>
+                    {record.images && record.images.length > 0 ? (
+                      <Image
+                        width={60}
+                        height={60}
+                        src={record.images[0].imageUrl || record.images[0]}
+                        style={{ objectFit: 'cover' }}
+                        fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+                      />
+                    ) : (
+                      <div style={{
+                        width: 60,
+                        height: 60,
+                        backgroundColor: '#f5f5f5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 24,
+                        color: '#bfbfbf'
+                      }}>
+                        🚗
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <Text style={{ fontWeight: 600, fontSize: 14, display: 'block' }}>
+                      {record.name}
+                    </Text>
+                    <Text style={{ color: '#6b7280', fontSize: 12, display: 'block' }}>
+                      {record.carBrand?.name} {record.model} ({record.year})
+                    </Text>
+                    <Text style={{ color: '#9ca3af', fontSize: 11 }}>
+                      {record.licensePlate}
+                    </Text>
+                  </div>
                 </div>
-                <div className="card-footer">
-                  <a className="icon-move-right" href="#pablo">
-                    Read More
-                    <RightOutlined />
-                  </a>
+              ),
+            },
+            {
+              title: 'Owner',
+              dataIndex: 'emailOwner',
+              key: 'emailOwner',
+              width: '20%',
+              render: (email) => (
+                <Text style={{ fontSize: 12, color: '#6b7280' }}>
+                  {email}
+                </Text>
+              ),
+            },
+            {
+              title: 'Specifications',
+              key: 'specs',
+              width: '25%',
+              render: (_, record) => (
+                <div>
+                  <div style={{ marginBottom: 8 }}>
+                    <Tag color={record.transmission === 'AUTO' ? 'blue' : 'green'}>
+                      {record.transmission}
+                    </Tag>
+                    <Tag color="purple">
+                      {record.carType}
+                    </Tag>
+                  </div>
+                  <Text style={{ fontSize: 12, color: '#6b7280', display: 'block' }}>
+                    {record.seats} seats • {record.fuelType}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: '#9ca3af' }}>
+                    {record.fuelConsumption}
+                  </Text>
                 </div>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-    </>
+              ),
+            },
+            {
+              title: 'Pricing',
+              key: 'pricing',
+              width: '15%',
+              render: (_, record) => (
+                <div>
+                  <Text style={{ fontWeight: 600, fontSize: 13, display: 'block' }}>
+                    {new Intl.NumberFormat('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND'
+                    }).format(record.pricePerHour)}/hour
+                  </Text>
+                  <Text style={{ fontSize: 11, color: '#6b7280' }}>
+                    Daily: {new Intl.NumberFormat('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND'
+                    }).format(record.pricePer24Hour)}
+                  </Text>
+                </div>
+              ),
+            },
+            {
+              title: 'Actions',
+              key: 'actions',
+              width: '20%',
+              render: (_, record) => (
+                <Space size="small">
+                  <Button
+                    type="primary"
+                    icon={<CheckOutlined />}
+                    onClick={() => handleApproveCar(record.id)}
+                    size="small"
+                    style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    danger
+                    icon={<CloseOutlined />}
+                    onClick={() => handleRejectCar(record.id)}
+                    size="small"
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    type="text"
+                    icon={<EyeOutlined />}
+                    onClick={() => window.open(`/admin/cars/${record.id}`, '_blank')}
+                    size="small"
+                  >
+                    View
+                  </Button>
+                </Space>
+              ),
+            },
+          ]}
+        />
+      </Modal>
+
+      <style jsx>{`
+        .pending-card-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+      `}</style>
+    </div>
   );
 }
 

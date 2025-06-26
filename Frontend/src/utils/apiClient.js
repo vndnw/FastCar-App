@@ -4,7 +4,7 @@ import tokenManager from './tokenManager';
 // Create axios instance with base configuration
 const apiClient = axios.create({
     baseURL: 'http://localhost:8080/api/v1',
-    timeout: 10000,
+    timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
     },

@@ -57,7 +57,7 @@ export const userService = {    // Get all users with pagination
 
     // Deactivate user by email (specific endpoint)
     deactivateUser: async (email) => {
-        return apiClient.patch(`/user/${email}/deactivate`);
+        return apiClient.patch(`/user/${email}/in-activate`);
     },
 
     // Search users
