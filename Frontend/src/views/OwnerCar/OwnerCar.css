@@ -1,112 +1,113 @@
-.owner-car-wrapper {
-    padding: 40px;
-    margin-top: 100px;
-    background-color: #f9f9f9;
+/* OwnerCar.css */
+
+/* ==========================================================================
+   1. TÙY CHỈNH THEME MÀU SẮC CHO ANT DESIGN
+   Phần này định nghĩa màu sắc chủ đạo và ghi đè lên các component của Antd.
+   Bạn có thể cân nhắc chuyển phần này ra file CSS toàn cục (vd: App.css)
+   để áp dụng cho toàn bộ trang web.
+   ========================================================================== */
+
+:root {
+    --primary-color: #51c09f;
+    --primary-color-dark: #3ea98a;
+    --primary-color-light: #e6f7f3;
+    --primary-color-selected: #d0f0e6;
 }
 
-.owner-car-header {
-    text-align: center;
-    margin-bottom: 40px;
+/* --- Tùy chỉnh Button --- */
+.ant-btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.owner-car-title {
-    font-size: 36px;
-    font-weight: bold;
-    color: #51c09f;
-    margin-bottom: 20px;
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+    background-color: var(--primary-color-dark) !important;
+    border-color: var(--primary-color-dark) !important;
 }
 
-.owner-car-description {
-    font-size: 18px;
-    line-height: 1.6;
-    color: #333;
+/* --- Tùy chỉnh Input, InputNumber, Select --- */
+.ant-input:hover,
+.ant-input-number:hover,
+.ant-select-selector:hover {
+    border-color: var(--primary-color) !important;
 }
 
-.owner-car-registration {
-    margin: 40px auto;
-    max-width: 600px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-number:focus,
+.ant-input-number-focused,
+.ant-select-focused .ant-select-selector,
+.ant-select-selector:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(81, 192, 159, 0.2) !important;
 }
 
-.registration-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #51c09f;
-    margin-bottom: 20px;
+/* --- Tùy chỉnh Dropdown của Select --- */
+.ant-select-item-option:hover {
+    background-color: var(--primary-color-light) !important;
 }
 
-.registration-form label {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 10px;
-    color: #333;
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: var(--primary-color-selected) !important;
+    color: var(--primary-color-dark) !important;
+    font-weight: 600;
 }
 
-.registration-form input,
-.registration-form textarea {
+
+/* ==========================================================================
+   2. BỐ CỤC CHÍNH CỦA TRANG (OWNER CAR PAGE)
+   ========================================================================== */
+
+.owner-car-page {
+    padding: 24px;
+    margin-top: 90px;
+}
+
+.owner-car-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+
+/* ==========================================================================
+   3. CÁC THÀNH PHẦN CHI TIẾT
+   ========================================================================== */
+
+/* --- Phần Form đăng ký --- */
+.form-description {
+    margin-bottom: 24px;
+    color: #595959;
+}
+
+.ant-form-item-label>label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.full-width {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
 }
 
-.registration-form textarea {
-    resize: none;
-}
-
-.registration-button {
-    background-color: #51c09f;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.registration-button:hover {
-    background-color: #3a9b7a;
-}
-
-.owner-car-container {
-    margin-top: 40px;
-}
-
-.car-list-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #51c09f;
-    margin-bottom: 20px;
-}
-
-.owner-car-item {
+/* --- Phần Danh sách xe --- */
+.spinner-container {
     display: flex;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-height: 200px;
 }
 
-.owner-car-image {
-    width: 150px;
-    height: auto;
-    border-radius: 10px;
-    margin-right: 20px;
+.car-list-item-card .ant-card-cover img {
+    height: 200px;
+    object-fit: cover;
 }
 
-.owner-car-info h3 {
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
+.car-list-item-card .ant-card-body {
+    padding: 16px;
 }
 
-.owner-car-info p {
-    font-size: 16px;
-    color: #666;
+.car-list-item-card p {
+    margin-bottom: 8px;
 }
