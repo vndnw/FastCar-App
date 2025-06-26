@@ -99,7 +99,7 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(URL_PUBLIC).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
         );
         http.exceptionHandling(exception -> exception
             .authenticationEntryPoint(customAuthenticationEntryPoint)
