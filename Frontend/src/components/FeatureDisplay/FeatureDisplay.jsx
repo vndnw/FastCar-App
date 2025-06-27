@@ -165,7 +165,7 @@ const FeatureDisplay = ({
                     </Col>
                 ))}
             </Row>
-        </Card>
+        </Card >
     );
 };
 

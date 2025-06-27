@@ -44,7 +44,7 @@ const OwnerCar = () => {
                 const res = await featureService.getFeatures(0, 100, 'createdAt,desc');
                 setFeatures(res.data.content || []);
             } catch (error) {
-                message.error('Không thể tải danh sách tính năng!');
+                // message.error('Không thể tải danh sách tính năng!');
             }
         };
         fetchFeatures();

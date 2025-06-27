@@ -142,12 +142,14 @@ const Cars = () => {
                     total: result.data.totalElements || 0,
                 }));
             } else {
-                message.error('Failed to fetch cars');
+                const errorMessage = result.data?.message || 'Failed to fetch cars';
+                message.error(errorMessage);
                 setCars([]);
             }
         } catch (error) {
             console.error('Error fetching cars:', error);
-            message.error('Failed to fetch cars');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch cars';
+            message.error(errorMessage);
             setCars([]);
         } finally {
             setLoading(false);
@@ -173,7 +175,8 @@ const Cars = () => {
             }
         } catch (error) {
             console.error('Error fetching car features:', error);
-            message.error('Failed to fetch car features');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch car features';
+            message.error(errorMessage);
             setCarFeatures([]);
         }
     };
@@ -190,11 +193,13 @@ const Cars = () => {
                 featureForm.resetFields();
                 fetchCarFeatures(); // Refresh the features list
             } else {
-                message.error('Failed to create feature');
+                const errorMessage = result.data?.message || 'Failed to create feature';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error creating feature:', error);
-            message.error('Failed to create feature');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create feature';
+            message.error(errorMessage);
         } finally {
             setFeatureCreateLoading(false);
         }
@@ -212,11 +217,13 @@ const Cars = () => {
                 featureEditForm.resetFields();
                 fetchCarFeatures(); // Refresh the features list
             } else {
-                message.error('Failed to update feature');
+                const errorMessage = result.data?.message || 'Failed to update feature';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error updating feature:', error);
-            message.error('Failed to update feature');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to update feature';
+            message.error(errorMessage);
         } finally {
             setFeatureEditLoading(false);
         }
@@ -230,11 +237,13 @@ const Cars = () => {
                 message.success('Feature deleted successfully!');
                 fetchCarFeatures(); // Refresh the features list
             } else {
-                message.error('Failed to delete feature');
+                const errorMessage = result.data?.message || 'Failed to delete feature';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error deleting feature:', error);
-            message.error('Failed to delete feature');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete feature';
+            message.error(errorMessage);
         }
     };
 
@@ -318,11 +327,13 @@ const Cars = () => {
                 form.resetFields();
                 fetchCars(pagination.current, pagination.pageSize);
             } else {
-                message.error('Failed to create car');
+                const errorMessage = result.data?.message || 'Failed to create car';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error creating car:', error);
-            message.error('Failed to create car');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create car';
+            message.error(errorMessage);
         } finally {
             setCreateLoading(false);
         }
@@ -336,11 +347,13 @@ const Cars = () => {
                 message.success('Car deleted successfully');
                 fetchCars(pagination.current, pagination.pageSize);
             } else {
-                message.error('Failed to delete car');
+                const errorMessage = result.data?.message || 'Failed to delete car';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error deleting car:', error);
-            message.error('Failed to delete car');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete car';
+            message.error(errorMessage);
         }
     };
 
@@ -403,7 +416,8 @@ const Cars = () => {
                 }
             } catch (error) {
                 console.error('Error searching cars:', error);
-                message.error('Failed to search cars');
+                const errorMessage = error.response?.data?.message || error.message || 'Failed to search cars';
+                message.error(errorMessage);
             } finally {
                 setLoading(false);
             }
@@ -687,7 +701,7 @@ const Cars = () => {
                     <Row gutter={[24, 0]}>
                         <Col xs="24" xl={24}>
                             <Card
-                                bordered={false}
+                                variant={false}
                                 className="criclebox tablespace mb-24"
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1123,7 +1137,7 @@ const Cars = () => {
                     <Row gutter={[24, 0]}>
                         <Col xs="24" xl={24}>
                             <Card
-                                bordered={false}
+                                variant={false}
                                 className="criclebox tablespace mb-24"
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1184,11 +1198,13 @@ const Cars = () => {
                 message.success(`Car status updated to ${newStatus}`);
                 fetchCars(pagination.current, pagination.pageSize);
             } else {
-                message.error('Failed to update car status');
+                const errorMessage = result.data?.message || 'Failed to update car status';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error updating car status:', error);
-            message.error('Failed to update car status');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to update car status';
+            message.error(errorMessage);
         }
     };
 

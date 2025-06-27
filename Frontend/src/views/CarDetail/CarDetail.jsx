@@ -21,7 +21,7 @@ const CarDetail = () => {
         try {
             const response = await carService.getCarById(id);
             setCar(response.data);
-            console.log('Car data fetched:', response.data);
+            // console.log('Car data fetched:', response.data);
         } catch (error) {
             console.error('Error fetching car by ID:', error);
         }

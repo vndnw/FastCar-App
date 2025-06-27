@@ -41,12 +41,12 @@ const CarDetail = () => {
             if (result.status === 200 && result.data) {
                 setCar(result.data);
             } else {
-                message.error('Failed to fetch car details');
+                message.error(result.data?.message || 'Failed to fetch car details');
                 navigate('/admin/cars');
             }
         } catch (error) {
             console.error('Error fetching car details:', error);
-            message.error('Failed to fetch car details');
+            message.error(error.response?.data?.message || 'Failed to fetch car details');
             navigate('/admin/cars');
         } finally {
             setLoading(false);

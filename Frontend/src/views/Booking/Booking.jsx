@@ -105,13 +105,13 @@ const Booking = () => {
                     <Button type="link" onClick={() => navigate(-1)} style={{ fontSize: 18, padding: 0 }}>
                         &lt; Quay lại
                     </Button>
-                    
+
                 </div>
 
-                
+
 
                 {/* Thông tin đơn hàng */}
-                <Card bordered={false} style={{ margin: '24px auto', maxWidth: 600, borderRadius: 16 }}>
+                <Card variant={false} style={{ margin: '24px auto', maxWidth: 600, borderRadius: 16 }}>
                     <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 16 }}>Thông tin đơn hàng</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#1890ff', marginBottom: 8 }}>
                         <CalendarOutlined />
@@ -181,7 +181,7 @@ const Booking = () => {
                                         {(tienTheChap)?.toLocaleString('vi-VN')}đ
                                     </span>
                                 )}
-                                {tienTheChap? (tienTheChap - tienGiuCho).toLocaleString('vi-VN') : 0}đ
+                                {tienTheChap ? (tienTheChap - tienGiuCho).toLocaleString('vi-VN') : 0}đ
                             </span>
                         </div>
                         <div style={{ color: '#888', fontSize: 13 }}>

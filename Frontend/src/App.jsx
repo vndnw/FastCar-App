@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import UserLayout from './components/layout/UserLayout';
 import HeroSection from './components/HeroSection/HeroSection';
 import Home from './views/Home/Home';
+import UserProfile from './views/Profile/UserProfile';
 import About from './views/About/About';
 import Login from './components/Login/Login';
 import Register from './components/Login/Register';
@@ -24,6 +25,8 @@ import UserEdit from "./views/admin/UserEdit";
 import Discount from "./views/admin/Discount";
 import CarBrand from "./views/admin/CarBrand";
 import Cars from "./views/admin/Cars";
+import Bookings from "./views/admin/Bookings";
+import BookingDetail from "./views/admin/BookingDetail";
 import Main from "./components/admin/layout/Main";
 import CarEdit from "./views/admin/CarEdit";
 import CarDetailAdmin from "./views/admin/CarDetail";
@@ -37,6 +40,7 @@ import { BookingProvider } from './contexts/BookingContext';
 import { CarProvider } from './contexts/CarContext';
 
 
+
 function App() {
   return (
     <AuthProvider>
@@ -46,6 +50,7 @@ function App() {
             {/* Layout cho trang người dùng */}
             <Route element={<UserLayout />}>
               <Route path="/" element={<><HeroSection /><Home /></>} />
+              <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/about" element={<About />} />
               <Route path="/owner-car" element={<OwnerCar />} />
               <Route path="/booking/:carId" element={<Booking />} />
@@ -84,6 +89,8 @@ function App() {
               <Route path="cars" element={<Cars />} />
               <Route path="cars/:carId" element={<CarDetailAdmin />} />
               <Route path="cars/edit/:carId" element={<CarEdit />} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path="bookings/:bookingId" element={<BookingDetail />} />
               <Route path="*" element={<AdminNotFound />} />
             </Route>
 

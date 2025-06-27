@@ -79,6 +79,7 @@ const Login = ({ onClose }) => {
         message.success('Đăng nhập thành công!');
         // SỬA ĐỔI TẠI ĐÂY: Luôn điều hướng về trang chủ sau khi thành công
         navigate('/');
+        onClose();
       } else {
         setErrors({
           general: result.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',

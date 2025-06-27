@@ -18,7 +18,8 @@
     "react-apexcharts": "^1.7.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.6.0",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

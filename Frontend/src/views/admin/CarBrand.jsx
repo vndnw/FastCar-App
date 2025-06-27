@@ -89,12 +89,14 @@ const CarBrand = () => {
                     total: result.data.totalElements || 0,
                 }));
             } else {
-                message.error('Failed to fetch car brands');
+                const errorMessage = result.data?.message || 'Failed to fetch car brands';
+                message.error(errorMessage);
                 setCarBrands([]);
             }
         } catch (error) {
             console.error('Error fetching car brands:', error);
-            message.error('Failed to fetch car brands');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch car brands';
+            message.error(errorMessage);
             setCarBrands([]);
         } finally {
             setLoading(false);
@@ -119,11 +121,13 @@ const CarBrand = () => {
                 // Refresh car brand list with current pagination
                 await fetchCarBrands(pagination.current, pagination.pageSize);
             } else {
-                message.error(result.message || 'Failed to create car brand');
+                const errorMessage = result.data?.message || result.message || 'Failed to create car brand';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error creating car brand:', error);
-            message.error('Failed to create car brand');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create car brand';
+            message.error(errorMessage);
         } finally {
             setCreateLoading(false);
         }
@@ -148,11 +152,13 @@ const CarBrand = () => {
                 // Refresh car brand list with current pagination
                 await fetchCarBrands(pagination.current, pagination.pageSize);
             } else {
-                message.error(result.message || 'Failed to update car brand');
+                const errorMessage = result.data?.message || result.message || 'Failed to update car brand';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error updating car brand:', error);
-            message.error('Failed to update car brand');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to update car brand';
+            message.error(errorMessage);
         } finally {
             setEditLoading(false);
         }
@@ -170,7 +176,8 @@ const CarBrand = () => {
 
         } catch (error) {
             console.error('Error deleting car brand:', error);
-            message.error('Failed to delete car brand');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete car brand';
+            message.error(errorMessage);
         }
     };
 
@@ -295,7 +302,7 @@ const CarBrand = () => {
                 <Row gutter={[24, 0]}>
                     <Col xs="24" xl={24}>
                         <Card
-                            bordered={false}
+                            variant={false}
                             className="criclebox tablespace mb-24"
                             title={
                                 <div style={{ display: 'flex', alignItems: 'center' }}>

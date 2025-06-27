@@ -53,8 +53,8 @@ export const PaymentSuccess = () => {
                     </Button>,
                 ]}
             >
-                <Card title="Chi tiết giao dịch" bordered={false} style={{ maxWidth: 600, margin: '0 auto', textAlign: 'left' }}>
-                    <Descriptions column={1} bordered>
+                <Card title="Chi tiết giao dịch" variant={false} style={{ maxWidth: 600, margin: '0 auto', textAlign: 'left' }}>
+                    <Descriptions column={1} variant>
                         <Descriptions.Item label="Mã giao dịch">{transactionDetails.txnRef}</Descriptions.Item>
                         <Descriptions.Item label="Số tiền">
                             {(parseInt(transactionDetails.amount, 10) / 100).toLocaleString('vi-VN')} VNĐ

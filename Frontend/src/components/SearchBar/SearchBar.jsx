@@ -111,7 +111,7 @@ const SearchBar = () => {
                                             placeholder="Chọn địa điểm"
                                             size="large"
                                             showSearch
-                                            bordered={false}
+                                            variant={false}
                                             className="field-select"
                                             filterOption={(input, option) =>
                                                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -135,7 +135,7 @@ const SearchBar = () => {
                                             locale={locale}
                                             format="DD/MM/YYYY"
                                             size="large"
-                                            bordered={false}
+                                            variant={false}
                                             disabledDate={disabledDate}
                                             placeholder="31/05/2025"
                                             className="field-input"
@@ -151,7 +151,7 @@ const SearchBar = () => {
                                         <TimePicker
                                             format="HH:mm"
                                             size="large"
-                                            bordered={false}
+                                            variant={false}
                                             minuteStep={30}
                                             placeholder="21:00"
                                             className="field-input"
@@ -168,7 +168,7 @@ const SearchBar = () => {
                                             locale={locale}
                                             format="DD/MM/YYYY"
                                             size="large"
-                                            bordered={false}
+                                            variant={false}
                                             disabledDate={disabledDate}
                                             placeholder="02/06/2025"
                                             className="field-input"
@@ -184,7 +184,7 @@ const SearchBar = () => {
                                         <TimePicker
                                             format="HH:mm"
                                             size="large"
-                                            bordered={false}
+                                            variant={false}
                                             minuteStep={30}
                                             placeholder="04:00"
                                             className="field-input"
@@ -211,7 +211,7 @@ const SearchBar = () => {
                     </Form>
                 </Card>
             </div>
-        </div>
+        </div >
     );
 };
 

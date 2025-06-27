@@ -103,12 +103,14 @@ const Discount = () => {
                     total: result.data.totalElements || 0,
                 }));
             } else {
-                message.error('Failed to fetch discounts');
+                const errorMessage = result.data?.message || 'Failed to fetch discounts';
+                message.error(errorMessage);
                 setDiscounts([]);
             }
         } catch (error) {
             console.error('Error fetching discounts:', error);
-            message.error('Failed to fetch discounts');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch discounts';
+            message.error(errorMessage);
             setDiscounts([]);
         } finally {
             setLoading(false);
@@ -135,11 +137,13 @@ const Discount = () => {
                 // Refresh discount list with current pagination
                 await fetchDiscounts(pagination.current, pagination.pageSize);
             } else {
-                message.error(result.message || 'Failed to create discount');
+                const errorMessage = result.data?.message || result.message || 'Failed to create discount';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error creating discount:', error);
-            message.error('Failed to create discount');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create discount';
+            message.error(errorMessage);
         } finally {
             setCreateLoading(false);
         }
@@ -166,11 +170,13 @@ const Discount = () => {
                 // Refresh discount list with current pagination
                 await fetchDiscounts(pagination.current, pagination.pageSize);
             } else {
-                message.error(result.message || 'Failed to update discount');
+                const errorMessage = result.data?.message || result.message || 'Failed to update discount';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error updating discount:', error);
-            message.error('Failed to update discount');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to update discount';
+            message.error(errorMessage);
         } finally {
             setEditLoading(false);
         }
@@ -185,11 +191,13 @@ const Discount = () => {
                 // Refresh discount list with current pagination
                 await fetchDiscounts(pagination.current, pagination.pageSize);
             } else {
-                message.error(result.message || 'Failed to delete discount');
+                const errorMessage = result.data?.message || result.message || 'Failed to delete discount';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error deleting discount:', error);
-            message.error('Failed to delete discount');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete discount';
+            message.error(errorMessage);
         }
     };
 
@@ -347,7 +355,7 @@ const Discount = () => {
                 <Row gutter={[24, 0]}>
                     <Col xs="24" xl={24}>
                         <Card
-                            bordered={false}
+                            variant={false}
                             className="criclebox tablespace mb-24"
                             title={
                                 <div style={{ display: 'flex', alignItems: 'center' }}>

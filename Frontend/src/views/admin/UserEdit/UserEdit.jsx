@@ -92,12 +92,14 @@ function UserEdit() {
                     }
                 });
             } else {
-                message.error('Failed to fetch user details');
+                const errorMessage = result.data?.message || 'Failed to fetch user details';
+                message.error(errorMessage);
                 navigate('/admin/users');
             }
         } catch (error) {
             console.error('Error fetching user details:', error);
-            message.error(error.message || 'Failed to fetch user details');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch user details';
+            message.error(errorMessage);
             navigate('/admin/users');
         } finally {
             setLoading(false);
@@ -118,12 +120,14 @@ function UserEdit() {
                 setRoles(roleOptions);
             } else {
                 console.error('Failed to fetch roles:', result.message);
-                message.error('Failed to load user roles. Please try again later.');
+                const errorMessage = result.data?.message || 'Failed to load user roles. Please try again later.';
+                message.error(errorMessage);
                 setRoles([]);
             }
         } catch (error) {
             console.error('Error fetching roles:', error);
-            message.error('Unable to load user roles. Please check your connection and try again.');
+            const errorMessage = error.response?.data?.message || error.message || 'Unable to load user roles. Please check your connection and try again.';
+            message.error(errorMessage);
             setRoles([]);
         } finally {
             setLoadingRoles(false);
@@ -191,15 +195,19 @@ function UserEdit() {
                 message.success('User updated successfully!');
                 navigate(`/admin/users/${userId}`);
             } else {
-                message.error(result.message || 'Failed to update user');
+                const errorMessage = result.data?.message || result.message || 'Failed to update user';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error updating user:', error);
-            message.error(error.message || 'Failed to update user');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to update user';
+            message.error(errorMessage);
         } finally {
             setSaving(false);
         }
-    }; const handleUpdateBankInfo = async () => {
+    };
+
+    const handleUpdateBankInfo = async () => {
         try {
             setSavingBank(true);
 
@@ -269,43 +277,33 @@ function UserEdit() {
     }
 
     return (
-        <div style={{ padding: '24px' }}>            {/* Header */}
-            <div style={{ marginBottom: '24px' }}>
-                <Breadcrumb style={{ marginBottom: '16px' }}>
-                    <Breadcrumb.Item>
-                        <span style={{ color: '#1890ff', cursor: 'pointer' }} onClick={handleGoBack}>
-                            Users Management
-                        </span>
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item>
-                        <span style={{ color: '#1890ff', cursor: 'pointer' }} onClick={handleViewUserDetail}>
-                            {user?.firstName} {user?.lastName}
-                        </span>
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item>Edit</Breadcrumb.Item>
-                </Breadcrumb>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <Title level={2} style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
-                            <UserOutlined style={{ marginRight: '12px', color: '#1890ff' }} />
-                            Edit User Information
-                        </Title>
-                        <Text type="secondary">Update user profile and account settings</Text>
-                    </div>
-                    <Space>
-                        <Button onClick={handleGoBack} size="large">
-                            Cancel
-                        </Button>
+        <div>
+            {/* Header */}
+            <Card style={{ marginBottom: 24 }}>
+                <Row justify="space-between" align="middle">
+                    <Col>
+                        <Space>
+                            <Button
+                                icon={<ArrowLeftOutlined />}
+                                onClick={handleGoBack}
+                            >
+                                Back to Users
+                            </Button>
+                            <Title level={3} style={{ margin: 0 }}>
+                                Edit User
+                            </Title>
+                        </Space>
+                    </Col>
+                    <Col>
                         <Button
                             type="primary"
                             onClick={handleViewUserDetail}
                         >
                             View Details
                         </Button>
-                    </Space>
-                </div>
-            </div>
+                    </Col>
+                </Row>
+            </Card>
             <Form
                 form={form}
                 layout="vertical"
