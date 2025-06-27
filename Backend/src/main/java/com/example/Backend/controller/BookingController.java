@@ -5,9 +5,11 @@ import com.example.Backend.dto.request.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import com.example.Backend.dto.response.BookingResponse;
+import com.example.Backend.dto.response.CarBookingScheduleResponse;
 import com.example.Backend.dto.response.PaymentResponse;
 import com.example.Backend.dto.response.ReservationFeeResponse;
 import com.example.Backend.model.Payment;
@@ -204,6 +206,17 @@ public class BookingController {
                 .data(bookingService.getBookingsByCarId(carId, pageable))
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/car/{carId}/schedule")
+    public ResponseEntity<?> getCarBookingSchedule(@PathVariable Long carId) {
+        List<CarBookingScheduleResponse> schedule = bookingService.getCarBookingSchedule(carId);
+        ResponseData<?> response = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("Car booking schedule retrieved successfully")
+                .data(schedule)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     // tải thông tin hình ảnh xe để check

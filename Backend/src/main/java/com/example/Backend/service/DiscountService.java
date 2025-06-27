@@ -6,6 +6,7 @@ import com.example.Backend.dto.response.DiscountResponse;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.DiscountMapper;
 import com.example.Backend.model.Discount;
+import com.example.Backend.model.enums.DiscountStatus;
 import com.example.Backend.repository.DiscountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -60,6 +62,17 @@ public class DiscountService {
         }
         return discounts.map(discountMapper::mapToResponse);
     }
+
+    public List<DiscountResponse> getAllDiscountActive() {
+        List<Discount> discounts = discountRepository.findAllByStatus(DiscountStatus.ACTIVE);
+
+        if (discounts.isEmpty()) {
+            throw new ResourceNotFoundException("No active discount found");
+        }
+
+        return discounts.stream().map(discountMapper::mapToResponse).toList();
+    }
+
     public DiscountResponse getDiscountById(long discountId) {
         Discount discount = discountRepository.findById(discountId).orElseThrow(()->new ResourceNotFoundException("Discount not found"));
         return discountMapper.mapToResponse(discount);
@@ -69,7 +82,8 @@ public class DiscountService {
         if (discount.getQuantity() <= 0) {
             log.warn("Discount with code " + discount.getCode() + "is negative");
             return false; // Discount is out of stock
-        }else if (discount.getStartDate() != null && discount.getEndDate() != null) {
+        }
+        else if (discount.getStartDate() != null && discount.getEndDate() != null) {
             LocalDateTime now = LocalDateTime.now();
             if (now.isBefore(discount.getStartDate()) || now.isAfter(discount.getEndDate())) {
                 log.warn("Discount with code " + discount.getCode() + " is not valid at this time");
@@ -88,10 +102,27 @@ public class DiscountService {
             log.warn("Discount with code " + discountCode + " is not valid or out of stock");
             return 0;
         }
+
+        discount.setQuantity(discount.getQuantity() - 1);
+        if(discount.getQuantity() <= 0){
+            discount.setStatus(DiscountStatus.INACTIVE);
+        }
+        discountRepository.save(discount);
         return discount.getPercent();
     }
 
-    public Discount getDiscountByCode(String discountCode) {
-        return discountRepository.findDiscountByCode(discountCode).orElseThrow(() -> new ResourceNotFoundException("Discount not found"));
+    public boolean updateStatus(long id ,DiscountStatus discountStatus) {
+        Discount discount = discountRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Discount not found"));
+        if (discount.getStatus() == discountStatus) {
+            log.warn("Discount with id " + id + " already has status " + discountStatus);
+            return false; // No change in status
+        }
+        discount.setStatus(discountStatus);
+        discountRepository.save(discount);
+        return true; // Status updated successfully
+    }
+
+    public DiscountResponse getDiscountByCode(String discountCode) {
+        return discountMapper.mapToResponse(discountRepository.findDiscountByCode(discountCode).orElseThrow(() -> new ResourceNotFoundException("Discount not found")));
     }
 }

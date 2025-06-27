@@ -11,14 +11,37 @@ const CarInfo = ({ car }) => {
                 <h1 className="car-title">{car.name} {car.year}</h1>
             </div>
 
-            <p className="car-location">📍 {car.location.district}</p>
+            <p className="car-location"> 
+                {car.location.district} - {car.location.city}</p>
 
             <div className="car-pricing">
-                <div className="current-price">
-                    <span className="price-value">
-                        {car.pricePerHour.toLocaleString('vi-VN')}K
-                    </span>
-                    <span className="price-unit">/giờ</span>
+                <div className="price-row">
+                    <div className="current-price">
+                        <span className="price-value">
+                            {car.pricePer4Hour.toLocaleString('vi-VN')}vnd
+                        </span>
+                        <span className="price-unit">/4 giờ</span>
+                    </div>
+                    <div className="current-price">
+                        <span className="price-value">
+                            {car.pricePer8Hour.toLocaleString('vi-VN')}vnd
+                        </span>
+                        <span className="price-unit">/8 giờ</span>
+                    </div>
+                </div>
+                <div className="price-row">
+                    <div className="current-price">
+                        <span className="price-value">
+                            {car.pricePer12Hour.toLocaleString('vi-VN')}vnd
+                        </span>
+                        <span className="price-unit">/12 giờ</span>
+                    </div>
+                    <div className="current-price">
+                        <span className="price-value">
+                            {car.pricePer24Hour.toLocaleString('vi-VN')}vnd
+                        </span>
+                        <span className="price-unit">/24 giờ</span>
+                    </div>
                 </div>
             </div>
 

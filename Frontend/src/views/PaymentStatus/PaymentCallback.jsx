@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Spin } from 'antd';
+import paymentService from '../../services/paymentService';
 
 const PaymentCallback = () => {
     const navigate = useNavigate();
@@ -9,6 +10,17 @@ const PaymentCallback = () => {
     useEffect(() => {
         // Lấy mã trạng thái và các tham số khác từ URL
         const vnp_ResponseCode = searchParams.get('vnp_ResponseCode');
+
+        // Sử dụng paymentService để xử lý callback lấy params và chuyển hướng về backend
+        paymentService.paymentCallBack(searchParams)
+            .then(response => {
+                // Xử lý thành công nếu cần thiết
+                console.log('Callback processed successfully:', response);
+            })
+            .catch(error => {
+                // Xử lý lỗi nếu cần thiết
+                console.error('Error processing callback:', error);
+            });
 
         // Lấy toàn bộ chuỗi query để chuyển tiếp qua trang kết quả
         const queryString = searchParams.toString();

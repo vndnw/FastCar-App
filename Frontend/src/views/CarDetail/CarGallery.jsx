@@ -2,10 +2,14 @@
 import React, { useState } from 'react';
 import './CarGallery.css';
 
-
 const CarGallery = ({ car }) => {
+    // Đảm bảo images là mảng URL hợp lệ
+    const images = Array.isArray(car.images)
+        ? car.images.map(img => (img && img.imageUrl ? img.imageUrl : '/default-car.png'))
+        : ['/default-car.png'];
+
     const [activeImage, setActiveImage] = useState(0);
-    const images = car.images;
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <div className="car-gallery">
@@ -14,12 +18,15 @@ const CarGallery = ({ car }) => {
                     src={images[activeImage]}
                     alt={car.name}
                     className="main-car-image"
+                    onClick={() => setIsModalOpen(true)}
+                    style={{ cursor: 'zoom-in' }}
+                    onError={e => { e.target.onerror = null; e.target.src = '/default-car.png'; }}
                 />
-                <div className="view-all-badge">
+                {/* <div className="view-all-badge">
                     <button type="button" className="view-all-btn">
                         XEM TẤT CẢ
                     </button>
-                </div>
+                </div> */}
             </div>
 
             <div className="thumbnail-gallery">
@@ -33,6 +40,32 @@ const CarGallery = ({ car }) => {
                     </div>
                 ))}
             </div>
+
+            {isModalOpen && (
+                <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <button
+                            className="modal-prev"
+                            onClick={() => setActiveImage((activeImage - 1 + images.length) % images.length)}
+                        >
+                            &#8592;
+                        </button>
+                        <img
+                            src={images[activeImage]}
+                            alt={car.name}
+                            className="modal-image"
+                            onError={e => { e.target.onerror = null; e.target.src = '/default-car.png'; }}
+                        />
+                        <button
+                            className="modal-next"
+                            onClick={() => setActiveImage((activeImage + 1) % images.length)}
+                        >
+                            &#8594;
+                        </button>
+                        <button className="close-modal" onClick={() => setIsModalOpen(false)}>×</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

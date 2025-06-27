@@ -11,6 +11,7 @@ public class DiscountMapper {
                 .id(discount.getId())
                 .code(discount.getCode())
                 .percent(discount.getPercent())
+                .status(discount.getStatus())
                 .startDate(discount.getStartDate())
                 .endDate(discount.getEndDate())
                 .description(discount.getDescription())

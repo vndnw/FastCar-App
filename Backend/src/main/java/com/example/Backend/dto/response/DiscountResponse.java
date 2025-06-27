@@ -1,5 +1,6 @@
 package com.example.Backend.dto.response;
 
+import com.example.Backend.model.enums.DiscountStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +19,6 @@ public class DiscountResponse {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private int quantity;
+    private DiscountStatus status;
     private String description;
 }

@@ -2,6 +2,7 @@ package com.example.Backend.controller;
 
 import com.example.Backend.dto.ResponseData;
 import com.example.Backend.dto.request.DiscountResquest;
+import com.example.Backend.model.enums.DiscountStatus;
 import com.example.Backend.service.DiscountService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -40,7 +41,6 @@ public class DiscountController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('admin')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getDiscountById(@PathVariable Long id) {
         ResponseData<?> responseData = ResponseData.builder()
@@ -70,7 +70,26 @@ public class DiscountController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
-    @GetMapping("/check/{code}")
+    @GetMapping("get-discounts-active")
+    public ResponseEntity<?> getAllActiveDiscounts() {
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Successfully retrieved all active discounts")
+                .data(discountService.getAllDiscountActive())
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/status/{status}")
+    public ResponseEntity<?> updateDiscountStatus(@PathVariable Long id, @PathVariable DiscountStatus status) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .message("Successfully updated discount status")
+                .data(discountService.updateStatus(id, status))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/code/{code}")
     public ResponseEntity<?> checkDiscountCode(@PathVariable String code) {
         ResponseData<?> responseData = ResponseData.builder()
                 .message("Successfully checked discount code")

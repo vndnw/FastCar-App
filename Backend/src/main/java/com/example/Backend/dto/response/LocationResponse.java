@@ -15,8 +15,10 @@ import java.time.LocalDateTime;
 public class LocationResponse {
     private long id;
     private String address;     // Địa chỉ cụ thể
+    private String street;
+    private String ward;
+    private String district;
+    private String city;
     private Double latitude;    // Tọa độ GPS (nếu cần)
     private Double longitude;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

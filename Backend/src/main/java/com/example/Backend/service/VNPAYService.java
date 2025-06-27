@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -28,8 +27,8 @@ public class VNPAYService {
     public String generatePayUrl(HttpServletRequest request, @NotNull BigDecimal amount, String vnp_TxnRef) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
-//        String vnp_IpAddr = VNPAYConfig.getIpAddress(request);
-        String vnp_IpAddr = "127.0.0.1";
+        String vnp_IpAddr = VNPAYConfig.getIpAddress(request);
+//        String vnp_IpAddr = "127.0.0.1";
         log.info("vnp_IpAddr: {}", vnp_IpAddr);
         String vnp_TmnCode = VNPAYConfig.vnp_TmnCode;
         String vnp_Amount = String.valueOf(amount.multiply(new BigDecimal(100)).longValue());
@@ -37,7 +36,6 @@ public class VNPAYService {
         String vnp_OrderType = "other"; // Sửa lại thành "other" hoặc một loại hợp lệ
         String vnp_Locale = "vn";
         String vnp_ReturnUrl = VNPAYConfig.vnp_ReturnUrl;
-        String vnp_IpnUrl = VNPAYConfig.vnp_IpnUrl;
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
@@ -69,19 +67,15 @@ public class VNPAYService {
         while (itr.hasNext()) {
             String fieldName = itr.next();
             String fieldValue = vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
                 //Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
-                try {
-                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    //Build query
-                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
-                    query.append('=');
-                    query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                } catch (UnsupportedEncodingException e) {
-                    log.error("Error encoding VNPAY params", e);
-                }
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                //Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 if (itr.hasNext()) {
                     query.append('&');
                     hashData.append('&');
@@ -137,7 +131,7 @@ public class VNPAYService {
         StringBuilder hashData = new StringBuilder();
         for (String fieldName : fieldNames) {
             String fieldValue = vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
                 hashData.append(fieldName).append('=').append(fieldValue).append('|');
             }
         }
@@ -164,12 +158,16 @@ public class VNPAYService {
     }
 
     public Map<String, String> extractVnpParams(@NotNull HttpServletRequest request) {
-        Map<String, String> fields = new HashMap<>();
-        request.getParameterMap().forEach((key, values) -> {
-            if (key.startsWith("vnp_")) {
-                fields.put(key, values[0]);
+        Map<String, String>  fields = new HashMap<> ();
+        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
+            String fieldName ;
+            String fieldValue ;
+            fieldName = URLEncoder.encode(params.nextElement(), StandardCharsets.US_ASCII);
+            fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII);
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
+                fields.put(fieldName, fieldValue);
             }
-        });
+        }
         return fields;
     }
 }

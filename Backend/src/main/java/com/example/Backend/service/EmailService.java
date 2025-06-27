@@ -64,13 +64,13 @@ public class EmailService {
             mimeMessageHelper.setSubject("Thông báo thanh toán thành công");
             String htmlContent = loadHtmlTemplate("templates/thanhtoanthanhcong.html");
 
-            htmlContent = htmlContent.replace("${[Tên khách hàng]}", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
-            htmlContent = htmlContent.replace("${[Mã đơn hàng]}", booking.getBookingCode());
-            htmlContent = htmlContent.replace("${[Mã giao dịch]}", payment.getExternalRef());
-            htmlContent = htmlContent.replace("${[Số tiền]}", payment.getAmount().toString());
-            htmlContent = htmlContent.replace("${[Phương thức thanh toán]}", "VNPAY");
-            htmlContent = htmlContent.replace("${[Thời gian giao dịch]}", payment.getCreatedAt().toString());
-            htmlContent = htmlContent.replace("${[LINK_DEN_TRANG_CHU]}", LINK_DEN_TRANG_CHU);
+            htmlContent = htmlContent.replace("[Tên khách hàng]", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
+            htmlContent = htmlContent.replace("[Mã đơn hàng]", booking.getBookingCode());
+            htmlContent = htmlContent.replace("[Mã giao dịch]", payment.getExternalRef());
+            htmlContent = htmlContent.replace("[Số tiền]", payment.getAmount().toString());
+            htmlContent = htmlContent.replace("[Phương thức thanh toán]", "VNPAY");
+            htmlContent = htmlContent.replace("[Thời gian giao dịch]", payment.getCreatedAt().toString());
+            htmlContent = htmlContent.replace("[LINK_DEN_TRANG_CHU]", LINK_DEN_TRANG_CHU);
 
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
@@ -91,12 +91,12 @@ public class EmailService {
             mimeMessageHelper.setSubject("Thông báo thanh toán không thành công");
             String htmlContent = loadHtmlTemplate("templates/thanhtoanthatbai.html");
 
-            htmlContent = htmlContent.replace("${[Tên khách hàng]}", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
-            htmlContent = htmlContent.replace("${[Mã đơn hàng]}", booking.getBookingCode());
-            htmlContent = htmlContent.replace("${[Mã giao dịch]}", payment.getExternalRef());
-            htmlContent = htmlContent.replace("${[Số tiền]}", payment.getAmount().toString());
-            htmlContent = htmlContent.replace("${[Thời gian giao dịch]}", payment.getCreatedAt().toString());
-            htmlContent = htmlContent.replace("${[LINK_DEN_TRANG_CHU]}", LINK_DEN_TRANG_CHU);
+            htmlContent = htmlContent.replace("[Tên khách hàng]", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
+            htmlContent = htmlContent.replace("[Mã đơn hàng]", booking.getBookingCode());
+            htmlContent = htmlContent.replace("[Mã giao dịch]", payment.getExternalRef());
+            htmlContent = htmlContent.replace("[Số tiền]", payment.getAmount().toString());
+            htmlContent = htmlContent.replace("[Thời gian giao dịch]", payment.getCreatedAt().toString());
+            htmlContent = htmlContent.replace("[LINK_DEN_TRANG_CHU]", LINK_DEN_TRANG_CHU);
 
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
@@ -117,13 +117,13 @@ public class EmailService {
             mimeMessageHelper.setSubject("Thông báo hoàn tiền");
             String htmlContent = loadHtmlTemplate("templates/thongbaohoantien.html");
 
-            htmlContent = htmlContent.replace("${[Tên khách hàng]}", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
-            htmlContent = htmlContent.replace("${[Mã đơn hàng]}", booking.getBookingCode());
-            htmlContent = htmlContent.replace("${[Số tiền hoàn]}", payment.getAmount().toString());
-            htmlContent = htmlContent.replace("${[Mã giao dịch]}", payment.getExternalRef());
-            htmlContent = htmlContent.replace("${[Phương thức thanh toán ban đầu]}", "VNPAY");
-            htmlContent = htmlContent.replace("${[Ngày xử lý hoàn tiền]}", LocalDate.now().toString());
-            htmlContent = htmlContent.replace("${[Số ngày]}", "7");
+            htmlContent = htmlContent.replace("[Tên khách hàng]", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
+            htmlContent = htmlContent.replace("[Mã đơn hàng]", booking.getBookingCode());
+            htmlContent = htmlContent.replace("[Số tiền hoàn]", payment.getAmount().toString());
+            htmlContent = htmlContent.replace("[Mã giao dịch]", payment.getExternalRef());
+            htmlContent = htmlContent.replace("[Phương thức thanh toán ban đầu]", "VNPAY");
+            htmlContent = htmlContent.replace("[Ngày xử lý hoàn tiền]", LocalDate.now().toString());
+            htmlContent = htmlContent.replace("[Số ngày]", "7");
 
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
@@ -153,13 +153,13 @@ public class EmailService {
                         .append("<br>");
             }
 
-            htmlContent = htmlContent.replace("${[Tên khách hàng]}", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
-            htmlContent = htmlContent.replace("${[Mã đơn hàng]}", booking.getBookingCode());
-            htmlContent = htmlContent.replace("${[Số tiền phụ phí]}", payment.getAmount().toString());
-            htmlContent = htmlContent.replace("${[Mã giao dịch]}", payment.getExternalRef());
-            htmlContent = htmlContent.replace("${[Mô tả chi tiết phụ phí, ví dụ: Phí quá giờ, Phí vệ sinh, Phí hư hỏng...]}", extraChargesDetails.toString());
-            htmlContent = htmlContent.replace("${[Ngày phát sinh]}", LocalDate.now().toString());
-            htmlContent = htmlContent.replace("${[LINK_DEN_TRANG_THANH_TOAN_PHU_PHI]}", paymentUrl);
+            htmlContent = htmlContent.replace("[Tên khách hàng]", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
+            htmlContent = htmlContent.replace("[Mã đơn hàng]", booking.getBookingCode());
+            htmlContent = htmlContent.replace("[Số tiền phụ phí]", payment.getAmount().toString());
+            htmlContent = htmlContent.replace("[Mã giao dịch]", payment.getExternalRef());
+            htmlContent = htmlContent.replace("[Mô tả chi tiết phụ phí, ví dụ: Phí quá giờ, Phí vệ sinh, Phí hư hỏng...]", extraChargesDetails.toString());
+            htmlContent = htmlContent.replace("[Ngày phát sinh]", LocalDate.now().toString());
+            htmlContent = htmlContent.replace("[LINK_DEN_TRANG_THANH_TOAN_PHU_PHI]", paymentUrl);
 
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
@@ -180,12 +180,12 @@ public class EmailService {
             mimeMessageHelper.setSubject("Thông báo nhận xe thành công");
             String htmlContent = loadHtmlTemplate("templates/thongbaonhanxe.html");
 
-            htmlContent = htmlContent.replace("${[Tên khách hàng]}", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
-            htmlContent = htmlContent.replace("${[Mã đơn hàng]}", booking.getBookingCode());
-            htmlContent = htmlContent.replace("${[Tên xe / Loại xe]}", booking.getCar().getName());
-            htmlContent = htmlContent.replace("${[Biển số xe]}", booking.getCar().getLicensePlate());
-            htmlContent = htmlContent.replace("${[Thời gian nhận xe]}", LocalDateTime.now().toString());
-            htmlContent = htmlContent.replace("${[Địa điểm nhận xe]}", booking.getPickupLocation().getAddress());
+            htmlContent = htmlContent.replace("[Tên khách hàng]", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
+            htmlContent = htmlContent.replace("[Mã đơn hàng]", booking.getBookingCode());
+            htmlContent = htmlContent.replace("[Tên xe / Loại xe]", booking.getCar().getName());
+            htmlContent = htmlContent.replace("[Biển số xe]", booking.getCar().getLicensePlate());
+            htmlContent = htmlContent.replace("[Thời gian nhận xe]", LocalDateTime.now().toString());
+            htmlContent = htmlContent.replace("[Địa điểm nhận xe]", booking.getPickupLocation().getAddress());
 
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);
@@ -206,12 +206,12 @@ public class EmailService {
             mimeMessageHelper.setSubject("Thông báo trả xe thành công");
             String htmlContent = loadHtmlTemplate("templates/thongbaotraxe.html");
 
-            htmlContent = htmlContent.replace("${[Tên khách hàng]}", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
-            htmlContent = htmlContent.replace("${[Mã đơn hàng]}", booking.getBookingCode());
-            htmlContent = htmlContent.replace("${[Tên xe / Loại xe]}", booking.getCar().getName());
-            htmlContent = htmlContent.replace("${[Biển số xe]}", booking.getCar().getLicensePlate());
-            htmlContent = htmlContent.replace("${[Thời gian nhận xe]}", LocalDateTime.now().toString());
-            htmlContent = htmlContent.replace("${[Địa điểm nhận xe]}", booking.getPickupLocation().getAddress());
+            htmlContent = htmlContent.replace("[Tên khách hàng]", booking.getUser().getFirstName() + " " + booking.getUser().getLastName());
+            htmlContent = htmlContent.replace("[Mã đơn hàng]", booking.getBookingCode());
+            htmlContent = htmlContent.replace("[Tên xe / Loại xe]", booking.getCar().getName());
+            htmlContent = htmlContent.replace("[Biển số xe]", booking.getCar().getLicensePlate());
+            htmlContent = htmlContent.replace("[Thời gian nhận xe]", LocalDateTime.now().toString());
+            htmlContent = htmlContent.replace("[Địa điểm nhận xe]", booking.getPickupLocation().getAddress());
 
             mimeMessageHelper.setText(htmlContent, true);
             mailSender.send(mimeMessage);

@@ -38,7 +38,7 @@ export const PaymentSuccess = () => {
     }
 
     return (
-        <div className="payment-status-container">
+        <div className="payment-status-container" >
             <Result
                 status="success"
                 icon={<CheckCircleOutlined />}

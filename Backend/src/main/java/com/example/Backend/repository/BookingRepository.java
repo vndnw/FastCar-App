@@ -32,6 +32,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findByStatus(BookingStatus status, Pageable pageable);
 
     Page<Booking> findByCarId(Long carId, Pageable pageable);
+
+    List<Booking> findByCarId(Long carId);
     
     @Query(value = "SELECT * FROM bookingacar.bookings b WHERE b.driver_id = :driverId AND b.status NOT IN ('CANCELLED', 'COMPLETED') AND " +
             "((b.pickup_time <= :returnDate AND :pickupDate <= b.return_time) OR " +

@@ -77,6 +77,17 @@ export const userService = {    // Get all users with pagination
         });
     },
 
+    // Create car for user
+    createACar: async (userId, carData) => {
+        // apiClient sẽ tự động thêm "Authorization: Bearer <token>"
+        return apiClient.post(`/user/${userId}/create-car`, carData);
+    },
+
+     getUserCars: async (userId) => {
+        // apiClient sẽ tự động đính kèm token xác thực
+        return apiClient.get(`/user/${userId}/list-car`); // Giả sử đây là endpoint của bạn
+    },
+
     // Get users by role
     getUsersByRole: async (role, page = 0, size = 10) => {
         const params = new URLSearchParams({
