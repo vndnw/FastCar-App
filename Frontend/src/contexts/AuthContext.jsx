@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/authService';
 import { userService } from '../services/userService';
+import { bankInformationService } from '../services/bankInformationService';
 import tokenManager from '../utils/tokenManager';
 
 // Create Auth Context
@@ -142,6 +143,55 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
     };
 
+    const refreshUserData = useCallback(async () => {
+        if (!user?.id) {
+            console.error("Không có người dùng để làm mới dữ liệu.");
+            return;
+        }
+        try {
+            // Sử dụng lại API lấy user theo ID để đảm bảo tính nhất quán
+            const result = await userService.getUserById(user.id);
+            if (result.data) {
+                const newUserData = result.data;
+                setUser(newUserData);
+                localStorage.setItem('userInfo', JSON.stringify(newUserData));
+            } else {
+                throw new Error("Không tìm thấy dữ liệu người dùng trong phản hồi API.");
+            }
+        } catch (error) {
+            console.error('Lỗi khi làm mới dữ liệu người dùng:', error);
+        }
+    }, [user?.id]);
+
+    const updateUserProfile = useCallback(async (newProfileData) => {
+        if (!user?.id) {
+            throw new Error("Không tìm thấy người dùng để cập nhật.");
+        }
+        // Gọi API service để cập nhật thông tin
+        const result = await userService.updateUserInfo(user.id, newProfileData);
+
+        // Tự động làm mới dữ liệu sau khi cập nhật thành công
+        await refreshUserData();
+
+        return result; // Trả về kết quả của lời gọi API
+    }, [user?.id, refreshUserData]);
+
+    const addUserBankInfo = useCallback(async (bankData) => {
+        if (!user?.id) throw new Error("Không tìm thấy người dùng.");
+
+        const result = await bankInformationService.createBankUserInfo(user.id, bankData);
+        await refreshUserData(); // Tự động làm mới sau khi thêm
+        return result;
+    }, [user?.id, refreshUserData]);
+
+    const updateUserBankInfo = useCallback(async (bankData) => {
+        if (!user?.id) throw new Error("Không tìm thấy người dùng.");
+
+        const result = await bankInformationService.updateBankUserInfo(user.id, bankData);
+        await refreshUserData(); // Tự động làm mới sau khi cập nhật
+        return result;
+    }, [user?.id, refreshUserData]);
+
     const value = {
         user,
         token,
@@ -154,7 +204,11 @@ export const AuthProvider = ({ children }) => {
         hasRole,
         isAdmin,
         updateTokens,
-        forceLogout
+        forceLogout,
+        refreshUserData,
+        updateUserProfile,
+        addUserBankInfo,
+        updateUserBankInfo
     };
 
     return (
