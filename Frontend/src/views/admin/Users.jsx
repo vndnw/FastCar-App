@@ -147,11 +147,13 @@ function UserPage() {
         // Refresh the users list
         fetchUsers(pagination.current - 1, pagination.pageSize);
       } else {
-        message.error('Failed to delete user');
+        const errorMessage = result.data?.message || 'Failed to delete user';
+        message.error(errorMessage);
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      message.error(error.message || 'Failed to delete user');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to delete user';
+      message.error(errorMessage);
     }
   };
 
@@ -181,11 +183,13 @@ function UserPage() {
         message.success(`Password changed successfully for user "${selectedUser.firstName} ${selectedUser.lastName}"`);
         handleCloseChangePasswordModal();
       } else {
-        message.error(result.message || 'Failed to change password');
+        const errorMessage = result.data?.message || result.message || 'Failed to change password';
+        message.error(errorMessage);
       }
     } catch (error) {
       console.error('Error changing password:', error);
-      message.error(error.response?.data?.message || 'Failed to change password');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to change password';
+      message.error(errorMessage);
     } finally {
       setChangePasswordLoading(false);
     }
@@ -209,11 +213,13 @@ function UserPage() {
         // Refresh the users list
         fetchUsers(pagination.current - 1, pagination.pageSize);
       } else {
-        message.error('Failed to update user status');
+        const errorMessage = result.data?.message || 'Failed to update user status';
+        message.error(errorMessage);
       }
     } catch (error) {
       console.error('Error updating user status:', error);
-      message.error(error.message || 'Failed to update user status');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update user status';
+      message.error(errorMessage);
     }
   };
 
@@ -339,7 +345,8 @@ function UserPage() {
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      message.error(error.message || 'Failed to fetch users');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch users';
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -411,7 +418,8 @@ function UserPage() {
       }));
 
       setRoles(roleData);
-      message.error('Failed to fetch roles from server, showing mock data');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch roles from server, showing mock data';
+      message.error(errorMessage);
     } finally {
       setRoleLoading(false);
     }
@@ -539,11 +547,13 @@ function UserPage() {
                 // Refresh the users list
                 fetchUsers(pagination.current - 1, pagination.pageSize);
               } else {
-                message.error('Failed to create user');
+                const errorMessage = result.data?.message || 'Failed to create user';
+                message.error(errorMessage);
               }
             } catch (error) {
               console.error('Error creating user:', error);
-              message.error(error.message || 'Failed to create user');
+              const errorMessage = error.response?.data?.message || error.message || 'Failed to create user';
+              message.error(errorMessage);
             } finally {
               setCreateLoading(false);
             }

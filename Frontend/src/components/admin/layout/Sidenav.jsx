@@ -114,6 +114,25 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  const booking = [
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      key={0}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M6 2C5.44772 2 5 2.44772 5 3V4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H16C17.1046 18 18 17.1046 18 16V6C18 4.89543 17.1046 4 16 4H15V3C15 2.44772 14.5523 2 14 2C13.4477 2 13 2.44772 13 3V4H7V3C7 2.44772 6.55228 2 6 2ZM4 8V16H16V8H4ZM7 10C6.44772 10 6 10.4477 6 11C6 11.5523 6.44772 12 7 12H13C13.5523 12 14 11.5523 14 11C14 10.4477 13.5523 10 13 10H7Z"
+        fill={color}
+      />
+    </svg>,
+  ];
+
+
   return (
     <>
       <div className="brand" style={{ display: "flex", alignItems: "center" }}>
@@ -186,6 +205,20 @@ function Sidenav({ color }) {
             <span className="label">Cars</span>
           </NavLink>
         </Menu.Item>
+        <Menu.Item key="13">
+          <NavLink to="/admin/bookings">
+            <span
+              className="icon"
+              style={{
+                background: page === "admin/bookings" ? color : "",
+              }}
+            >
+              {booking}
+            </span>
+            <span className="label">Bookings</span>
+          </NavLink>
+        </Menu.Item>
+
       </Menu>
       <div className="aside-footer">
         <div

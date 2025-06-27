@@ -12,11 +12,14 @@ export const adminService = {
         return apiClient.get('/admin/car-pending-approval?page=0&size=9999');
     },
 
-    // Get new users in last 7 days
-    getNewUsersInLast7Days: async () => {
-        return apiClient.get('/admin/new-users-in-last-7-days?page=0&size=9999');
+    getBookingWaitingApproval: async () => {
+        return apiClient.get('/admin/booking-waiting-approval?page=0&size=9999');
     },
 
+    // Get new users in last 7 days
+    getNewUsersInLast7Days: async () => {
+        return apiClient.get('/admin/new-users-in-last-7-days?page=0&size=9999&sort=createdAt,desc');
+    },
 
     // Approve car
     approveCar: async (carId) => {

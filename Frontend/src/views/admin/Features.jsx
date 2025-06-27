@@ -69,12 +69,14 @@ const Features = () => {
                     total: result.data.totalElements || 0,
                 }));
             } else {
-                message.error('Failed to fetch features');
+                const errorMessage = result.data?.message || 'Failed to fetch features';
+                message.error(errorMessage);
                 setFeatures([]);
             }
         } catch (error) {
             console.error('Error fetching features:', error);
-            message.error('Failed to fetch features');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch features';
+            message.error(errorMessage);
             setFeatures([]);
         } finally {
             setLoading(false);
@@ -98,11 +100,13 @@ const Features = () => {
                 form.resetFields();
                 fetchFeatures(pagination.current, pagination.pageSize);
             } else {
-                message.error('Failed to create feature');
+                const errorMessage = result.data?.message || 'Failed to create feature';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error creating feature:', error);
-            message.error('Failed to create feature');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create feature';
+            message.error(errorMessage);
         } finally {
             setCreateLoading(false);
         }
@@ -126,11 +130,13 @@ const Features = () => {
                 setSelectedFeature(null);
                 fetchFeatures(pagination.current, pagination.pageSize);
             } else {
-                message.error('Failed to update feature');
+                const errorMessage = result.data?.message || 'Failed to update feature';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error updating feature:', error);
-            message.error('Failed to update feature');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to update feature';
+            message.error(errorMessage);
         } finally {
             setEditLoading(false);
         }
@@ -144,11 +150,13 @@ const Features = () => {
                 message.success('Feature deleted successfully');
                 fetchFeatures(pagination.current, pagination.pageSize);
             } else {
-                message.error('Failed to delete feature');
+                const errorMessage = result.data?.message || 'Failed to delete feature';
+                message.error(errorMessage);
             }
         } catch (error) {
             console.error('Error deleting feature:', error);
-            message.error('Failed to delete feature');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete feature';
+            message.error(errorMessage);
         }
     };
 

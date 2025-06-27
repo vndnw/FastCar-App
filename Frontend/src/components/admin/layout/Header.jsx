@@ -157,6 +157,7 @@ function Header({
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
+      message.error(error.response?.data?.message || 'Logout failed');
     }
   };
 
