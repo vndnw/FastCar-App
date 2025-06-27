@@ -47,6 +47,9 @@ function Home() {
   const [pendingCarsModalVisible, setPendingCarsModalVisible] = useState(false);
   const [pendingCars, setPendingCars] = useState([]);
   const [pendingCarsLoading, setPendingCarsLoading] = useState(false);
+  const [pendingBookingsModalVisible, setPendingBookingsModalVisible] = useState(false);
+  const [pendingBookings, setPendingBookings] = useState([]);
+  const [pendingBookingsLoading, setPendingBookingsLoading] = useState(false);
   const [newUsersData, setNewUsersData] = useState(null);
 
   // Fetch dashboard data
@@ -58,7 +61,7 @@ function Home() {
         setDashboardData(response);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        message.error('Failed to load dashboard data');
+        message.error(error.response?.data?.message || 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -70,6 +73,7 @@ function Home() {
         setNewUsersData(response);
       } catch (error) {
         console.error('Error fetching new users data:', error);
+        message.error(error.response?.data?.message || 'Failed to load new users data');
       }
     };
 
@@ -89,7 +93,7 @@ function Home() {
       }
     } catch (error) {
       console.error('Error fetching pending cars:', error);
-      message.error('Failed to load pending cars');
+      message.error(error.response?.data?.message || 'Failed to load pending cars');
       setPendingCars([]);
     } finally {
       setPendingCarsLoading(false);
@@ -106,11 +110,11 @@ function Home() {
         const dashboardResponse = await adminService.getDashboard();
         setDashboardData(dashboardResponse);
       } else {
-        message.error('Failed to approve car');
+        message.error(result.data?.message || 'Failed to approve car');
       }
     } catch (error) {
       console.error('Error approving car:', error);
-      message.error('Failed to approve car');
+      message.error(error.response?.data?.message || 'Failed to approve car');
     }
   };
 
@@ -124,11 +128,11 @@ function Home() {
         const dashboardResponse = await adminService.getDashboard();
         setDashboardData(dashboardResponse);
       } else {
-        message.error('Failed to reject car');
+        message.error(result.data?.message || 'Failed to reject car');
       }
     } catch (error) {
       console.error('Error rejecting car:', error);
-      message.error('Failed to reject car');
+      message.error(error.response?.data?.message || 'Failed to reject car');
     }
   };
 
@@ -136,6 +140,31 @@ function Home() {
   const showPendingCarsModal = () => {
     setPendingCarsModalVisible(true);
     fetchPendingCars();
+  };
+
+  // Fetch pending bookings
+  const fetchPendingBookings = async () => {
+    try {
+      setPendingBookingsLoading(true);
+      const result = await adminService.getBookingWaitingApproval();
+      if (result.content) {
+        setPendingBookings(result.content);
+      } else {
+        setPendingBookings([]);
+      }
+    } catch (error) {
+      console.error('Error fetching pending bookings:', error);
+      message.error(error.response?.data?.message || 'Failed to load pending bookings');
+      setPendingBookings([]);
+    } finally {
+      setPendingBookingsLoading(false);
+    }
+  };
+
+  // Show pending bookings modal
+  const showPendingBookingsModal = () => {
+    setPendingBookingsModalVisible(true);
+    fetchPendingBookings();
   };
 
   // Statistics data with improved styling
@@ -174,7 +203,7 @@ function Home() {
       title: "Total Revenue",
       value: dashboardData?.totalRevenue ? (dashboardData.totalRevenue / 1000000).toFixed(1) : 0,
       prefix: <DollarCircleOutlined style={{ color: '#722ed1' }} />,
-      suffix: "M USD",
+      suffix: "M VND",
       trend: dashboardData?.revenueGrowth || "+0%",
       trendUp: dashboardData?.revenueGrowth ? dashboardData.revenueGrowth.startsWith('+') : true,
       backgroundColor: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
@@ -204,7 +233,8 @@ function Home() {
       count: dashboardData?.bookingsAwaitingAction || 0,
       icon: <ClockCircleOutlined />,
       color: "#f5222d",
-      clickable: false
+      onClick: showPendingBookingsModal,
+      clickable: true
     }
   ];
 
@@ -665,6 +695,239 @@ function Home() {
                     View
                   </Button>
                 </Space>
+              ),
+            },
+          ]}
+        />
+      </Modal>
+
+      {/* Pending Bookings Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ClockCircleOutlined style={{ color: '#f5222d' }} />
+            <span>Bookings Awaiting Action</span>
+          </div>
+        }
+        open={pendingBookingsModalVisible}
+        onCancel={() => setPendingBookingsModalVisible(false)}
+        width={1400}
+        footer={null}
+        style={{ top: 20 }}
+      >
+        <Table
+          dataSource={pendingBookings}
+          loading={pendingBookingsLoading}
+          rowKey="id"
+          pagination={false}
+          columns={[
+            {
+              title: 'Booking Info',
+              key: 'bookingInfo',
+              width: '18%',
+              render: (_, record) => (
+                <div>
+                  <Text style={{ fontWeight: 600, fontSize: 13, display: 'block' }}>
+                    #{record.id}
+                  </Text>
+                  <Text style={{ color: '#6b7280', fontSize: 11, display: 'block' }}>
+                    {record.bookingCode}
+                  </Text>
+                  <Text style={{ color: '#9ca3af', fontSize: 10, display: 'block' }}>
+                    {new Date(record.createdAt).toLocaleDateString('vi-VN')}
+                  </Text>
+                  <Tag
+                    color={
+                      record.status === 'PENDING' ? 'orange' :
+                        record.status === 'CONFIRMED' ? 'blue' :
+                          record.status === 'COMPLETED' ? 'green' :
+                            record.status === 'CANCELLED' ? 'red' :
+                              record.status === 'WAITING_REFUND' ? 'purple' :
+                                record.status === 'WAITING_EXTRA_CHARGE' ? 'gold' : 'default'
+                    }
+                    size="small"
+                  >
+                    {record.status.replace('_', ' ')}
+                  </Tag>
+                  {record.discountCode && (
+                    <div style={{ marginTop: 4 }}>
+                      <Tag color="green" size="small">
+                        {record.discountCode}
+                      </Tag>
+                    </div>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: 'Customer',
+              key: 'customer',
+              width: '18%',
+              render: (_, record) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Avatar size={40} style={{ backgroundColor: '#1890ff' }}>
+                    {record.user?.firstName?.[0] || record.user?.email?.[0] || 'U'}
+                  </Avatar>
+                  <div>
+                    <Text style={{ fontWeight: 500, fontSize: 13, display: 'block' }}>
+                      {record.user?.firstName && record.user?.lastName
+                        ? `${record.user.firstName} ${record.user.lastName}`
+                        : record.user?.email?.split('@')[0] || 'Unknown User'
+                      }
+                    </Text>
+                    <Text style={{ color: '#6b7280', fontSize: 11 }}>
+                      {record.user?.email}
+                    </Text>
+                    {record.user?.phone && (
+                      <Text style={{ color: '#9ca3af', fontSize: 10, display: 'block' }}>
+                        {record.user.phone}
+                      </Text>
+                    )}
+                  </div>
+                </div>
+              ),
+            },
+            {
+              title: 'Car',
+              key: 'car',
+              width: '20%',
+              render: (_, record) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 50, height: 50, borderRadius: 6, overflow: 'hidden' }}>
+                    {record.car?.images && record.car.images.length > 0 ? (
+                      <Image
+                        width={50}
+                        height={50}
+                        src={record.car.images[0].imageUrl || record.car.images[0]}
+                        style={{ objectFit: 'cover' }}
+                        fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+                      />
+                    ) : (
+                      <div style={{
+                        width: 50,
+                        height: 50,
+                        backgroundColor: '#f5f5f5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 20,
+                        color: '#bfbfbf'
+                      }}>
+                        🚗
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <Text style={{ fontWeight: 500, fontSize: 13, display: 'block' }}>
+                      {record.car?.name || 'Unknown Car'}
+                    </Text>
+                    <Text style={{ color: '#6b7280', fontSize: 11, display: 'block' }}>
+                      {record.car?.carBrand?.name} {record.car?.model} ({record.car?.year})
+                    </Text>
+                    <Text style={{ color: '#9ca3af', fontSize: 10 }}>
+                      {record.car?.licensePlate}
+                    </Text>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              title: 'Rental Period',
+              key: 'period',
+              width: '18%',
+              render: (_, record) => (
+                <div>
+                  <Text style={{ fontSize: 12, display: 'block' }}>
+                    <strong>Pickup:</strong> {new Date(record.pickupTime).toLocaleDateString('vi-VN')}
+                  </Text>
+                  <Text style={{ fontSize: 12, display: 'block' }}>
+                    <strong>Return:</strong> {new Date(record.returnTime).toLocaleDateString('vi-VN')}
+                  </Text>
+                  <Text style={{ color: '#6b7280', fontSize: 11 }}>
+                    Duration: {Math.ceil((new Date(record.returnTime) - new Date(record.pickupTime)) / (1000 * 60 * 60 * 24))} days
+                  </Text>
+                  <Text style={{ color: '#9ca3af', fontSize: 10, display: 'block' }}>
+                    Type: {record.type}
+                  </Text>
+                </div>
+              ),
+            },
+            {
+              title: 'Location',
+              key: 'location',
+              width: '17%',
+              render: (_, record) => (
+                <div>
+                  <Text style={{ fontSize: 11, color: '#6b7280', display: 'block' }}>
+                    {record.location?.address || 'No address provided'}
+                  </Text>
+                  {record.driver && (
+                    <div style={{ marginTop: 4 }}>
+                      <Tag color="blue" size="small">With Driver</Tag>
+                    </div>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: 'Amount',
+              key: 'amount',
+              width: '14%',
+              render: (_, record) => (
+                <div>
+                  <Text style={{ fontWeight: 600, fontSize: 12, display: 'block' }}>
+                    {new Intl.NumberFormat('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND'
+                    }).format(record.rentalPrice || 0)}
+                  </Text>
+                  <Text style={{ color: '#6b7280', fontSize: 10, display: 'block' }}>
+                    Rental Price
+                  </Text>
+                  {record.reservationFee > 0 && (
+                    <Text style={{ color: '#fa8c16', fontSize: 10, display: 'block' }}>
+                      Fee: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.reservationFee)}
+                    </Text>
+                  )}
+                  {record.depositAmount > 0 && (
+                    <Text style={{ color: '#722ed1', fontSize: 10, display: 'block' }}>
+                      Deposit: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.depositAmount)}
+                    </Text>
+                  )}
+                  {record.totalExtraCharges > 0 && (
+                    <Text style={{ color: '#f5222d', fontSize: 10, display: 'block' }}>
+                      Extra: +{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.totalExtraCharges)}
+                    </Text>
+                  )}
+                  {record.totalDiscount > 0 && (
+                    <Text style={{ color: '#52c41a', fontSize: 10, display: 'block' }}>
+                      Discount: -{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.totalDiscount)}
+                    </Text>
+                  )}
+                  {record.totalRefunded > 0 && (
+                    <Text style={{ color: '#52c41a', fontSize: 10, display: 'block' }}>
+                      Refunded: -{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.totalRefunded)}
+                    </Text>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: 'Actions',
+              key: 'actions',
+              width: '13%',
+              render: (_, record) => (
+                <Button
+                  type="primary"
+                  size="small"
+                  style={{ width: '100%' }}
+                  onClick={() => {
+                    navigate(`/admin/bookings/${record.id}`);
+                    setPendingBookingsModalVisible(false);
+                  }}
+                >
+                  Manage
+                </Button>
               ),
             },
           ]}

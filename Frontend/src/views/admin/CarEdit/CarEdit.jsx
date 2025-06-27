@@ -97,12 +97,12 @@ const CarEdit = () => {
                     carFeatures: carData.features?.map(f => f.id) || carData.carFeatures || []
                 });
             } else {
-                message.error('Failed to fetch car details');
+                message.error(result.data?.message || 'Failed to fetch car details');
                 navigate('/admin/cars');
             }
         } catch (error) {
             console.error('Error fetching car details:', error);
-            message.error('Failed to fetch car details');
+            message.error(error.response?.data?.message || 'Failed to fetch car details');
             navigate('/admin/cars');
         } finally {
             setInitialLoading(false);
@@ -117,6 +117,7 @@ const CarEdit = () => {
             }
         } catch (error) {
             console.error('Error fetching car brands:', error);
+            message.error(error.response?.data?.message || 'Failed to fetch car brands');
         }
     };
 
@@ -130,6 +131,7 @@ const CarEdit = () => {
             }
         } catch (error) {
             console.error('Error fetching car features:', error);
+            message.error(error.response?.data?.message || 'Failed to fetch car features');
             setCarFeatures([]);
         }
     };
@@ -197,11 +199,11 @@ const CarEdit = () => {
                 // Refresh car data
                 await fetchCarDetail();
             } else {
-                message.error('Failed to update car information');
+                message.error(result.data?.message || 'Failed to update car information');
             }
         } catch (error) {
             console.error('Error updating car:', error);
-            message.error('Failed to update car information');
+            message.error(error.response?.data?.message || 'Failed to update car information');
         } finally {
             setLoading(false);
         }
@@ -234,11 +236,11 @@ const CarEdit = () => {
                 // Refresh car data to show new images
                 await fetchCarDetail();
             } else {
-                message.error('Failed to upload images');
+                message.error(result.data?.message || 'Failed to upload images');
             }
         } catch (error) {
             console.error('Error uploading images:', error);
-            message.error('Failed to upload images');
+            message.error(error.response?.data?.message || 'Failed to upload images');
         } finally {
             setImageLoading(false);
         }
@@ -257,7 +259,7 @@ const CarEdit = () => {
             await fetchCarDetail(); // Refresh to show updated images
         } catch (error) {
             console.error('Error removing image:', error);
-            message.error('Failed to remove image');
+            message.error(error.response?.data?.message || 'Failed to remove image');
         }
     };
 
@@ -269,7 +271,7 @@ const CarEdit = () => {
             await fetchCarDetail(); // Refresh to show updated images
         } catch (error) {
             console.error('Error removing all images:', error);
-            message.error('Failed to remove all images');
+            message.error(error.response?.data?.message || 'Failed to remove all images');
         }
     };
 

@@ -24,6 +24,8 @@ import UserEdit from "./views/admin/UserEdit";
 import Discount from "./views/admin/Discount";
 import CarBrand from "./views/admin/CarBrand";
 import Cars from "./views/admin/Cars";
+import Bookings from "./views/admin/Bookings";
+import BookingDetail from "./views/admin/BookingDetail";
 import Main from "./components/admin/layout/Main";
 import CarEdit from "./views/admin/CarEdit";
 import CarDetailAdmin from "./views/admin/CarDetail";
@@ -83,6 +85,8 @@ function App() {
             <Route path="cars" element={<Cars />} />
             <Route path="cars/:carId" element={<CarDetailAdmin />} />
             <Route path="cars/edit/:carId" element={<CarEdit />} />
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="bookings/:bookingId" element={<BookingDetail />} />
             <Route path="*" element={<AdminNotFound />} />
           </Route>
 
