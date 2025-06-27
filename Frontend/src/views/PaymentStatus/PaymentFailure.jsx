@@ -40,7 +40,7 @@ export const PaymentFailure = () => {
                     </Button>,
                 ]}
             >
-                <Card title="Thông tin lỗi" bordered={false} style={{ maxWidth: 600, margin: '0 auto' }}>
+                <Card title="Thông tin lỗi" variant={false} style={{ maxWidth: 600, margin: '0 auto' }}>
                     <p><strong>Mã đơn hàng:</strong> {transactionRef || 'Không có'}</p>
                     <p><strong>Lý do:</strong> {getErrorMessage(errorCode)} (Mã lỗi: {errorCode || 'N/A'})</p>
                 </Card>

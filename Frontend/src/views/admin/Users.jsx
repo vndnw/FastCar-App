@@ -437,7 +437,7 @@ function UserPage() {
                   label: 'Users Management',
                   children: (
                     <Card
-                      bordered={false}
+                      variant={false}
                       className="criclebox tablespace mb-24"
                       title="Users Table"
                       extra={
@@ -477,7 +477,7 @@ function UserPage() {
                   label: 'Roles',
                   children: (
                     <Card
-                      bordered={false}
+                      variant={false}
                       className="criclebox tablespace mb-24"
                       title="Roles Table"
                     >

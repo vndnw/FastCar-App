@@ -347,7 +347,7 @@ const Discount = () => {
                 <Row gutter={[24, 0]}>
                     <Col xs="24" xl={24}>
                         <Card
-                            bordered={false}
+                            variant={false}
                             className="criclebox tablespace mb-24"
                             title={
                                 <div style={{ display: 'flex', alignItems: 'center' }}>

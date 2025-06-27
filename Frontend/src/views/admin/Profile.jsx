@@ -196,12 +196,12 @@ function Profile() {
             </Col>
           </Row>
         }
-      ></Card>
+      ></Card >
 
       <Row gutter={[24, 0]}>
         <Col span={24} md={8} className="mb-24 ">
           <Card
-            bordered={false}
+            variant={false}
             className="header-solid h-full"
             title={<h6 className="font-semibold m-0">Platform Settings</h6>}
           >
@@ -244,7 +244,7 @@ function Profile() {
         </Col>
         <Col span={24} md={8} className="mb-24">
           <Card
-            bordered={false}
+            variant={false}
             title={<h6 className="font-semibold m-0">Profile Information</h6>}
             className="header-solid h-full card-profile-information"
             extra={<Button type="link">{pencil}</Button>}
@@ -287,7 +287,7 @@ function Profile() {
         </Col>
         <Col span={24} md={8} className="mb-24">
           <Card
-            bordered={false}
+            variant={false}
             title={<h6 className="font-semibold m-0">Conversations</h6>}
             className="header-solid h-full"
             bodyStyle={{ paddingTop: 0, paddingBottom: 16 }}
@@ -310,10 +310,10 @@ function Profile() {
               )}
             />
           </Card>
-        </Col>
-      </Row>
+        </Col >
+      </Row >
       <Card
-        bordered={false}
+        variant={false}
         className="header-solid mb-24"
         title={
           <>
@@ -326,7 +326,7 @@ function Profile() {
           {project.map((p, index) => (
             <Col span={24} md={12} xl={6} key={index}>
               <Card
-                bordered={false}
+                variant={false}
                 className="card-project"
                 cover={<img alt="example" src={p.img} />}
               >

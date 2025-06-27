@@ -36,7 +36,7 @@ const BookingForm = ({ car }) => {
     const fetchSchedules = async () => {
         try {
             const res = await bookingService.getSchedulesByCar(car.id);
-            console.log("Fetched schedules:", res.data);
+            // console.log("Fetched schedules:", res.data);
             setSchedules(res.data || []);
         } catch (err) {
             console.error("Error fetching schedules:", err);
@@ -178,7 +178,7 @@ const BookingForm = ({ car }) => {
 
     useEffect(() => {
         if (car && car.id) {
-        fetchSchedules();
+            fetchSchedules();
         }
         if (startTime && endTime) {
             if (endTime.isBefore(startTime)) {
@@ -206,7 +206,7 @@ const BookingForm = ({ car }) => {
         cocXe = cocXe + 5000000; // Cọc xe tiêu chuẩn
     } else if (car.carType === 'LUXURY') {
         cocXe = cocXe + 10000000; // Cọc xe hạng sang
-    } else{
+    } else {
         cocXe = cocXe + 20000000; // Cọc xe sieu sang
     }
     const tongCong = finalPrice + VAT;
@@ -239,7 +239,7 @@ const BookingForm = ({ car }) => {
     };
 
     return (
-        <Card className="booking-form" bordered={false} style={{ borderRadius: 16, boxShadow: '0 2px 12px #eee', padding: 24 }}>
+        <Card className="booking-form" variant={false} style={{ borderRadius: 16, boxShadow: '0 2px 12px #eee', padding: 24 }}>
 
             {/* Vùng chọn thời gian, click để mở modal */}
             <div
@@ -340,7 +340,7 @@ const BookingForm = ({ car }) => {
                 <br />
                 <div style={{ marginBottom: 5 }}>
                     <label style={{ fontWeight: 500, marginBottom: 4, display: 'block' }}>
-                      Địa chỉ giao xe (nếu muốn giao tận nơi):
+                        Địa chỉ giao xe (nếu muốn giao tận nơi):
                     </label>
                     <Input
                         placeholder="Nhập địa chỉ bạn muốn giao xe (tuỳ chọn)"
@@ -552,7 +552,7 @@ const BookingForm = ({ car }) => {
             >
                 🚗 THUÊ XE NGAY
             </Button>
-        </Card>
+        </Card >
     );
 };
 

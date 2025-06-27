@@ -284,7 +284,7 @@ function UserDetail() {
             <Col xs={24} lg={16}>
                 {/* Personal Information */}
                 <Card title="Personal Information" style={{ marginBottom: '24px' }}>
-                    <Descriptions bordered column={2}>
+                    <Descriptions variant column={2}>
                         <Descriptions.Item label={<><MailOutlined /> Email</>}>
                             {user.email}
                         </Descriptions.Item>
@@ -318,7 +318,7 @@ function UserDetail() {
         <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
             <Col xs={24} lg={12}>
                 <Card title={<><EnvironmentOutlined /> Address Information</>} style={{ height: '100%' }}>
-                    <Descriptions bordered column={1} size="middle">
+                    <Descriptions variant column={1} size="middle">
                         <Descriptions.Item label="Full Address">
                             {user.address?.address || 'N/A'}
                         </Descriptions.Item>
@@ -327,7 +327,7 @@ function UserDetail() {
             </Col>
             <Col xs={24} lg={12}>
                 <Card title={<><BankOutlined /> Bank Information</>} style={{ height: '100%' }}>
-                    <Descriptions bordered column={1} size="middle">
+                    <Descriptions variant column={1} size="middle">
                         <Descriptions.Item label="Bank Name">
                             {user.bankInformation?.bankName || 'N/A'}
                         </Descriptions.Item>

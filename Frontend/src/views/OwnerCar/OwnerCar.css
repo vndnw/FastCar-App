@@ -70,6 +70,12 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
 }
 
+.ant-card-head-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #51c09f;
+}
+
 
 /* ==========================================================================
    3. CÁC THÀNH PHẦN CHI TIẾT

@@ -507,7 +507,8 @@ function Home() {
             </Col>
           </Row>
         </>
-      )}
+      )
+      }
 
       {/* Pending Cars Modal */}
       <Modal
@@ -677,7 +678,7 @@ function Home() {
           box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
       `}</style>
-    </div>
+    </div >
   );
 }
 
