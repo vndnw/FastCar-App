@@ -348,8 +348,6 @@ function UserDetail() {
                             <Descriptions.Item label="Account Holder">
                                 {user.bankInformation?.accountHolderName || 'N/A'}
                             </Descriptions.Item>
->>>>>>> 7eeea298b45a5b15b63a76b7438b98c1bc55e104
-
                         </Descriptions>
                     </Card>
                 </Col>
