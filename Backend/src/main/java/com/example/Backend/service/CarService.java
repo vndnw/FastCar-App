@@ -15,10 +15,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.TimeUnit;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class CarService {
@@ -29,6 +36,12 @@ public class CarService {
     private final LocationService locationService;
     private final UserRepository userRepository;
     private final UserService userService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private ObjectMapper redisObjectMapper; // Đã cấu hình hỗ trợ JavaTimeModule
 
     public CarService(CarRepository carRepository,
                       CarMapper carMapper,
@@ -44,6 +57,14 @@ public class CarService {
         this.locationService = locationService;
         this.userRepository = userRepository;
         this.userService = userService;
+    }
+
+    private void clearCarSearchCache() {
+        // Xóa tất cả các key bắt đầu bằng "car_search:"
+        var keys = redisTemplate.keys("car_search:*");
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
     }
 
     public CarResponse createCar(long userId, @NotNull CarRequest carRequest) {
@@ -73,7 +94,9 @@ public class CarService {
 
         userService.addRoleToUser(userId, "owner");
 
-        return carMapper.mapToResponse(carRepository.save(car));
+        CarResponse response = carMapper.mapToResponse(carRepository.save(car));
+        clearCarSearchCache();
+        return response;
     }
 
     public CarResponse updateCar(long carId, @NotNull CarRequest carRequest) {
@@ -97,12 +120,15 @@ public class CarService {
         car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePer24Hour()));
         car.setDescription(carRequest.getDescription());
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
-        return carMapper.mapToResponse(carRepository.save(car));
+        CarResponse response = carMapper.mapToResponse(carRepository.save(car));
+        clearCarSearchCache();
+        return response;
     }
 
     public void deleteCar(long carId) {
         Car car = carRepository.findById(carId).orElseThrow(()-> new ResourceNotFoundException("Car not found"));
         carRepository.delete(car);
+        clearCarSearchCache();
     }
 
     public List<CarResponse> getAllCarsByUserId(long userId) {
@@ -148,12 +174,69 @@ public class CarService {
             car.setActive(false);
         }
         carRepository.save(car);
+        clearCarSearchCache();
         return true;
     }
 
     public Page<CarResponse> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
+        String cacheKey = buildCacheKey(criteria, pageable);
+
+        // Thử lấy kết quả từ Redis
+        Object cachedObj = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedObj != null) {
+            try {
+                // Dữ liệu cache là một Map chứa content, totalElements, totalPages
+                @SuppressWarnings("unchecked")
+                java.util.Map<String, Object> map = (java.util.Map<String, Object>) cachedObj;
+                List<CarResponse> content = redisObjectMapper.convertValue(
+                        map.get("content"),
+                        new TypeReference<List<CarResponse>>() {}
+                );
+                int pageNumber = (int) map.getOrDefault("pageNumber", pageable.getPageNumber());
+                int pageSize = (int) map.getOrDefault("pageSize", pageable.getPageSize());
+                long totalElements = ((Number) map.getOrDefault("totalElements", content.size())).longValue();
+                return new PageImpl<>(content, PageRequest.of(pageNumber, pageSize), totalElements);
+            } catch (Exception e) {
+                // Nếu lỗi deserialize, bỏ qua cache và query lại DB
+            }
+        }
+
+        // Nếu không có cache, thực hiện truy vấn DB
         Specification<Car> spec = CarSpecification.findByCriteria(criteria);
         Page<Car> carPage = carRepository.findAll(spec, pageable);
-        return carPage.map(carMapper::mapToResponse);
+        Page<CarResponse> result = carPage.map(carMapper::mapToResponse);
+
+        // Lưu vào Redis: chỉ lưu content + metadata, không lưu trực tiếp Page object
+        java.util.Map<String, Object> cacheMap = new java.util.HashMap<>();
+        cacheMap.put("content", result.getContent());
+        cacheMap.put("pageNumber", result.getNumber());
+        cacheMap.put("pageSize", result.getSize());
+        cacheMap.put("totalElements", result.getTotalElements());
+        redisTemplate.opsForValue().set(cacheKey, cacheMap, 10, TimeUnit.MINUTES);
+
+        return result;
+    }
+
+    private String buildCacheKey(CarSearchCriteriaRequest criteria, Pageable pageable) {
+        StringBuilder sb = new StringBuilder("car_search:");
+        sb.append("brandId=").append(criteria.getBrandId()).append(";");
+        sb.append("name=").append(criteria.getName()).append(";");
+        sb.append("carType=").append(criteria.getCarType()).append(";");
+        sb.append("fuelType=").append(criteria.getFuelType()).append(";");
+        sb.append("minPrice=").append(criteria.getMinPrice()).append(";");
+        sb.append("maxPrice=").append(criteria.getMaxPrice()).append(";");
+        sb.append("minSeats=").append(criteria.getMinSeats()).append(";");
+        sb.append("startDate=").append(criteria.getStartDate()).append(";");
+        sb.append("endDate=").append(criteria.getEndDate()).append(";");
+        sb.append("latitude=").append(criteria.getLatitude()).append(";");
+        sb.append("longitude=").append(criteria.getLongitude()).append(";");
+        sb.append("radiusInKm=").append(criteria.getRadiusInKm()).append(";");
+        sb.append("city=").append(criteria.getCity()).append(";");
+        sb.append("district=").append(criteria.getDistrict()).append(";");
+        sb.append("location=").append(criteria.getLocation()).append(";");
+        sb.append("page=").append(pageable.getPageNumber()).append(";");
+        sb.append("size=").append(pageable.getPageSize()).append(";");
+        sb.append("sort=").append(pageable.getSort());
+        return sb.toString();
     }
 }

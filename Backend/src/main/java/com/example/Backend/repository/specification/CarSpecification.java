@@ -34,12 +34,20 @@ public class CarSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("brand").get("id"), criteria.getBrandId()));
             }
             if (StringUtils.hasText(criteria.getName())) {
-                // Tối ưu: Nếu có thể, hãy dùng LIKE 'value%' thay vì '%value%'
-                // Nếu cần tìm kiếm toàn văn bản, hãy cân nhắc Full-Text Search hoặc pg_trgm (PostgreSQL)
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + criteria.getName().toLowerCase() + "%"));
+                // Ưu tiên LIKE 'value%' thay vì '%value%' nếu có thể
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), criteria.getName().toLowerCase() + "%"));
             }
             if (StringUtils.hasText(criteria.getCarType())) {
-                predicates.add(criteriaBuilder.equal(root.get("carType").as(String.class), criteria.getCarType().toUpperCase()));
+                String carType = criteria.getCarType().toUpperCase();
+                if ("LUXURY".equals(carType)) {
+                    predicates.add(
+                        root.get("carType").as(String.class).in("LUXURY", "SUPER_LUXURY")
+                    );
+                } else {
+                    predicates.add(
+                        criteriaBuilder.equal(root.get("carType").as(String.class), carType)
+                    );
+                }
             }
             if (StringUtils.hasText(criteria.getFuelType())) {
                 predicates.add(criteriaBuilder.equal(root.get("fuelType").as(String.class), criteria.getFuelType().toUpperCase()));
@@ -51,7 +59,7 @@ public class CarSpecification {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("pricePerHour"), criteria.getMaxPrice()));
             }
             if (criteria.getMinSeats() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("seats"), criteria.getMinSeats()));
+                predicates.add(criteriaBuilder.equal(root.get("seats"), criteria.getMinSeats()));
             }
 
             // --- Lọc theo ngày có sẵn (Availability) ---
@@ -113,26 +121,21 @@ public class CarSpecification {
                 predicates.add(criteriaBuilder.between(locationJoin.get("latitude"), latDeg - latDelta, latDeg + latDelta));
                 predicates.add(criteriaBuilder.between(locationJoin.get("longitude"), lonDeg - lonDelta, lonDeg + lonDelta));
 
-                // Sau đó mới tính toán khoảng cách Haversine chính xác
+                // Đã có bounding box, chỉ tính Haversine cho các bản ghi đã lọc sơ bộ
                 Expression<Double> distanceInKm = createDistanceExpression(criteriaBuilder, locationJoin, criteria.getLatitude(), criteria.getLongitude());
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(distanceInKm, radius));
-
-                // Sắp xếp kết quả theo khoảng cách gần nhất
                 query.orderBy(criteriaBuilder.asc(distanceInKm));
-
             } else if (StringUtils.hasText(criteria.getCity()) || StringUtils.hasText(criteria.getDistrict())) {
                 // ƯU TIÊN 2: TÌM THEO CITY/DISTRICT
                 // Đảm bảo có chỉ mục trên các cột city và district của bảng Location.
                 if (StringUtils.hasText(criteria.getCity())) {
-                    predicates.add(criteriaBuilder.like(criteriaBuilder.lower(locationJoin.get("city")), "%" + criteria.getCity().toLowerCase() + "%"));
+                    predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(locationJoin.get("city")), criteria.getCity().toLowerCase()));
                 }
                 if (StringUtils.hasText(criteria.getDistrict())) {
-                    predicates.add(criteriaBuilder.like(criteriaBuilder.lower(locationJoin.get("district")), "%" + criteria.getDistrict().toLowerCase() + "%"));
+                    predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(locationJoin.get("district")), criteria.getDistrict().toLowerCase()));
                 }
             } else if (StringUtils.hasText(criteria.getLocation())) {
-                // ƯU TIÊN 3: TÌM THEO TEXT CHUNG
-                // Như đã nói ở trên, LIKE %...% không hiệu quả với chỉ mục B-tree thông thường.
-                // Cân nhắc Full-Text Search hoặc pg_trgm nếu tìm kiếm này chậm.
+                // Nếu có thể, hãy cân nhắc loại bỏ LIKE %...% hoặc chuyển sang full-text search ở tầng DB
                 String pattern = "%" + criteria.getLocation().toLowerCase() + "%";
                 predicates.add(criteriaBuilder.or(
                         criteriaBuilder.like(criteriaBuilder.lower(locationJoin.get("city")), pattern),

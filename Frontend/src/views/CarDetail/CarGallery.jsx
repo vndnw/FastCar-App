@@ -5,8 +5,8 @@ import './CarGallery.css';
 const CarGallery = ({ car }) => {
     // Đảm bảo images là mảng URL hợp lệ
     const images = Array.isArray(car.images)
-        ? car.images.map(img => (img && img.imageUrl ? img.imageUrl : '/default-car.png'))
-        : ['/default-car.png'];
+        ? car.images.map(img => (img && img.imageUrl ? img.imageUrl : 'https://cdn.tgdd.vn/Files/2022/01/06/1409479/Gallery/vinfast-vf7-8-164143096342319009.jpg'))
+        : ['https://cdn.tgdd.vn/Files/2022/01/06/1409479/Gallery/vinfast-vf7-8-164143096342319009.jpg'];
 
     const [activeImage, setActiveImage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +20,7 @@ const CarGallery = ({ car }) => {
                     className="main-car-image"
                     onClick={() => setIsModalOpen(true)}
                     style={{ cursor: 'zoom-in' }}
-                    onError={e => { e.target.onerror = null; e.target.src = '/default-car.png'; }}
+                    onError={e => { e.target.onerror = null; e.target.src = 'https://cdn.tgdd.vn/Files/2022/01/06/1409479/Gallery/vinfast-vf7-8-164143096342319009.jpg'; }}
                 />
                 {/* <div className="view-all-badge">
                     <button type="button" className="view-all-btn">
@@ -54,7 +54,7 @@ const CarGallery = ({ car }) => {
                             src={images[activeImage]}
                             alt={car.name}
                             className="modal-image"
-                            onError={e => { e.target.onerror = null; e.target.src = '/default-car.png'; }}
+                            onError={e => { e.target.onerror = null; e.target.src = 'https://cdn.tgdd.vn/Files/2022/01/06/1409479/Gallery/vinfast-vf7-8-164143096342319009.jpg'; }}
                         />
                         <button
                             className="modal-next"

@@ -39,38 +39,85 @@ export const carService = {
     // Delete car
     deleteCar: async (id) => {
         return apiClient.delete(`/car/${id}`);
-    },    // Search cars by name
-    getCarsByName: async (name, page = 0, size = 10) => {
+    },
+    
+    // Advanced search cars with multiple criteria
+    searchCars: async (searchCriteria = {}, page = 0, size = 10) => {
         const params = new URLSearchParams({
-            name: name,
             page: page.toString(),
             size: size.toString()
         });
+
+        // Add search criteria to params if they exist
+        if (searchCriteria.brandId) {
+            params.append('brandId', searchCriteria.brandId.toString());
+        }
+        if (searchCriteria.name) {
+            params.append('name', searchCriteria.name);
+        }
+        if (searchCriteria.carType) {
+            params.append('carType', searchCriteria.carType);
+        }
+        if (searchCriteria.fuelType) {
+            params.append('fuelType', searchCriteria.fuelType);
+        }
+        if (searchCriteria.minPrice) {
+            params.append('minPrice', searchCriteria.minPrice.toString());
+        }
+        if (searchCriteria.maxPrice) {
+            params.append('maxPrice', searchCriteria.maxPrice.toString());
+        }
+        if (searchCriteria.minSeats) {
+            params.append('minSeats', searchCriteria.minSeats.toString());
+        }
+        
+        // Date availability filters
+        if (searchCriteria.startDate) {
+            params.append('startDate', searchCriteria.startDate);
+        }
+        if (searchCriteria.endDate) {
+            params.append('endDate', searchCriteria.endDate);
+        }
+        
+        // Location filters (priority order)
+        // Priority 1: Geographic radius (most accurate)
+        if (searchCriteria.latitude && searchCriteria.longitude) {
+            params.append('latitude', searchCriteria.latitude.toString());
+            params.append('longitude', searchCriteria.longitude.toString());
+            if (searchCriteria.radiusInKm) {
+                params.append('radiusInKm', searchCriteria.radiusInKm.toString());
+            }
+        }
+        // Priority 2: City/District (structured)
+        else if (searchCriteria.city || searchCriteria.district) {
+            if (searchCriteria.city) {
+                params.append('city', searchCriteria.city);
+            }
+            if (searchCriteria.district) {
+                params.append('district', searchCriteria.district);
+            }
+        }
+        // Priority 3: General location text (least accurate)
+        else if (searchCriteria.location) {
+            params.append('location', searchCriteria.location);
+        }
 
         return apiClient.get(`/car/search?${params}`);
     },
 
-    // Get cars by location
-    getCarsByLocation: async (location, page = 0, size = 10) => {
-        const params = new URLSearchParams({
-            location: location,
-            page: page.toString(),
-            size: size.toString()
-        });
-
-        return apiClient.get(`/car/location?${params}`);
+    // Search cars by name (kept for backward compatibility)
+    getCarsByName: async (name, page = 0, size = 10) => {
+        return carService.searchCars({ name }, page, size);
     },
 
-    // Get available cars
-    getAvailableCars: async (startDate, endDate, page = 0, size = 10) => {
-        const params = new URLSearchParams({
-            startDate: startDate,
-            endDate: endDate,
-            page: page.toString(),
-            size: size.toString()
-        });
+    // Get cars by location (kept for backward compatibility)
+    getCarsByLocation: async (location, page = 0, size = 10) => {
+        return carService.searchCars({ location }, page, size);
+    },
 
-        return apiClient.get(`/car/available?${params}`);
+    // Get available cars (kept for backward compatibility)
+    getAvailableCars: async (startDate, endDate, page = 0, size = 10) => {
+        return carService.searchCars({ startDate, endDate }, page, size);
     },
 
     // Upload car images
@@ -83,32 +130,17 @@ export const carService = {
     },
 
     // lấy xe xịn
-    getCarsSuperLuxury: async () => {
-        const params = new URLSearchParams({
-            carType: "SUPER_LUXURY",
-            page: 0,
-            size: 10
-        });
-        return apiClient.get(`/car/search?${params}`);
+    getCarsSuperLuxury: async (page = 0, size = 10) => {
+        return carService.searchCars({ carType: "SUPER_LUXURY" }, page, size);
     },
 
     // lấy xe sang
-    getCarsLuxury: async () => {
-        const params = new URLSearchParams({
-            carType: "LUXURY",
-            page: 0,
-            size: 7
-        });
-        return apiClient.get(`/car/search?${params}`);
+    getCarsLuxury: async (page = 0, size = 7) => {
+        return carService.searchCars({ carType: "LUXURY" }, page, size);
     },
 
-    getCarsStandard: async () => {
-        const params = new URLSearchParams({
-            carType: "STANDARD",
-            page: 0,
-            size: 7
-        });
-        return apiClient.get(`/car/search?${params}`);
+    getCarsStandard: async (page = 0, size = 7) => {
+        return carService.searchCars({ carType: "STANDARD" }, page, size);
     },
 
     // Update car status

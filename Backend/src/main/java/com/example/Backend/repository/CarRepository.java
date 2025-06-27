@@ -6,6 +6,8 @@ import com.example.Backend.model.enums.CarStatus;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -15,8 +17,16 @@ import java.util.Optional;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, Integer> , JpaSpecificationExecutor<Car> {
-    Page<Car> findAll(@NotNull Pageable pageable);
+    @NotNull Page<Car> findAll(@NotNull Pageable pageable);
     Optional<Car> findById(long id);
+
+
+    @NotNull
+    @EntityGraph(attributePaths = {"brand", "location"})
+    Page<Car> findAll(Specification<Car> spec, @NotNull Pageable pageable);
+
+    // Nếu muốn tối ưu hơn nữa, có thể dùng projection (DTO) thay vì entity đầy đủ:
+    // Page<CarResponse> findAllProjectedBy(Specification<Car> spec, Pageable pageable);
 
     long countByStatus(@NotNull CarStatus status);
 

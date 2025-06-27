@@ -44,13 +44,13 @@ const CarCard = ({ car, isInCarousel = false }) => {
                 <div style={{ position: 'relative' }}>
                     <img
                         alt={car.name}
-                        src={car.images && car.images[0] && car.images[0].imageUrl ? car.images[0].imageUrl : '/default-car.png'}
+                        src={car.images && car.images[0] && car.images[0].imageUrl ? car.images[0].imageUrl : 'https://cdn.tgdd.vn/Files/2022/01/06/1409479/Gallery/vinfast-vf7-8-164143096342319009.jpg'}
                         style={{
                             width: '100%',
                             height: 200,
                             objectFit: 'cover'
                         }}
-                        onError={e => { e.target.onerror = null; e.target.src = '/default-car.png'; }}
+                        onError={e => { e.target.onerror = null; e.target.src = 'https://cdn.tgdd.vn/Files/2022/01/06/1409479/Gallery/vinfast-vf7-8-164143096342319009.jpg'; }}
                     />
 
                     {/* Badge 24/7 */}
@@ -130,27 +130,27 @@ const CarCard = ({ car, isInCarousel = false }) => {
                 </div>
 
                 {/* Thông tin xe */}
-                <Row gutter={[8, 8]} style={{ fontSize: 12 }}>
+                <Row gutter={[4, 4]} style={{ fontSize: 12 }}>
                     <Col span={8}>
-                        <Space size={4} style={{ display: 'flex', alignItems: 'center' }}>
-                            <UserOutlined style={{ color: '#51c09f', fontSize: 14 }} />
-                            <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>
+                        <Space size={2} style={{ display: 'flex', alignItems: 'center' }}>
+                            <UserOutlined style={{ color: '#51c09f', fontSize: 12 }} />
+                            <Text style={{ fontSize: 11, fontWeight: '500', color: '#333' }}>
                                 {car.seats} chỗ
                             </Text>
                         </Space>
                     </Col>
                     <Col span={8}>
-                        <Space size={4} style={{ display: 'flex', alignItems: 'center' }}>
-                            <SettingOutlined style={{ color: '#51c09f', fontSize: 14 }} />
-                            <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>
+                        <Space size={2} style={{ display: 'flex', alignItems: 'center' }}>
+                            <SettingOutlined style={{ color: '#51c09f', fontSize: 12 }} />
+                            <Text style={{ fontSize: 11, fontWeight: '500', color: '#333' }}>
                                 {car.transmission}
                             </Text>
                         </Space>
                     </Col>
                     <Col span={8}>
-                        <Space size={4} style={{ display: 'flex', alignItems: 'center' }}>
-                            <CarOutlined style={{ color: '#51c09f', fontSize: 14 }} />
-                            <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>
+                        <Space size={2} style={{ display: 'flex', alignItems: 'center' }}>
+                            <CarOutlined style={{ color: '#51c09f', fontSize: 12 }} />
+                            <Text style={{ fontSize: 11, fontWeight: '500', color: '#333' }}>
                                 {car.fuelType}
                             </Text>
                         </Space>

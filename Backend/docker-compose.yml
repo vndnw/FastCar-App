@@ -4,7 +4,7 @@ version: '3.8'
 
 services:
   app:
-    image: voxuanduong/bookingacar:1.5.1
+    image: voxuanduong/bookingacar:1.5.5
     container_name: spring-boot-app
     # Thêm dòng này để container tự khởi động lại khi gặp lỗi hoặc khi server reboot
     restart: unless-stopped

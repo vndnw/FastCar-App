@@ -65,7 +65,7 @@ function App() {
                 </RedirectIfAuthenticated>
               }
               />
-              <Route path="/xe-co-ngay" element={<CarListing />} />
+              <Route path="/car-listing" element={<CarListing />} />
               <Route path="/car-detail/:carId" element={<CarDetail />} />
             </Route>
             {/* Layout cho trang admin */}

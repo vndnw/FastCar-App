@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Listing Demo - Tìm xe tự lái</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .demo-title {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .demo-description {
+            color: #666;
+            margin: 0;
+        }
+        
+        .search-section-preview {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .search-inputs {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .search-input {
+            background: white;
+            color: #333;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-button {
+            background: #52c41a;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 120px;
+        }
+        
+        .filter-section-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .filter-tags {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-tag {
+            background: white;
+            border: 1px solid #d9d9d9;
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .filter-tag:hover {
+            border-color: #52c41a;
+            color: #52c41a;
+        }
+        
+        .filter-tag.active {
+            background: #52c41a;
+            color: white;
+            border-color: #52c41a;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .filter-badge {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        .sort-dropdown {
+            background: white;
+            border: 1px solid #d9d9d9;
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        
+        .cars-grid-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .car-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .car-card-preview {
+            background: #f8f9fa;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .features-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .features-list h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .feature-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #52c41a;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .feature-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .search-inputs {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .filter-tags {
+                justify-content: center;
+            }
+            
+            .sort-dropdown {
+                margin: 10px 0 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">🚗 Car Listing Page - Trang danh sách xe tự lái</h1>
+            <p class="demo-description">
+                Giao diện mới với bộ lọc hiện đại, tìm kiếm thông minh và trải nghiệm người dùng tối ưu
+            </p>
+        </div>
+
+        <!-- Search Section Preview -->
+        <div class="search-section-preview">
+            <h2 style="margin: 0 0 15px 0;">Tìm xe tự lái</h2>
+            <div class="search-inputs">
+                <div class="search-input">
+                    <span>📍</span>
+                    <span>Chọn địa điểm tìm xe</span>
+                </div>
+                <div class="search-input">
+                    <span>📅</span>
+                    <span>21h00, 27/06/2025 đến 01h00, 30/06/2025</span>
+                </div>
+                <button class="search-button">TÌM XE</button>
+            </div>
+        </div>
+
+        <!-- Filter Section Preview -->
+        <div class="filter-section-preview">
+            <div class="filter-tags">
+                <div class="filter-tag active">
+                    <span>🔍</span>
+                    <span>Tất cả</span>
+                </div>
+                <div class="filter-tag">
+                    <span>✨</span>
+                    <span>Xe xịn</span>
+                </div>
+                <div class="filter-tag">
+                    <span>🪑</span>
+                    <span>Số chỗ</span>
+                    <span class="filter-badge">2</span>
+                </div>
+                <div class="filter-tag">
+                    <span>🏷️</span>
+                    <span>Hãng xe</span>
+                    <span class="filter-badge">3</span>
+                </div>
+                <div class="filter-tag">
+                    <span>🚙</span>
+                    <span>Loại xe</span>
+                </div>
+                <div class="filter-tag">
+                    <span>⛽</span>
+                    <span>Nhiên liệu</span>
+                </div>
+                <div class="filter-tag">
+                    <span>📍</span>
+                    <span>Khu vực xe</span>
+                </div>
+                
+                <div class="sort-dropdown">
+                    <span>🔄</span>
+                    <span>Sắp xếp</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cars Grid Preview -->
+        <div class="cars-grid-preview">
+            <h2 style="margin: 0 0 10px 0;">Danh sách xe</h2>
+            <p style="color: #666; margin: 0 0 20px 0;">
+                Tìm thấy <strong>156 xe</strong> (Hiển thị 12 xe)
+            </p>
+            
+            <div class="car-cards-grid">
+                <div class="car-card-preview">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🚗</div>
+                    <div>Car Card Component</div>
+                    <div style="font-size: 12px; margin-top: 5px;">Hiển thị thông tin xe</div>
+                </div>
+                <div class="car-card-preview">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🚙</div>
+                    <div>Car Card Component</div>
+                    <div style="font-size: 12px; margin-top: 5px;">Hiển thị thông tin xe</div>
+                </div>
+                <div class="car-card-preview">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🏎️</div>
+                    <div>Car Card Component</div>
+                    <div style="font-size: 12px; margin-top: 5px;">Hiển thị thông tin xe</div>
+                </div>
+                <div class="car-card-preview">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🚘</div>
+                    <div>Car Card Component</div>
+                    <div style="font-size: 12px; margin-top: 5px;">Hiển thị thông tin xe</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="search-button">Xem thêm xe</button>
+            </div>
+        </div>
+
+        <!-- Features List -->
+        <div class="features-list">
+            <h3>🎯 Tính năng chính đã được implement</h3>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-title">🔍 Bộ lọc thông minh</div>
+                    <div class="feature-description">
+                        Filter tags hiện đại với badge đếm, hover effects, và advanced drawer với đầy đủ options
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">🏷️ Lọc theo hãng xe</div>
+                    <div class="feature-description">
+                        Tích hợp với carBrandService API, checkbox multiple selection, fallback từ car data
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">💰 Khoảng giá linh hoạt</div>
+                    <div class="feature-description">
+                        Slider range picker từ 0-5M VND, format tiền tệ Việt Nam, real-time update
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">🪑 Lọc số chỗ ngồi</div>
+                    <div class="feature-description">
+                        2, 4, 5, 7, 8+ chỗ với checkbox selection, mapping thành minSeats cho API
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">⛽ Loại nhiên liệu</div>
+                    <div class="feature-description">
+                        Xăng, Diesel, Điện, Hybrid với icon và mapping API chính xác
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">🚙 Loại xe đa dạng</div>
+                    <div class="feature-description">
+                        Sedan, SUV, Hatchback, Coupe, Convertible, Pickup, Minivan với emoji icons
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">🔄 Sắp xếp thông minh</div>
+                    <div class="feature-description">
+                        Phổ biến, Giá tăng/giảm, Xe mới nhất, Đánh giá cao với icon và API sorting
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">📍 Tìm kiếm địa điểm</div>
+                    <div class="feature-description">
+                        URL params support, location mapping, coordinates và radius search
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">📱 Responsive Design</div>
+                    <div class="feature-description">
+                        Mobile-first approach, filter drawer, adaptive grid layout
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">⚡ Performance</div>
+                    <div class="feature-description">
+                        Lazy loading, pagination, memoization, debounced search
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">🎨 UX/UI Modern</div>
+                    <div class="feature-description">
+                        Loading states, empty states, filter count badges, animations
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-title">🔌 API Integration</div>
+                    <div class="feature-description">
+                        carService.searchCars(), carBrandService, error handling, fallback strategies
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Examples -->
+        <div class="features-list">
+            <h3>🚀 URL Examples để test</h3>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 14px;">
+                <div style="margin-bottom: 10px;">
+                    <strong>Basic listing:</strong><br>
+                    /car-listing
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>Luxury cars:</strong><br>
+                    /car-listing?carType=LUXURY<br>
+                    /car-listing?luxury=true
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>With location:</strong><br>
+                    /car-listing?location=ho-chi-minh
+                </div>
+                <div>
+                    <strong>Full search:</strong><br>
+                    /car-listing?location=ha-noi&pickupDate=2025-07-01&returnDate=2025-07-03&carType=STANDARD
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive demo
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                // Remove active from all tags
+                document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                // Add active to clicked tag
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelector('.search-button').addEventListener('click', function() {
+            this.textContent = 'ĐANG TÌM...';
+            this.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                this.textContent = 'TÌM XE';
+                this.style.opacity = '1';
+            }, 1500);
+        });
+
+        // Auto demo - rotate through filters
+        let currentFilter = 0;
+        const filters = document.querySelectorAll('.filter-tag');
+        
+        setInterval(() => {
+            filters.forEach(f => f.classList.remove('active'));
+            filters[currentFilter].classList.add('active');
+            currentFilter = (currentFilter + 1) % filters.length;
+        }, 3000);
+    </script>
+</body>
+</html>
