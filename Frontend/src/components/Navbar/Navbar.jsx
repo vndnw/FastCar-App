@@ -27,7 +27,7 @@ const Navbar = () => {
       key: 'profile',
       label: 'Trang cá nhân',
       icon: <ProfileOutlined />,
-      onClick: () => navigate('/profile'),
+      onClick: () => navigate('/user-profile'),
     },
     {
       key: 'my-trips',

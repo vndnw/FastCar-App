@@ -4,7 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import UserLayout from './components/layout/UserLayout';
 import HeroSection from './components/HeroSection/HeroSection';
 import Home from './views/Home/Home';
-import Profile from './views/Profile/Profile';
+import UserProfile from './views/Profile/UserProfile';
 import About from './views/About/About';
 import Login from './components/Login/Login';
 import Register from './components/Login/Register';
@@ -50,7 +50,7 @@ function App() {
             {/* Layout cho trang người dùng */}
             <Route element={<UserLayout />}>
               <Route path="/" element={<><HeroSection /><Home /></>} />
-              <Route path="/profile" element={<Profile />} />
+              <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/about" element={<About />} />
               <Route path="/owner-car" element={<OwnerCar />} />
               <Route path="/booking/:carId" element={<Booking />} />
