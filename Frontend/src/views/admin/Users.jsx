@@ -284,7 +284,7 @@ function UserPage() {
               cancelText="No"
             >
               <Button
-                type="primary"
+                type={user.active ? "primary" : "default"}
                 className={user.active ? "tag-primary" : "tag-badge"}
                 style={{ cursor: 'pointer' }}
               >

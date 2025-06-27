@@ -674,6 +674,7 @@ const Bookings = () => {
     return (
         <>
             {/* Statistics Cards */}
+            {/*
             <div style={{ marginBottom: 24 }}>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12} md={6} lg={4}>
@@ -739,6 +740,7 @@ const Bookings = () => {
                     </Col>
                 </Row>
             </div>
+            */}
 
             <div className="tabled">
                 <Row gutter={[24, 0]}>
