@@ -40,3 +40,10 @@
     justify-content: flex-end;
     margin-top: 24px;
 }
+
+.profile-page-container.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}

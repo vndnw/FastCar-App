@@ -87,6 +87,13 @@ export const userService = {    // Get all users with pagination
         // apiClient sẽ tự động đính kèm token xác thực
         return apiClient.get(`/user/${userId}/list-car`); // Giả sử đây là endpoint của bạn
     },
+    
+    // Update avatar for user
+    updateAvatar: async (newAvatar) => {
+        return apiClient.patch(`/user/me/update-avatar`, newAvatar, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    },
 
     // Get users by role
     getUsersByRole: async (role, page = 0, size = 10) => {

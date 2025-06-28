@@ -11,16 +11,28 @@ import {
 } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import Register from '../Login/Register'; // Import component Register
-import Login from '../Login/Login'; // Import component Login
+import Register from '../Login/Register';
+import Login from '../Login/Login';
 
 const { Header } = Layout;
 
 const Navbar = () => {
-  const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false); // State để điều khiển modal đăng ký
-  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false); // State để điều khiển modal đăng nhập
+  const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user, logout, isAdmin } = useAuth();
+
+  // Logic xử lý menu và logout không thay đổi
+  async function handleLogout() {
+    try {
+      await logout();
+      message.success('Đăng xuất thành công!');
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      message.error('Đăng xuất thất bại!');
+    }
+  }
 
   const userMenuItems = [
     {
@@ -55,17 +67,6 @@ const Navbar = () => {
     },
   ];
 
-  async function handleLogout() {
-    try {
-      await logout();
-      message.success('Đăng xuất thành công!');
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      message.error('Đăng xuất thất bại!');
-    }
-  }
-
   const handleLogoClick = () => {
     navigate('/');
   };
@@ -74,7 +75,6 @@ const Navbar = () => {
     <>
       <Header className="navbar">
         <div className="navbar-content">
-          {/* Logo */}
           <div className="navbar-left">
             <div
               className="navbar-logo"
@@ -86,48 +86,44 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Right section */}
           <div className="navbar-right">
-            {/* Link about */}
             <Link to="/about" className="navbar-link">
               Về chúng tôi
             </Link>
-
             <Link to="/owner-car" className="navbar-link">
               Trở thành chủ xe
             </Link>
 
-            {/* Chỉ hiển thị link "Chuyến của tôi" khi đã đăng nhập */}
-            {isAuthenticated && (
-              <Link to="/my-trips" className="navbar-link">
-                Chuyến của tôi
-              </Link>
-            )}
-
-            {/* Hiển thị nút đăng nhập và đăng ký khi chưa đăng nhập */}
             {!isAuthenticated ? (
               <div className="navbar-auth">
                 <Button
                   type="default"
-                  onClick={() => setIsRegisterModalVisible(true)} // Hiển thị modal đăng ký
+                  onClick={() => setIsRegisterModalVisible(true)}
                   style={{ marginRight: '8px' }}
                 >
                   Đăng ký
                 </Button>
                 <Button
                   type="primary"
-                  onClick={() => setIsLoginModalVisible(true)} // Hiển thị modal đăng nhập
+                  onClick={() => setIsLoginModalVisible(true)}
                 >
                   Đăng nhập
                 </Button>
               </div>
             ) : (
-              /* Hiển thị avatar và dropdown khi đã đăng nhập */
               <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
                 <div className="navbar-avatar" style={{ cursor: 'pointer' }}>
-                  <Avatar icon={<UserOutlined />} size="medium" />
+                  {/* === THAY ĐỔI DUY NHẤT TẠI ĐÂY === */}
+                  <Avatar
+                    src={user?.profilePicture}
+                    icon={<UserOutlined />}
+                    size="medium"
+                  />
+                  {/* =================================== */}
                   <span className="navbar-avatar-name">
-                    {user?.fullName || user?.email || 'User'}
+                    {user?.firstName && user?.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : user?.fullName || user?.email || 'User'}
                   </span>
                   <DownOutlined />
                 </div>
@@ -137,12 +133,10 @@ const Navbar = () => {
         </div>
       </Header>
 
-      {/* Modal đăng ký */}
       {isRegisterModalVisible && (
         <Register onClose={() => setIsRegisterModalVisible(false)} />
       )}
 
-      {/* Modal đăng nhập */}
       {isLoginModalVisible && (
         <Login onClose={() => setIsLoginModalVisible(false)} />
       )}

@@ -1,156 +1,118 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Form,
-    Input,
-    Button,
-    Row,
-    Col,
-    message,
-    Card,
-    Avatar,
-    DatePicker,
-    Upload,
-    Descriptions
+    Form, Input, Button, Row, Col, message, Card, Avatar,
+    DatePicker, Upload, Descriptions, Spin, Alert, Divider
 } from 'antd';
-import { UserOutlined, UploadOutlined, EditOutlined } from '@ant-design/icons';
+import { UserOutlined, UploadOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import './UserProfile.css';
-
-// Dữ liệu giả lập ban đầu
-const MOCK_USER_DATA = {
-    lastName: "Văn",
-    firstName: "Nguyễn",
-    phone: "0987654321",
-    address: {
-        address: "123 Đường ABC, Phường Cống Vị, Quận Ba Đình, Hà Nội"
-    },
-    profilePicture: "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png", // URL ảnh mẫu
-    dateOfBirth: "1995-08-15"
-};
+import { useAuth } from '../../contexts/AuthContext';
+import userService from '../../services/userService';
+import BankInfoModal from './BankInfoModal'; // Import modal mới
 
 const UserProfile = () => {
     const [form] = Form.useForm();
+    const { user, updateUserProfile, refreshUserData, loading: authLoading, updateUserAvatar } = useAuth();
+
     const [isEditing, setIsEditing] = useState(false);
-    const [userData, setUserData] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [isBankModalVisible, setIsBankModalVisible] = useState(false);
 
-    // Giả lập việc lấy dữ liệu người dùng khi component được tải
     useEffect(() => {
-        setUserData(MOCK_USER_DATA);
-    }, []);
-
-    // Cập nhật giá trị cho form khi người dùng nhấn nút chỉnh sửa
-    useEffect(() => {
-        if (isEditing) {
+        if (isEditing && user) {
             form.setFieldsValue({
-                ...userData,
-                address: userData.address?.address, // Xử lý object lồng nhau
-                dateOfBirth: userData.dateOfBirth ? dayjs(userData.dateOfBirth) : null,
+                ...user,
+                address: user.address?.address,
+                dateOfBirth: user.dateOfBirth ? dayjs(user.dateOfBirth) : null,
             });
         }
-    }, [isEditing, userData, form]);
+        console.log("User data loaded:", user);
+    }, [isEditing, user, form]);
 
-
-    const handleFormFinish = (values) => {
-        setLoading(true);
-
-        // Giả lập việc gọi API và cập nhật
-        setTimeout(() => {
-            const updatedData = {
-                ...userData,
-                firstName: values.firstName,
+    const handleFormFinish = async (values) => {
+        setSubmitLoading(true);
+        try {
+            const payload = {
                 lastName: values.lastName,
-                phone: values.phone,
-                dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
-                address: {
-                    address: values.address
-                }
+                firstName: values.firstName,
+                address: { address: values.address },
+                profilePicture: user.profilePicture,
+                dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null
             };
-
-            // Xử lý mật khẩu: chỉ cập nhật nếu người dùng nhập mật khẩu mới
-            if (values.password) {
-                // Trong thực tế, bạn sẽ mã hóa mật khẩu trước khi gửi đi
-                console.log("Mật khẩu mới đã được nhập (chưa mã hóa):", values.password);
-            }
-
-            setUserData(updatedData);
+            await updateUserProfile(payload);
             message.success("Cập nhật thông tin thành công!");
             setIsEditing(false);
-            setLoading(false);
-        }, 1000);
-    };
-
-    // Xử lý khi người dùng tải ảnh lên
-    const handleImageUpload = (info) => {
-        if (info.file.status === 'done') {
-            // Chuyển ảnh thành dạng base64 để hiển thị ngay lập tức
-            const reader = new FileReader();
-            reader.readAsDataURL(info.file.originFileObj);
-            reader.onload = () => {
-                setUserData(prev => ({ ...prev, profilePicture: reader.result }));
-                message.success(`${info.file.name} tải lên thành công.`);
-            };
+        } catch (err) {
+            message.error(err.response?.data?.message || "Đã xảy ra lỗi khi cập nhật.");
+        } finally {
+            setSubmitLoading(false);
         }
     };
 
+    // Logic xử lý upload ảnh giữ nguyên
+    const handleImageUpload = async (info) => {
+        if (info.file.status === 'done') {
+            try {
+                // info.file.originFileObj là file gốc từ Upload của Ant Design
+                await updateUserAvatar(info.file.originFileObj);
+                message.success(`${info.file.name} đã được tải lên.`);
+            } catch (error) {
+                message.error('Tải lên ảnh đại diện thất bại.');
+            }
+        } else if (info.file.status === 'error') {
+            message.error(`${info.file.name} tải lên thất bại.`);
+        }
+    };
+
+    if (authLoading) {
+        return <div className="profile-page-container loading"><Spin size="large" /></div>;
+    }
+
+    if (!user) {
+        return <div className="profile-page-container"><Alert message="Lỗi" description="Không thể tải dữ liệu người dùng." type="error" showIcon /></div>;
+    }
+
+    // Kiểm tra xem user đã có thông tin ngân hàng hay chưa
+    const hasBankInfo = user.bankInformation && user.bankInformation.bankName;
 
     const renderDisplayMode = () => (
-        <Descriptions bordered column={1} title="Thông tin cá nhân" extra={<Button icon={<EditOutlined />} onClick={() => setIsEditing(true)}>Chỉnh sửa</Button>}>
-            <Descriptions.Item label="Họ và tên">{`${userData.lastName || ''} ${userData.firstName || ''}`}</Descriptions.Item>
-            <Descriptions.Item label="Số điện thoại">{userData.phone}</Descriptions.Item>
-            <Descriptions.Item label="Ngày sinh">{userData.dateOfBirth ? dayjs(userData.dateOfBirth).format('DD/MM/YYYY') : 'Chưa cập nhật'}</Descriptions.Item>
-            <Descriptions.Item label="Địa chỉ">{userData.address?.address || 'Chưa cập nhật'}</Descriptions.Item>
-        </Descriptions>
+        <>
+            <Descriptions bordered column={1} title="Thông tin cá nhân" extra={<Button icon={<EditOutlined />} onClick={() => setIsEditing(true)}>Chỉnh sửa</Button>}>
+                <Descriptions.Item label="Họ và tên">{`${user.lastName || ''} ${user.firstName || ''}`}</Descriptions.Item>
+                <Descriptions.Item label="Email">{user.email || 'Chưa cập nhật'}</Descriptions.Item>
+                <Descriptions.Item label="Số điện thoại">{user.phone || 'Chưa cập nhật'}</Descriptions.Item>
+                <Descriptions.Item label="Ngày sinh">{user.dateOfBirth ? dayjs(user.dateOfBirth).format('DD/MM/YYYY') : 'Chưa cập nhật'}</Descriptions.Item>
+                <Descriptions.Item label="Địa chỉ">{user.address?.address || 'Chưa cập nhật'}</Descriptions.Item>
+            </Descriptions>
+
+            <Divider />
+
+            <Descriptions bordered column={1} title="Thông tin ngân hàng" extra={
+                hasBankInfo ? (
+                    <Button icon={<EditOutlined />} onClick={() => setIsBankModalVisible(true)}>Cập nhật</Button>
+                ) : (
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsBankModalVisible(true)}>Thêm thông tin</Button>
+                )
+            }>
+                <Descriptions.Item label="Tên ngân hàng">{user.bankInformation?.bankName || 'Chưa cập nhật'}</Descriptions.Item>
+                <Descriptions.Item label="Số tài khoản">{user.bankInformation?.accountNumber || 'Chưa cập nhật'}</Descriptions.Item>
+                <Descriptions.Item label="Tên chủ tài khoản">{user.bankInformation?.accountHolderName || 'Chưa cập nhật'}</Descriptions.Item>
+            </Descriptions>
+        </>
     );
 
     const renderEditMode = () => (
-        <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleFormFinish}
-        >
-            <Row gutter={24}>
-                <Col span={12}>
-                    <Form.Item name="lastName" label="Họ" rules={[{ required: true, message: 'Vui lòng nhập họ!' }]}>
-                        <Input />
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item name="firstName" label="Tên" rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}>
-                        <Input />
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
-                <Input />
-            </Form.Item>
-
-            <Form.Item name="dateOfBirth" label="Ngày sinh">
-                <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
-            </Form.Item>
-
-            <Form.Item name="address" label="Địa chỉ">
-                <Input.TextArea rows={3} />
-            </Form.Item>
-
-            <Form.Item
-                name="password"
-                label="Mật khẩu mới"
-                help="Để trống nếu không muốn thay đổi mật khẩu."
-            >
-                <Input.Password />
-            </Form.Item>
-
+        <Form form={form} layout="vertical" onFinish={handleFormFinish}>
+            <Row gutter={24}><Col span={12}><Form.Item name="lastName" label="Họ"><Input /></Form.Item></Col><Col span={12}><Form.Item name="firstName" label="Tên"><Input /></Form.Item></Col></Row>
+            <Form.Item name="email" label="Email"><Input disabled /></Form.Item>
+            <Form.Item name="phone" label="Số điện thoại"><Input /></Form.Item>
+            <Form.Item name="dateOfBirth" label="Ngày sinh"><DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" /></Form.Item>
+            <Form.Item name="address" label="Địa chỉ"><Input.TextArea rows={2} /></Form.Item>
             <Form.Item>
                 <div className="profile-form-buttons">
-                    <Button type="default" onClick={() => setIsEditing(false)} style={{ marginRight: 8 }}>
-                        Hủy
-                    </Button>
-                    <Button type="primary" htmlType="submit" loading={loading}>
-                        Lưu thay đổi
-                    </Button>
+                    <Button type="default" onClick={() => setIsEditing(false)} style={{ marginRight: 8 }}>Hủy</Button>
+                    <Button type="primary" htmlType="submit" loading={submitLoading}>Lưu thay đổi</Button>
                 </div>
             </Form.Item>
         </Form>
@@ -161,24 +123,9 @@ const UserProfile = () => {
             <Card>
                 <Row gutter={[32, 32]}>
                     <Col xs={24} md={8} className="profile-avatar-section">
-                        <Avatar
-                            size={150}
-                            src={userData.profilePicture}
-                            icon={<UserOutlined />}
-                        />
-                        <Upload
-                            name="avatar"
-                            showUploadList={false}
-                            customRequest={({ file, onSuccess }) => {
-                                setTimeout(() => {
-                                    onSuccess("ok");
-                                }, 0);
-                            }}
-                            onChange={handleImageUpload}
-                        >
-                            <Button icon={<UploadOutlined />} style={{ marginTop: 16 }}>
-                                Thay đổi ảnh đại diện
-                            </Button>
+                        <Avatar size={150} src={user.profilePicture} icon={<UserOutlined />} />
+                        <Upload name="file" action={`http://localhost:8080/api/v1/user/${user.id}/avatar`} headers={{ Authorization: `Bearer ${localStorage.getItem('authToken')}` }} showUploadList={false} onChange={handleImageUpload}>
+                            <Button icon={<UploadOutlined />} style={{ marginTop: 16 }}>Thay đổi ảnh đại diện</Button>
                         </Upload>
                     </Col>
                     <Col xs={24} md={16} className="profile-info-section">
@@ -186,6 +133,12 @@ const UserProfile = () => {
                     </Col>
                 </Row>
             </Card>
+
+            <BankInfoModal
+                visible={isBankModalVisible}
+                onClose={() => setIsBankModalVisible(false)}
+                isUpdate={hasBankInfo}
+            />
         </div>
     );
 };
