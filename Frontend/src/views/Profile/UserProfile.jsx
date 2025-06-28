@@ -13,7 +13,7 @@ import BankInfoModal from './BankInfoModal'; // Import modal mới
 
 const UserProfile = () => {
     const [form] = Form.useForm();
-    const { user, updateUserProfile, refreshUserData, loading: authLoading } = useAuth();
+    const { user, updateUserProfile, refreshUserData, loading: authLoading, updateUserAvatar } = useAuth();
 
     const [isEditing, setIsEditing] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -53,8 +53,13 @@ const UserProfile = () => {
     // Logic xử lý upload ảnh giữ nguyên
     const handleImageUpload = async (info) => {
         if (info.file.status === 'done') {
-            message.success(`${info.file.name} đã được tải lên.`);
-            await refreshUserData();
+            try {
+                // info.file.originFileObj là file gốc từ Upload của Ant Design
+                await updateUserAvatar(info.file.originFileObj);
+                message.success(`${info.file.name} đã được tải lên.`);
+            } catch (error) {
+                message.error('Tải lên ảnh đại diện thất bại.');
+            }
         } else if (info.file.status === 'error') {
             message.error(`${info.file.name} tải lên thất bại.`);
         }

@@ -144,13 +144,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     const refreshUserData = useCallback(async () => {
-        if (!user?.id) {
-            console.error("Không có người dùng để làm mới dữ liệu.");
-            return;
-        }
         try {
-            // Sử dụng lại API lấy user theo ID để đảm bảo tính nhất quán
-            const result = await userService.getUserById(user.id);
+            // Gọi API lấy thông tin user hiện tại
+            const result = await userService.getCurrentUser();
             if (result.data) {
                 const newUserData = result.data;
                 setUser(newUserData);
@@ -161,7 +157,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Lỗi khi làm mới dữ liệu người dùng:', error);
         }
-    }, [user?.id]);
+    }, []);
 
     const updateUserProfile = useCallback(async (newProfileData) => {
         if (!user?.id) {
@@ -192,6 +188,24 @@ export const AuthProvider = ({ children }) => {
         return result;
     }, [user?.id, refreshUserData]);
 
+
+    // Update Avatar
+    const updateUserAvatar = useCallback(async (file) => {
+        if (!user?.id) throw new Error("Không tìm thấy người dùng.");
+
+        const formData = new FormData();
+        formData.append('profilePicture', file);
+
+        try {
+            const result = await userService.updateAvatar(formData);
+            await refreshUserData(); // Tự động làm mới sau khi cập nhật
+            return result;
+        } catch (error) {
+            console.error('Lỗi khi cập nhật ảnh đại diện:', error);
+            throw error;
+        }
+    }, [refreshUserData]);
+
     const value = {
         user,
         token,
@@ -208,7 +222,8 @@ export const AuthProvider = ({ children }) => {
         refreshUserData,
         updateUserProfile,
         addUserBankInfo,
-        updateUserBankInfo
+        updateUserBankInfo,
+        updateUserAvatar
     };
 
     return (
