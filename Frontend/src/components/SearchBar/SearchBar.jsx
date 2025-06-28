@@ -78,7 +78,7 @@ const SearchBar = () => {
         setTimeout(() => {
             setLoading(false);
             // Navigate to car listing page with search parameters
-            navigate(`/xe-co-ngay?${searchParams.toString()}`);
+            navigate(`/car-listing?${searchParams.toString()}`);
         }, 1000);
     };
 

@@ -15,8 +15,6 @@ import java.time.LocalDate;
 public class DocumentRequest {
     private DocumentType documentType;
     private String documentNumber;
-    private LocalDate issueDate;
-    private LocalDate expiryDate;
     private String imageFrontUrl;
     private String imageBackUrl;
     private String description;

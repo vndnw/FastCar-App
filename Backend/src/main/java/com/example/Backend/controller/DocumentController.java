@@ -77,4 +77,14 @@ public class DocumentController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @GetMapping("/all/user/{userId}")
+    public ResponseEntity<?> getAllDocumentsByUserId(@PathVariable Long userId) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Getting all documents by user id.")
+                .data(documentService.getAllDocumentsByUserId(userId))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
 }

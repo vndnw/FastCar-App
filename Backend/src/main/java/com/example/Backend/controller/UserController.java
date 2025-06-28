@@ -5,6 +5,7 @@ import com.example.Backend.dto.request.*;
 import com.example.Backend.dto.response.BankInformationResponse;
 import com.example.Backend.service.*;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -89,6 +91,45 @@ public class UserController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PostMapping("/{id}/add-cccd")
+    public ResponseEntity<?> addCccd(@PathVariable long id, @RequestBody DocumentRequest cccdRequest) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(201)
+                .message("Successfully added CCCD")
+                .data(userService.addCccd(id, cccdRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}/update-cccd")
+    public ResponseEntity<?> updateCccd(@PathVariable long id, @RequestBody DocumentRequest cccdRequest) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Successfully updated CCCD")
+                .data(userService.updateCccd(id, cccdRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/add-license")
+    public ResponseEntity<?> addLicense(@PathVariable long id, @RequestBody DocumentRequest licenseRequest) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(201)
+                .message("Successfully added license")
+                .data(userService.addLicense(id, licenseRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+    }
+    @PutMapping("/{id}/update-license")
+    public ResponseEntity<?> updateLicense(@PathVariable long id, @RequestBody DocumentRequest licenseRequest) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(200)
+                .message("Successfully updated license")
+                .data(userService.updateLicense(id, licenseRequest))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasRole('user')")
     @PutMapping("/{id}/update-info-user")
     public ResponseEntity<?> updateUserInfo(@PathVariable long id, @RequestBody UpdateInfoRequest userRequest) {
@@ -104,6 +145,7 @@ public class UserController {
     @PatchMapping("/me/update-avatar")
     public ResponseEntity<?> updateUserAvatar(@RequestParam("avatar") MultipartFile avatar) {
         String avatarUrl = cloudinaryService.uploadImage(avatar);
+        log.info("Avatar URL: {}", avatarUrl);
         if(userService.updateAvatar(avatarUrl)){
             ResponseData<?> responseData = ResponseData.builder()
                     .status(200)

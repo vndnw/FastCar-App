@@ -2,6 +2,7 @@ package com.example.Backend.dto.response;
 
 import com.example.Backend.model.Car;
 import com.example.Backend.model.enums.DocumentType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocumentResponse {
     private long id;
     private DocumentType documentType;

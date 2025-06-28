@@ -23,16 +23,15 @@ public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     @ManyToOne
     @JoinColumn(name = "car_id")
     private Car car;
-
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
     private String documentNumber;
-    private LocalDate issueDate;
-    private LocalDate expiryDate;
     private String imageFrontUrl;
     private String imageBackUrl;
     @Column(columnDefinition = "TEXT")

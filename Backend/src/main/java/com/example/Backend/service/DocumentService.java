@@ -6,13 +6,18 @@ import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.DocumentMapper;
 import com.example.Backend.model.Car;
 import com.example.Backend.model.Document;
+import com.example.Backend.model.User;
 import com.example.Backend.model.enums.DocumentStatus;
+import com.example.Backend.model.enums.DocumentType;
 import com.example.Backend.repository.CarRepository;
 import com.example.Backend.repository.DocumentRepository;
+import com.example.Backend.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -20,11 +25,16 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
     private final CarRepository carRepository;
+    private final UserRepository userRepository;
 
-    public DocumentService(DocumentRepository documentRepository, DocumentMapper documentMapper, CarRepository carRepository) {
+    public DocumentService(DocumentRepository documentRepository,
+                           DocumentMapper documentMapper,
+                           CarRepository carRepository,
+                           UserRepository userRepository) {
         this.documentRepository = documentRepository;
         this.documentMapper = documentMapper;
         this.carRepository = carRepository;
+        this.userRepository = userRepository;
     }
 
     public Page<DocumentResponse> getAllDocuments(Pageable pageable) {
@@ -46,8 +56,6 @@ public class DocumentService {
                 .documentType(documentRequest.getDocumentType())
                 .imageFrontUrl(documentRequest.getImageFrontUrl())
                 .imageBackUrl(documentRequest.getImageBackUrl())
-                .expiryDate(documentRequest.getExpiryDate())
-                .issueDate(documentRequest.getIssueDate())
                 .status(DocumentStatus.PENDING)
                 .active(false)
                 .build();
@@ -60,8 +68,6 @@ public class DocumentService {
         document.setDocumentType(documentRequest.getDocumentType());
         document.setImageFrontUrl(documentRequest.getImageFrontUrl());
         document.setImageBackUrl(documentRequest.getImageBackUrl());
-        document.setExpiryDate(documentRequest.getExpiryDate());
-        document.setIssueDate(documentRequest.getIssueDate());
         return documentMapper.mapToResponse(documentRepository.save(document));
     }
 
@@ -82,5 +88,33 @@ public class DocumentService {
     public void deleteDocument(long id) {
         Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
         documentRepository.delete(document);
+    }
+
+    public Document getDocumentByCarAndType(Car car, DocumentType documentType) {
+        return documentRepository.findDocumentByCarAndDocumentType(car, documentType)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found for the given car and type"));
+    }
+
+    public Document getDocumentByUserAndType(User user , DocumentType documentType) {
+        return documentRepository.findDocumentByUserAndDocumentType(user, documentType)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found for the given user and type"));
+    }
+
+    public Object getAllDocumentsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        List<Document> documents = documentRepository.findAllByUser(user);
+        if (documents.isEmpty()) {
+            throw new ResourceNotFoundException("No documents found for user with id: " + userId);
+        }
+        return documents.stream().map(documentMapper::mapToResponse);
+    }
+
+    public boolean checkIfDocumentExistsByCarAndType(Car car, DocumentType documentType) {
+        return documentRepository.findDocumentByCarAndDocumentType(car, documentType).isPresent();
+    }
+
+    public boolean checkIfDocumentExistsByUserAndType(User user, DocumentType documentType) {
+        return documentRepository.findDocumentByUserAndDocumentType(user, documentType).isPresent();
     }
 }

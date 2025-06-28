@@ -8,6 +8,7 @@ import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarMapper;
 import com.example.Backend.model.*;
 import com.example.Backend.model.enums.CarStatus;
+import com.example.Backend.model.enums.DocumentType;
 import com.example.Backend.repository.*;
 import com.example.Backend.repository.specification.CarSpecification;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ public class CarService {
     private final LocationService locationService;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final DocumentService documentService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -49,7 +51,8 @@ public class CarService {
                       FeatureService featureService,
                       LocationService locationService,
                       UserRepository userRepository,
-                      UserService userService) {
+                      UserService userService,
+                      DocumentService documentService) {
         this.carRepository = carRepository;
         this.carMapper = carMapper;
         this.carBrandRepository = carBrandRepository;
@@ -57,6 +60,7 @@ public class CarService {
         this.locationService = locationService;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.documentService = documentService;
     }
 
     private void clearCarSearchCache() {
@@ -68,8 +72,12 @@ public class CarService {
     }
 
     public CarResponse createCar(long userId, @NotNull CarRequest carRequest) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        if(documentService.checkIfDocumentExistsByUserAndType(user, DocumentType.CCCD)){
+            throw new ResourceNotFoundException("You must upload your CCCD before booking a car.");
+        }
         Car car = new Car();
-        car.setUser(userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found")));
+        car.setUser(user);
         car.setName(carRequest.getName().trim());
         car.setBrand(carBrandRepository.findById(carRequest.getCarBrandId()).orElseThrow(() -> new ResourceNotFoundException("Car Brand Not Found")));
         car.setModel(carRequest.getModel());
@@ -83,10 +91,10 @@ public class CarService {
         car.setLicensePlate(carRequest.getLicensePlate().trim());
         car.setFuelConsumption(carRequest.getFuelConsumption().trim());
         car.setPricePerHour(BigDecimal.valueOf(carRequest.getPricePerHour()));
-        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePer4Hour()));
-        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePer8Hour()));
-        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePer12Hour()));
-        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePer24Hour()));
+        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 4 * (1 - 0.05))); // Giảm giá 5% cho 4 giờ
+        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 8 * (1 - 0.10))); // Giảm giá 10% cho 8 giờ
+        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 12 * (1 - 0.15)));// Giảm giá 15% cho 12 giờ
+        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 24 * (1 - 0.2)));// Giảm giá 20% cho 24 giờ
         car.setDescription(carRequest.getDescription());
         car.setActive(false);
         car.setStatus(CarStatus.PENDING);
@@ -114,10 +122,10 @@ public class CarService {
         car.setLicensePlate(carRequest.getLicensePlate());
         car.setFuelConsumption(carRequest.getFuelConsumption());
         car.setPricePerHour(BigDecimal.valueOf(carRequest.getPricePerHour()));
-        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePer4Hour()));
-        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePer8Hour()));
-        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePer12Hour()));
-        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePer24Hour()));
+        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 4 * (1 - 0.05))); // Giảm giá 5% cho 4 giờ
+        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 8 * (1 - 0.10))); // Giảm giá 10% cho 8 giờ
+        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 12 * (1 - 0.15)));// Giảm giá 15% cho 12 giờ
+        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 24 * (1 - 0.2)));// Giảm giá 20% cho 24 giờ
         car.setDescription(carRequest.getDescription());
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         CarResponse response = carMapper.mapToResponse(carRepository.save(car));

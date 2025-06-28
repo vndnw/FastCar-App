@@ -1,16 +1,15 @@
 package com.example.Backend.service;
 
 
-import com.example.Backend.dto.request.RegisterRequest;
-import com.example.Backend.dto.request.UpdateInfoRequest;
-import com.example.Backend.dto.request.UpdateUserRequest;
-import com.example.Backend.dto.request.UserRequest;
+import com.example.Backend.dto.request.*;
 import com.example.Backend.dto.response.UserResponse;
 import com.example.Backend.exception.ResourceAlreadyExistsException;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.UserMapper;
+import com.example.Backend.model.Document;
 import com.example.Backend.model.Role;
 import com.example.Backend.model.User;
+import com.example.Backend.model.enums.DocumentStatus;
 import com.example.Backend.repository.RoleRepository;
 import com.example.Backend.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
@@ -34,17 +33,20 @@ public class UserService {
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final LocationService locationService;
+    private final DocumentService documentService;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        UserMapper userMapper,
                        RoleRepository roleRepository,
-                       LocationService locationService) {
+                       LocationService locationService,
+                       DocumentService documentService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.roleRepository = roleRepository;
         this.locationService = locationService;
+        this.documentService = documentService;
     }
 
     public UserResponse registerUser(@NotNull RegisterRequest registerRequest) {
@@ -82,6 +84,13 @@ public class UserService {
         user.setAddress(locationService.checkLocation(userRequest.getAddress()));
         user.setProfilePicture(userRequest.getProfilePicture());
         user.setDateOfBirth(userRequest.getDateOfBirth());
+        return userMapper.mapToResponse(userRepository.save(user));
+    }
+
+    public UserResponse updateAvatar(long id, String avatar) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setProfilePicture(avatar);
         return userMapper.mapToResponse(userRepository.save(user));
     }
 
@@ -228,5 +237,83 @@ public class UserService {
     }
 
 
+    public Object addCccd(long id, DocumentRequest cccdRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        Document cccd = Document.builder()
+                .user(user)
+                .documentType(cccdRequest.getDocumentType())
+                .documentNumber(cccdRequest.getDocumentNumber())
+                .imageFrontUrl(cccdRequest.getImageFrontUrl())
+                .imageBackUrl(cccdRequest.getImageBackUrl())
+                .description(cccdRequest.getDescription())
+                .status(DocumentStatus.PENDING)
+                .active(true)
+                .build();
+
+        user.getDocuments().add(cccd);
+        userRepository.save(user);
+        return userMapper.mapToResponse(user);
+    }
+
+    public Object addLicense(long id, DocumentRequest licenseRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Document license = Document.builder()
+                .user(user)
+                .documentType(licenseRequest.getDocumentType())
+                .documentNumber(licenseRequest.getDocumentNumber())
+                .imageFrontUrl(licenseRequest.getImageFrontUrl())
+                .imageBackUrl(licenseRequest.getImageBackUrl())
+                .description(licenseRequest.getDescription())
+                .status(DocumentStatus.PENDING)
+                .active(true)
+                .build();
+
+        user.getDocuments().add(license);
+        userRepository.save(user);
+        return userMapper.mapToResponse(user);
+    }
+
+    public Object updateCccd(long id, DocumentRequest cccdRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Document cccd = user.getDocuments().stream()
+                .filter(doc -> doc.getDocumentType() == cccdRequest.getDocumentType())
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Cccd document not found for user"));
+
+        cccd.setDocumentNumber(cccdRequest.getDocumentNumber());
+        cccd.setImageFrontUrl(cccdRequest.getImageFrontUrl());
+        cccd.setImageBackUrl(cccdRequest.getImageBackUrl());
+        cccd.setDescription(cccdRequest.getDescription());
+        cccd.setStatus(DocumentStatus.PENDING);
+        cccd.setActive(true);
+
+        userRepository.save(user);
+        return userMapper.mapToResponse(user);
+    }
+
+    public Object updateLicense(long id, DocumentRequest licenseRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Document license = user.getDocuments().stream()
+                .filter(doc -> doc.getDocumentType() == licenseRequest.getDocumentType())
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("License document not found for user"));
+
+        license.setDocumentNumber(licenseRequest.getDocumentNumber());
+        license.setImageFrontUrl(licenseRequest.getImageFrontUrl());
+        license.setImageBackUrl(licenseRequest.getImageBackUrl());
+        license.setDescription(licenseRequest.getDescription());
+        license.setStatus(DocumentStatus.PENDING);
+        license.setActive(true);
+
+        userRepository.save(user);
+        return userMapper.mapToResponse(user);
+    }
 }

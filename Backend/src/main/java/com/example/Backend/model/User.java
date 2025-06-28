@@ -40,7 +40,7 @@ public class User {
     @JoinColumn(name = "location_id")
     private Location address;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String profilePicture;
 
     private LocalDate dateOfBirth;
@@ -74,5 +74,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Document> documents = new java.util.ArrayList<>();
 
 }

@@ -522,30 +522,30 @@ const CarListing = () => {
     }, [selectedBrands, selectedSeats, selectedFuelTypes, selectedLocations, priceRange]);
 
     // Xử lý sắp xếp
-    const handleSortChange = useCallback((value) => {
-        // Use API search with sorting
-        const criteria = buildSearchCriteria();
-        let sort = 'id,desc';
+    // const handleSortChange = useCallback((value) => {
+    //     // Use API search with sorting
+    //     const criteria = buildSearchCriteria();
+    //     let sort = 'id,desc';
 
-        switch (value) {
-            case 'price-asc':
-                sort = 'pricePer24Hour,asc';
-                break;
-            case 'price-desc':
-                sort = 'pricePer24Hour,desc';
-                break;
-            case 'newest':
-                sort = 'year,desc';
-                break;
-            case 'price-asc':
-            default:
-                sort = 'pricePer24Hour,asc';
-                break;
-        }
+    //     switch (value) {
+    //         case 'price-asc':
+    //             sort = 'pricePer24Hour,asc';
+    //             break;
+    //         case 'price-desc':
+    //             sort = 'pricePer24Hour,desc';
+    //             break;
+    //         case 'newest':
+    //             sort = 'year,desc';
+    //             break;
+    //         case 'price-asc':
+    //         default:
+    //             sort = 'pricePer24Hour,asc';
+    //             break;
+    //     }
 
-        // Re-search with new sorting
-        searchCarsWithAPI(criteria, 0, true, sort);
-    }, [buildSearchCriteria, searchCarsWithAPI]);
+    //     // Re-search with new sorting
+    //     searchCarsWithAPI(criteria, 0, true, sort);
+    // }, [buildSearchCriteria, searchCarsWithAPI]);
 
     // Load more cars
     const handleLoadMore = useCallback(() => {
