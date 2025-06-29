@@ -43,6 +43,7 @@ import NotFound from "./views/NotFound";
 
 
 import OwnerCar from './views/OwnerCar/OwnerCar';
+import EditCar from './views/OwnerCar/EditCar';
 import MyTrips from './views/MyTrips/MyTrips';
 
 import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
@@ -63,6 +64,7 @@ function App() {
               <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/about" element={<About />} />
               <Route path="/owner-car" element={<OwnerCar />} />
+              <Route path="/edit-car/:carId" element={<EditCar />} />
               <Route path="/booking/:carId" element={<Booking />} />
               <Route path="/payment-callback" element={<PaymentCallback />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />

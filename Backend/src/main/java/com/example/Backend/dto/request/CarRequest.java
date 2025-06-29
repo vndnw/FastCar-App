@@ -31,4 +31,5 @@ public class CarRequest {
     private String fuelConsumption;//  fuel_consumption/100km
     private double pricePerHour;
     private String description;
+    private List<String> images;
 }

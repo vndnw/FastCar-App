@@ -19,8 +19,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     long countByStatus(DocumentStatus status);
     Page<Document> findByStatus(DocumentStatus status, Pageable pageable);
 
+    Optional<Document> findDocumentByUser_idAndDocumentType(long user_id, DocumentType documentType);
     Optional<Document> findDocumentByUserAndDocumentType(User user, DocumentType documentType);
-    Optional<Document> findDocumentByCarAndDocumentType(Car car, DocumentType documentType);
 
     List<Document> findAllByUser(User user);
 }

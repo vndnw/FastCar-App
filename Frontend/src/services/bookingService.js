@@ -99,7 +99,7 @@ export const bookingService = {
     },
 
     // Get user booking history
-    getUserBookingHistory: async (userId, page = 0, size = 9999) => {
+    getUserBookingHistory: async (userId, page = 0, size = 10) => {
         const params = new URLSearchParams({
             userId: userId.toString(),
             page: page.toString(),

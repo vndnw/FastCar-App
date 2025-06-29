@@ -191,20 +191,19 @@ export const AuthProvider = ({ children }) => {
 
     // Update Avatar
     const updateUserAvatar = useCallback(async (file) => {
-        if (!user?.id) throw new Error("Không tìm thấy người dùng.");
-
-        const formData = new FormData();
-        formData.append('profilePicture', file);
+        if (!user?.id) {
+            throw new Error("Không tìm thấy người dùng.");
+        }
 
         try {
-            const result = await userService.updateAvatar(formData);
+            const result = await userService.updateAvatar(file);
             await refreshUserData(); // Tự động làm mới sau khi cập nhật
             return result;
         } catch (error) {
             console.error('Lỗi khi cập nhật ảnh đại diện:', error);
             throw error;
         }
-    }, [refreshUserData]);
+    }, [user, refreshUserData]);
 
     const value = {
         user,

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.util.List;
 
 
@@ -26,15 +27,18 @@ public class DocumentService {
     private final DocumentMapper documentMapper;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
+    private final LocationService locationService;
 
     public DocumentService(DocumentRepository documentRepository,
                            DocumentMapper documentMapper,
                            CarRepository carRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           LocationService locationService) {
         this.documentRepository = documentRepository;
         this.documentMapper = documentMapper;
         this.carRepository = carRepository;
         this.userRepository = userRepository;
+        this.locationService = locationService;
     }
 
     public Page<DocumentResponse> getAllDocuments(Pageable pageable) {
@@ -45,14 +49,21 @@ public class DocumentService {
         Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
         return documentMapper.mapToResponse(document);
     }
-    public DocumentResponse createDocument(long carId , @NotNull DocumentRequest documentRequest) {
 
-        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+    public DocumentResponse createDocumentUser(long userId , @NotNull DocumentRequest documentRequest) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
 
         Document document = Document.builder()
-                .documentNumber(documentRequest.getDocumentNumber())
-                .car(car)
-                .description(documentRequest.getDescription())
+                .user(user)
+                .issueDate(documentRequest.getIssueDate())
+                .expiryDate(documentRequest.getExpiryDate())
+                .name(documentRequest.getFullName())
+                .gender(documentRequest.getGender())
+                .serialNumber(documentRequest.getSerialNumber())
+                .dateOfBirth(documentRequest.getDateOfBirth())
+                .placeOfIssue(documentRequest.getPlaceOfIssue())
+                .location(locationService.checkLocation(documentRequest.getLocation()))
                 .documentType(documentRequest.getDocumentType())
                 .imageFrontUrl(documentRequest.getImageFrontUrl())
                 .imageBackUrl(documentRequest.getImageBackUrl())
@@ -61,10 +72,19 @@ public class DocumentService {
                 .build();
         return documentMapper.mapToResponse(documentRepository.save(document));
     }
+
     public DocumentResponse updateDocument(long id, @NotNull DocumentRequest documentRequest) {
-        Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-        document.setDocumentNumber(documentRequest.getDocumentNumber());
-        document.setDescription(documentRequest.getDescription());
+        Document document = documentRepository.findDocumentByUser_idAndDocumentType(id, documentRequest.getDocumentType()).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+
+        document.setSerialNumber(documentRequest.getSerialNumber());
+        document.setName(documentRequest.getFullName());
+        document.setGender(documentRequest.getGender());
+        document.setRankLicense(documentRequest.getRankLicense());
+        document.setDateOfBirth(documentRequest.getDateOfBirth());
+        document.setIssueDate(documentRequest.getIssueDate());
+        document.setExpiryDate(documentRequest.getExpiryDate());
+        document.setPlaceOfIssue(documentRequest.getPlaceOfIssue());
+        document.setLocation(locationService.checkLocation(documentRequest.getLocation()));
         document.setDocumentType(documentRequest.getDocumentType());
         document.setImageFrontUrl(documentRequest.getImageFrontUrl());
         document.setImageBackUrl(documentRequest.getImageBackUrl());
@@ -90,14 +110,16 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
-    public Document getDocumentByCarAndType(Car car, DocumentType documentType) {
-        return documentRepository.findDocumentByCarAndDocumentType(car, documentType)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found for the given car and type"));
-    }
 
     public Document getDocumentByUserAndType(User user , DocumentType documentType) {
         return documentRepository.findDocumentByUserAndDocumentType(user, documentType)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found for the given user and type"));
+    }
+
+    public DocumentResponse getDocumentByUserIdAndDocumentType(long id , DocumentType documentType) {
+        Document document = documentRepository.findDocumentByUser_idAndDocumentType(id, documentType)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found for user with id: " + id + " and type: " + documentType));
+        return documentMapper.mapToResponse(document);
     }
 
     public Object getAllDocumentsByUserId(Long userId) {
@@ -110,9 +132,6 @@ public class DocumentService {
         return documents.stream().map(documentMapper::mapToResponse);
     }
 
-    public boolean checkIfDocumentExistsByCarAndType(Car car, DocumentType documentType) {
-        return documentRepository.findDocumentByCarAndDocumentType(car, documentType).isPresent();
-    }
 
     public boolean checkIfDocumentExistsByUserAndType(User user, DocumentType documentType) {
         return documentRepository.findDocumentByUserAndDocumentType(user, documentType).isPresent();

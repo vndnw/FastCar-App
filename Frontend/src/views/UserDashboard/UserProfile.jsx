@@ -17,7 +17,7 @@ import BankInfoModal from './BankInfoModal';
 import BookingHistory from './BookingHistory';
 import IdCardInfo from './IdCardInfo';
 import LicenseInfo from './LicenseInfo';
-import MyCars from '../OwnerCar/MyCars';
+import MyCars from './MyCars';
 
 const UserProfile = () => {
     const [isBankModalVisible, setIsBankModalVisible] = useState(false);
@@ -364,4 +364,4 @@ const UserProfile = () => {
     );
 };
 
-export default UserProfile;
+export default UserProfile; 
