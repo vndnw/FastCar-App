@@ -89,7 +89,7 @@ const SearchBar = () => {
     return (
         <div className={`search-bar-container ${isSticky ? 'sticky' : ''}`}>
             <div className="search-bar-wrapper">
-                <Card className="search-bar-card" bodyStyle={{ padding: '16px 24px' }}>
+                <Card className="search-bar-card" styles={{ body: { padding: '16px 24px' } }}>
                     <Form
                         form={form}
                         layout="vertical"

@@ -65,13 +65,15 @@ const FeatureDisplay = ({
                                 borderRadius: 8,
                                 transition: 'all 0.3s ease'
                             }}
-                            bodyStyle={{
-                                padding: 16,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                height: '100%'
+                            styles={{
+                                body: {
+                                    padding: 16,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    textAlign: 'center',
+                                    height: '100%'
+                                }
                             }}
                         >
                             <div style={{ marginBottom: 12 }}>

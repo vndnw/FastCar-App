@@ -166,3 +166,41 @@
 .password-icon:hover {
   color: #3a9b7a;
 }
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  /* Đẩy 2 phần tử về 2 phía */
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.forgot-password-link {
+  color: var(--primary-color, #1890ff);
+  /* Dùng màu chủ đạo nếu có, không thì dùng màu mặc định của link */
+  cursor: pointer;
+  transition: color 0.3s;
+  margin-top: -15px;
+}
+
+.forgot-password-link:hover {
+  color: var(--primary-color-dark, #096dd9);
+  text-decoration: underline;
+}
+
+.error-alert {
+  color: #ff4d4f;
+  background: #fff1f0;
+  border: 1px solid #ffa39e;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}

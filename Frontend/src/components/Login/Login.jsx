@@ -4,10 +4,13 @@ import './Login.css';
 import { message } from 'antd';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import ForgotPasswordFlow from '../ForgotPasswordFlow/ForgotPasswordFlow';
 
 const Login = ({ onClose }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const [isForgotPasswordVisible, setIsForgotPasswordVisible] = useState(false);
 
   const [formData, setFormData] = useState({
     emailOrPhone: '',
@@ -56,13 +59,16 @@ const Login = ({ onClose }) => {
     }
   };
 
-  // Hàm này vẫn dùng cho nút 'X' để đóng modal hoặc quay lại trang trước
   const handleClose = () => {
     if (onClose) {
       onClose();
     } else {
       navigate(-1);
     }
+  };
+
+  const handleForgotPassword = () => {
+    setIsForgotPasswordVisible(true);
   };
 
   const handleSubmit = async (e) => {
@@ -77,16 +83,17 @@ const Login = ({ onClose }) => {
 
       if (result.success) {
         message.success('Đăng nhập thành công!');
-        // SỬA ĐỔI TẠI ĐÂY: Luôn điều hướng về trang chủ sau khi thành công
         navigate('/');
         onClose();
       } else {
         setErrors({
-          general: result.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
+          general: 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
         });
       }
+      if (result.error) {
+        // console.error('Login failed:', result.error);
+      }
     } catch (error) {
-      console.error('Login error:', error);
       setErrors({
         general: 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
       });
@@ -150,6 +157,9 @@ const Login = ({ onClose }) => {
               />
               <span className="checkbox-label">Ghi nhớ đăng nhập</span>
             </label>
+            <span className="forgot-password-link" onClick={handleForgotPassword}>
+              Quên mật khẩu?
+            </span>
           </div>
 
           <button type="submit" className="login-button" disabled={isLoading}>
@@ -157,6 +167,10 @@ const Login = ({ onClose }) => {
           </button>
         </form>
       </div>
+      <ForgotPasswordFlow
+        visible={isForgotPasswordVisible}
+        onClose={() => setIsForgotPasswordVisible(false)}
+      />
     </div>
   );
 };

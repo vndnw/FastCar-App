@@ -80,7 +80,7 @@ public class SecurityConfig {
             "/auth/forgot-password",
             "/auth/verify-password-otp",
             "/auth/change-password",
-            "/auth//set-password",
+            "/auth/set-password",
             "/auth/check-email-exists",
             "/payment/callback",
             "/payment/vnpay-ipn",

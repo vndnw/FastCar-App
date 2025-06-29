@@ -265,7 +265,7 @@ const Home = () => {
       {/* Section 2: Xe sang & Siêu xe */}
       {luxuryCarsSection}
       {/* Hãng xe */}
-      <BrandCar />
+      {/* <BrandCar /> */}
     </div>
   );
 };

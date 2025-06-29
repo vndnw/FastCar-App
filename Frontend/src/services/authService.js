@@ -24,12 +24,18 @@ export const authService = {
 
     // Forgot password
     forgotPassword: async (email) => {
-        return apiClient.post('/auth/forgot-password', { email });
+        return apiClient.post(`/auth/forgot-password?email=${email}`);
+    },
+
+    // Verify password OTP
+    verifyPasswordOtp: async (email, otp) => {
+        return apiClient.post('/auth/verify-password-otp', { email, otp });
     },
 
     // Reset password
-    resetPassword: async (token, newPassword) => {
-        return apiClient.post('/auth/reset-password', { token, newPassword });
+    resetPassword: async (email, newPassword) => {
+        // API của bạn dùng PATCH và body là { email, newPass }
+        return apiClient.patch('/auth/set-password', { email, newPassword });
     },
 
     // Verify email
