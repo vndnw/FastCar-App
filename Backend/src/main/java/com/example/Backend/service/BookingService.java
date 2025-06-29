@@ -93,7 +93,7 @@ public class BookingService {
     public ReservationFeeResponse createBooking(HttpServletRequest request, long userId ,BookingRequest bookingRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-        if(documentService.checkIfDocumentExistsByUserAndType(user, DocumentType.CCCD)){
+        if(!documentService.checkIfDocumentExistsByUserAndType(user, DocumentType.CCCD)){
             throw new BookingException("You must upload your CCCD before booking a car.");
         }
         BookingResponse bookingResponse = addBooking(user, bookingRequest);

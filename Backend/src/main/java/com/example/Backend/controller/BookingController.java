@@ -73,7 +73,7 @@ public class BookingController {
 
     @PreAuthorize("hasRole('user')")
     @GetMapping("/history")
-    public ResponseEntity<ResponseData<?>> getBookingHistory(@RequestParam("userId") Long userId , @PageableDefault(size = 10, page = 0) Pageable pageable) {
+    public ResponseEntity<ResponseData<?>> getBookingHistory(@RequestParam("userId") Long userId , @PageableDefault(size = 10, page = 0, sort = "createdAt") Pageable pageable) {
         ResponseData<?> response = ResponseData.builder()
                 .status(HttpStatus.OK.value())
                 .message("Booking history retrieved successfully")

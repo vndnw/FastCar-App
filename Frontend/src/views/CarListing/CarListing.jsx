@@ -326,11 +326,11 @@ const CarListing = () => {
         const newSearchParams = new URLSearchParams();
         
         // Giữ lại location và date params nếu có
-        if (location) newSearchParams.set('location', location);
-        if (pickupDate) newSearchParams.set('pickupDate', pickupDate);
-        if (pickupTime) newSearchParams.set('pickupTime', pickupTime);
-        if (returnDate) newSearchParams.set('returnDate', returnDate);
-        if (returnTime) newSearchParams.set('returnTime', returnTime);
+        // if (location) newSearchParams.set('location', location);
+        // if (pickupDate) newSearchParams.set('pickupDate', pickupDate);
+        // if (pickupTime) newSearchParams.set('pickupTime', pickupTime);
+        // if (returnDate) newSearchParams.set('returnDate', returnDate);
+        // if (returnTime) newSearchParams.set('returnTime', returnTime);
         
         // Xóa carType và category params
         // Không set lại carType hoặc category

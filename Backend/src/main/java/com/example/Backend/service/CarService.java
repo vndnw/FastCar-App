@@ -133,10 +133,10 @@ public class CarService {
         car.setLicensePlate(carRequest.getLicensePlate());
         car.setFuelConsumption(carRequest.getFuelConsumption());
         car.setPricePerHour(BigDecimal.valueOf(carRequest.getPricePerHour()));
-        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 4 * (1 - 0.05))); // Giảm giá 5% cho 4 giờ
-        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 8 * (1 - 0.10))); // Giảm giá 10% cho 8 giờ
-        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 12 * (1 - 0.15)));// Giảm giá 15% cho 12 giờ
-        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 24 * (1 - 0.2)));// Giảm giá 20% cho 24 giờ
+        car.setPricePer4Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 4 * (1 - 0.5)));
+        car.setPricePer8Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 8 * (1 - 0.15)));
+        car.setPricePer12Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 12 * (1 - 0.25)));
+        car.setPricePer24Hour(BigDecimal.valueOf(carRequest.getPricePerHour() * 24 * (1 - 0.35)));
         car.setDescription(carRequest.getDescription());
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
         CarResponse response = carMapper.mapToResponse(carRepository.save(car));
