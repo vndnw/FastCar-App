@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { userService } from '../services/userService'; // Giả định bạn có một file carService
+import carService from '../services/carService';
 import { useAuth } from './AuthContext'; // Import useAuth để lấy thông tin user và token
 
 // 1. Create Car Context
@@ -13,7 +14,7 @@ export const CarProvider = ({ children }) => {
 
     const { user, isAuthenticated } = useAuth();
 
-    const createCar = async (carData) => {
+    const createCar = async (carData, files) => {
         if (!isAuthenticated || !user) {
             return { success: false, error: 'Người dùng chưa được xác thực. Vui lòng đăng nhập lại.' };
         }
@@ -22,7 +23,7 @@ export const CarProvider = ({ children }) => {
         setError(null);
 
         try {
-            const result = await userService.createACar(user.id, carData);
+            const result = await userService.createCarByUser(user.id, carData, files);
 
             if (result.status === 201 || result.status === 200) {
                 setCars(prevCars => [...prevCars, result.data]);
@@ -60,7 +61,7 @@ export const CarProvider = ({ children }) => {
     };
 
     // Hàm lấy danh sách xe của user từ API
-    const fetchUserCars = async (userId) => {
+    const fetchUserCars = useCallback(async (userId) => {
         setLoading(true);
         setError(null);
         try {
@@ -78,15 +79,105 @@ export const CarProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
+    }, []);
+
+    // Hàm xóa xe
+    const deleteCar = async (carId) => {
+        if (!isAuthenticated || !user) {
+            return { success: false, error: 'Người dùng chưa được xác thực. Vui lòng đăng nhập lại.' };
+        }
+
+        try {
+            const response = await carService.deleteCar(carId);
+            if (response.status === 200 || response.status === 204) {
+                // Cập nhật state local
+                setCars(prevCars => prevCars.filter(car => car.id !== carId));
+                return { success: true };
+            } else {
+                return { success: false, error: 'Xóa xe thất bại!' };
+            }
+        } catch (error) {
+            console.error('Error deleting car:', error);
+            const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi xóa xe!';
+            return { success: false, error: errorMessage };
+        }
     };
 
-    const value = {
+    // Hàm cập nhật trạng thái xe
+    const updateCarStatus = async (carId, newStatus) => {
+        if (!isAuthenticated || !user) {
+            return { success: false, error: 'Người dùng chưa được xác thực. Vui lòng đăng nhập lại.' };
+        }
+
+        try {
+            const response = await carService.updateCarStatus(carId, newStatus);
+            if (response.status === 200) {
+                // Cập nhật state local
+                setCars(prevCars => 
+                    prevCars.map(car => 
+                        car.id === carId ? { ...car, status: newStatus } : car
+                    )
+                );
+                return { success: true };
+            } else {
+                return { success: false, error: 'Cập nhật trạng thái xe thất bại!' };
+            }
+        } catch (error) {
+            console.error('Error updating car status:', error);
+            const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật trạng thái xe!';
+            return { success: false, error: errorMessage };
+        }
+    };
+
+    // Hàm cập nhật thông tin xe
+    const updateCar = async (carId, carData) => {
+        if (!isAuthenticated || !user) {
+            return { success: false, error: 'Người dùng chưa được xác thực. Vui lòng đăng nhập lại.' };
+        }
+
+        try {
+            const response = await carService.updateCar(carId, carData);
+            if (response.status === 200) {
+                // Cập nhật state local
+                setCars(prevCars => 
+                    prevCars.map(car => 
+                        car.id === carId ? { ...car, ...response.data } : car
+                    )
+                );
+                return { success: true, data: response.data };
+            } else {
+                return { success: false, error: 'Cập nhật xe thất bại!' };
+            }
+        } catch (error) {
+            console.error('Error updating car:', error);
+            const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật xe!';
+            return { success: false, error: errorMessage };
+        }
+    };
+
+    // Hàm lấy thông tin chi tiết xe
+    const getCarById = async (carId) => {
+        try {
+            const response = await carService.getCarById(carId);
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('Error getting car details:', error);
+            const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi lấy thông tin xe!';
+            return { success: false, error: errorMessage };
+        }
+    };
+
+    const value = useMemo(() => ({
         cars,
         loading,
         error,
         createCar,
         fetchUserCars,
-    };
+        deleteCar,
+        updateCarStatus,
+        updateCar,
+        getCarById,
+    }), [cars, loading, error, createCar, fetchUserCars, deleteCar, updateCarStatus, updateCar, getCarById]);
 
     return (
         <CarContext.Provider value={value}>

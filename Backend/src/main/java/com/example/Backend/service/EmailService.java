@@ -250,14 +250,14 @@ public class EmailService {
             htmlContent = htmlContent.replace("[ĐỊA CHỈ BÊN A]", userOwner.getAddress().getAddress());
             htmlContent = htmlContent.replace("[SỐ ĐIỆN THOẠI BÊN A]", userOwner.getPhone());
             htmlContent = htmlContent.replace("[EMAIL BÊN A]", userOwner.getEmail());
-            htmlContent = htmlContent.replace("[CCCD BÊN A]", documentOwner.getCar().getLicensePlate());
+            htmlContent = htmlContent.replace("[CCCD BÊN A]", documentOwner.getSerialNumber());
             htmlContent = htmlContent.replace("[NGƯỜI ĐẠI DIỆN BÊN A]", userOwner.getFirstName() + " " + userOwner.getLastName());
 
             htmlContent = htmlContent.replace("[CÁ NHÂN BÊN B]", user.getFirstName() + " " + user.getLastName());
             htmlContent = htmlContent.replace("[ĐỊA CHỈ BÊN B]", user.getAddress().getAddress());
             htmlContent = htmlContent.replace("[SỐ ĐIỆN THOẠI BÊN B]", user.getPhone());
             htmlContent = htmlContent.replace("[EMAIL BÊN B]", user.getEmail());
-            htmlContent = htmlContent.replace("[CCCD BÊN B]", documentUser.getDocumentNumber());
+            htmlContent = htmlContent.replace("[CCCD BÊN B]", documentUser.getSerialNumber());
             htmlContent = htmlContent.replace("[NGƯỜI ĐẠI DIỆN BÊN B]", user.getFirstName() + " " + user.getLastName());
 
             htmlContent = htmlContent.replace("[LOẠI XE]", car.getCarType().toString());

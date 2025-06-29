@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, InputNumber, Button, Row, Col, message, Card, Space, Spin, Upload, Image, Modal, Divider, Typography } from 'antd';
-import { PlusOutlined, DeleteOutlined, EyeOutlined, CarOutlined, CameraOutlined, DollarOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EyeOutlined, CarOutlined, CameraOutlined, DollarOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useCar } from '../../contexts/CarContext';
 import { useAuth } from '../../contexts/AuthContext';
 import featureService from '../../services/featureService';
 import carBrandService from '../../services/carBrandService';
-import './OwnerCar.css';
+import { useNavigate, useParams } from 'react-router-dom';
+import './EditCar.css';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -27,10 +28,12 @@ const FUEL_TYPE_OPTIONS = [
     { value: 'HYBRID', label: 'Hybrid' },
 ];
 
-const OwnerCar = () => {
+const EditCar = () => {
     const [form] = Form.useForm();
-    const { createCar } = useCar();
+    const navigate = useNavigate();
+    const { carId } = useParams();
     const { user } = useAuth();
+    const { getCarById, updateCar } = useCar();
 
     const [features, setFeatures] = useState([]);
     const [carBrands, setCarBrands] = useState([]);
@@ -40,17 +43,40 @@ const OwnerCar = () => {
     const [previewVisible, setPreviewVisible] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
-    const [isCreating, setIsCreating] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [carData, setCarData] = useState(null);
 
     useEffect(() => {
         const initializeData = async () => {
             try {
                 setBrandsLoading(true);
-                // Fetch both features and car brands in parallel
-                const [featuresRes, brandsRes] = await Promise.all([
+                
+                // Fetch car details, features, and car brands in parallel
+                const [carRes, featuresRes, brandsRes] = await Promise.all([
+                    getCarById(carId),
                     featureService.getFeatures(0, 100, 'createdAt,desc'),
                     carBrandService.getCarBrands(0, 100, 'id,desc')
                 ]);
+
+                if (carRes.success) {
+                    setCarData(carRes.data);
+                    
+                    // Convert existing images to file list format
+                    if (carRes.data.images && carRes.data.images.length > 0) {
+                        const existingImages = carRes.data.images.map((imageUrl, index) => ({
+                            uid: `existing-${index}`,
+                            name: `image-${index}.jpg`,
+                            status: 'done',
+                            url: imageUrl,
+                            originFileObj: null // This is an existing image, not a new file
+                        }));
+                        setImageList(existingImages);
+                    }
+                } else {
+                    message.error('Không thể tải thông tin xe!');
+                    navigate('/my-cars');
+                    return;
+                }
 
                 setFeatures(featuresRes.data.content || []);
                 setCarBrands(brandsRes.data.content || []);
@@ -63,8 +89,32 @@ const OwnerCar = () => {
             }
         };
 
-        initializeData();
-    }, []);
+        if (carId) {
+            initializeData();
+        }
+    }, [carId, getCarById, navigate]);
+
+    // Set form values when car data is loaded
+    useEffect(() => {
+        if (carData) {
+            form.setFieldsValue({
+                name: carData.name,
+                model: carData.model,
+                year: carData.year,
+                seats: carData.seats,
+                transmission: carData.transmission,
+                type: carData.type,
+                carBrandId: carData.carBrandId,
+                fuelType: carData.fuelType,
+                color: carData.color,
+                licensePlate: carData.licensePlate,
+                fuelConsumption: carData.fuelConsumption,
+                pricePerDay: carData.pricePerHour,
+                carFeatures: carData.carFeatures?.map(f => f.id) || [],
+                address: carData.location?.address || ''
+            });
+        }
+    }, [carData, form]);
 
     // Image upload handlers
     const handleImageChange = ({ fileList: newFileList }) => {
@@ -104,18 +154,13 @@ const OwnerCar = () => {
             return;
         }
 
-        if (imageList.length === 0) {
-            message.warning('Vui lòng thêm ít nhất một hình ảnh xe!');
-            return;
-        }
-
-        setIsCreating(true);
+        setIsUpdating(true);
 
         try {
             const { address, ...rest } = values;
             
             // Prepare car data according to API structure
-            const carData = {
+            const updatedCarData = {
                 name: rest.name,
                 model: rest.model,
                 year: rest.year,
@@ -131,30 +176,24 @@ const OwnerCar = () => {
                 carFeatures: rest.carFeatures || [],
                 location: {
                     address,
-                    latitude: "10.8231", // Default Ho Chi Minh City
-                    longitude: "106.6297",
+                    latitude: carData.location?.latitude || "10.8231",
+                    longitude: carData.location?.longitude || "106.6297",
                 }
             };
 
-            // Extract actual files from imageList
-            const files = imageList
-                .filter(file => file.originFileObj) // Only include actual files
-                .map(file => file.originFileObj);
-
-            const result = await createCar(carData, files);
+            const result = await updateCar(carId, updatedCarData);
 
             if (result.success) {
-                message.success('Đăng ký xe thành công!');
-                form.resetFields();
-                setImageList([]);
+                message.success('Cập nhật xe thành công!');
+                navigate('/my-cars');
             } else {
-                message.error(result.error || 'Đăng ký xe thất bại.');
+                message.error(result.error || 'Cập nhật xe thất bại.');
             }
         } catch (error) {
-            console.error('Error creating car:', error);
-            message.error('Đã xảy ra lỗi khi tạo xe. Vui lòng thử lại.');
+            console.error('Error updating car:', error);
+            message.error('Đã xảy ra lỗi khi cập nhật xe. Vui lòng thử lại.');
         } finally {
-            setIsCreating(false);
+            setIsUpdating(false);
         }
     };
 
@@ -164,7 +203,7 @@ const OwnerCar = () => {
 
     if (isInitializing) {
         return (
-            <div className="owner-car-page" style={{ 
+            <div className="edit-car-page" style={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center', 
@@ -177,14 +216,14 @@ const OwnerCar = () => {
                     background: 'rgba(255,255,255,0.95)',
                     backdropFilter: 'blur(10px)'
                 }}>
-                    <Spin size="large" tip="Đang tải dữ liệu..." />
+                    <Spin size="large" tip="Đang tải thông tin xe..." />
                 </Card>
             </div>
         );
     }
 
     return (
-        <div className="owner-car-page" style={{
+        <div className="edit-car-page" style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
             padding: '20px'
@@ -193,13 +232,17 @@ const OwnerCar = () => {
                 <Card 
                     title={
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <ArrowLeftOutlined 
+                                style={{ fontSize: '20px', cursor: 'pointer' }} 
+                                onClick={() => navigate('/my-cars')}
+                            />
                             <CarOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
                             <Title level={3} style={{ margin: 0, color: '#1a1a1a' }}>
-                                Đăng ký thông tin xe
+                                Chỉnh sửa thông tin xe
                             </Title>
                         </div>
                     } 
-                    className="owner-car-card"
+                    className="edit-car-card"
                     style={{
                         borderRadius: '16px',
                         boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
@@ -221,8 +264,7 @@ const OwnerCar = () => {
                             marginBottom: '24px',
                             lineHeight: '1.6'
                         }}>
-                            Điền các thông tin cần thiết bên dưới để đăng ký xe của bạn. 
-                            Thông tin này sẽ giúp khách hàng hiểu rõ hơn về xe của bạn.
+                            Cập nhật thông tin xe của bạn. Những thay đổi sẽ được áp dụng ngay lập tức.
                         </Text>
                         
                         <Form
@@ -230,12 +272,6 @@ const OwnerCar = () => {
                             layout="vertical"
                             onFinish={onFinish}
                             onFinishFailed={onFinishFailed}
-                            initialValues={{
-                                year: new Date().getFullYear(),
-                                transmission: 'AUTO',
-                                type: 'STANDARD',
-                                fuelType: 'GASOLINE',
-                            }}
                             size="large"
                         >
                             <Row gutter={[24, 16]}>
@@ -398,7 +434,7 @@ const OwnerCar = () => {
                                         title={
                                             <span>
                                                 <CameraOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
-                                                Hình ảnh xe
+                                                Hình ảnh xe (hiện tại)
                                             </span>
                                         }
                                         size="small"
@@ -408,49 +444,60 @@ const OwnerCar = () => {
                                             border: '1px solid #f0f0f0'
                                         }}
                                     >
-                                        <Form.Item 
-                                            name="images" 
-                                            rules={[{ required: true, message: 'Vui lòng thêm ít nhất một hình ảnh xe!' }]}
-                                        >
-                                            <Upload
-                                                listType="picture-card"
-                                                fileList={imageList}
-                                                onChange={handleImageChange}
-                                                onPreview={handlePreview}
-                                                beforeUpload={() => false}
-                                                accept="image/*"
-                                                maxCount={10}
-                                                style={{ width: '100%' }}
-                                            >
-                                                {imageList.length >= 10 ? null : uploadButton}
-                                            </Upload>
-                                        </Form.Item>
-                                        <Text style={{ color: '#666', fontSize: '12px' }}>
-                                            Tối đa 10 hình ảnh. Hỗ trợ: JPG, PNG, GIF. Kích thước tối đa: 5MB mỗi hình.
+                                        <Text style={{ color: '#666', fontSize: '14px', marginBottom: '16px', display: 'block' }}>
+                                            Hình ảnh hiện tại của xe. Để thay đổi hình ảnh, vui lòng liên hệ với quản trị viên.
                                         </Text>
+                                        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                            {carData?.images?.map((imageUrl, index) => (
+                                                <div key={index} style={{ position: 'relative' }}>
+                                                    <Image
+                                                        width={120}
+                                                        height={80}
+                                                        src={imageUrl}
+                                                        style={{ objectFit: 'cover', borderRadius: '8px' }}
+                                                        fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
                                     </Card>
                                 </Col>
 
                                 <Col xs={24}>
                                     <div style={{ textAlign: 'center', marginTop: '24px' }}>
-                                        <Button 
-                                            type="primary" 
-                                            htmlType="submit" 
-                                            size="large" 
-                                            loading={isCreating}
-                                            style={{
-                                                height: '48px',
-                                                padding: '0 48px',
-                                                borderRadius: '24px',
-                                                fontSize: '16px',
-                                                fontWeight: '600',
-                                                background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
-                                                border: 'none',
-                                                boxShadow: '0 4px 16px rgba(24, 144, 255, 0.3)'
-                                            }}
-                                        >
-                                            {isCreating ? 'Đang tạo xe...' : 'Đăng ký xe'}
-                                        </Button>
+                                        <Space size="large">
+                                            <Button 
+                                                size="large"
+                                                onClick={() => navigate('/my-cars')}
+                                                style={{
+                                                    height: '48px',
+                                                    padding: '0 32px',
+                                                    borderRadius: '24px',
+                                                    fontSize: '16px',
+                                                    fontWeight: '600'
+                                                }}
+                                            >
+                                                Hủy
+                                            </Button>
+                                            <Button 
+                                                type="primary" 
+                                                htmlType="submit" 
+                                                size="large" 
+                                                loading={isUpdating}
+                                                style={{
+                                                    height: '48px',
+                                                    padding: '0 48px',
+                                                    borderRadius: '24px',
+                                                    fontSize: '16px',
+                                                    fontWeight: '600',
+                                                    background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
+                                                    border: 'none',
+                                                    boxShadow: '0 4px 16px rgba(24, 144, 255, 0.3)'
+                                                }}
+                                            >
+                                                {isUpdating ? 'Đang cập nhật...' : 'Cập nhật xe'}
+                                            </Button>
+                                        </Space>
                                     </div>
                                 </Col>
                             </Row>
@@ -473,4 +520,4 @@ const OwnerCar = () => {
     );
 };
 
-export default OwnerCar;
+export default EditCar; 

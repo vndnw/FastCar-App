@@ -100,6 +100,17 @@ public class CarService {
         car.setStatus(CarStatus.PENDING);
         car.setLocation(locationService.checkLocation(carRequest.getLocation()));
 
+        if(carRequest.getImages() != null && !carRequest.getImages().isEmpty()) {
+            List<Image> images = carRequest.getImages().stream()
+                    .map(image -> {
+                        Image img = new Image();
+                        img.setImageUrl(image);
+                        img.setCar(car);
+                        return img;
+                    }).collect(Collectors.toList());
+            car.setImages(images);
+        }
+
         userService.addRoleToUser(userId, "owner");
 
         CarResponse response = carMapper.mapToResponse(carRepository.save(car));
@@ -158,10 +169,6 @@ public class CarService {
     public boolean activeCar(@NotNull Car car) {
         if (car.isActive()) {
             return false; // Car is already active
-        }
-        boolean hasInactive = car.getDocuments().stream().anyMatch(doc -> !doc.isActive());
-        if (hasInactive) {
-            throw new RuntimeException("Cannot activate car with inactive documents");
         }
         car.setActive(true);
         carRepository.save(car);
@@ -225,6 +232,7 @@ public class CarService {
         return result;
     }
 
+    @NotNull
     private String buildCacheKey(CarSearchCriteriaRequest criteria, Pageable pageable) {
         StringBuilder sb = new StringBuilder("car_search:");
         sb.append("brandId=").append(criteria.getBrandId()).append(";");
