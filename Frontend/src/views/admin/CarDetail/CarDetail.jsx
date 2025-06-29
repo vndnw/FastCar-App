@@ -17,15 +17,32 @@ import {
     EditOutlined,
     CarOutlined
 } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { carService } from '../../../services/carService';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
+// Fuel type mapping function
+const getFuelTypeLabel = (fuelType) => {
+    const fuelTypeMap = {
+        'OIL': 'Oil',
+        'HYBRID': 'Hybrid',
+        'ELECTRIC': 'Electric',
+        'GASOLINE': 'Gasoline'
+    };
+    return fuelTypeMap[fuelType] || fuelType;
+};
+
 const CarDetail = () => {
     const navigate = useNavigate();
     const { carId } = useParams();
+    const location = useLocation();
+
+    // Determine if we're in admin or owner context
+    const isOwnerContext = location.pathname.includes('/owner/');
+    const basePath = isOwnerContext ? '/owner/cars' : '/admin/cars';
+
     const [car, setCar] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -101,9 +118,7 @@ const CarDetail = () => {
 
     const getCarTypeColor = (carType) => {
         const colors = {
-            'ECONOMY': 'cyan',
             'STANDARD': 'blue',
-            'PREMIUM': 'purple',
             'LUXURY': 'gold',
             'SUPER_LUXURY': 'magenta'
         };
@@ -119,7 +134,7 @@ const CarDetail = () => {
                         <Space>
                             <Button
                                 icon={<ArrowLeftOutlined />}
-                                onClick={() => navigate('/admin/cars')}
+                                onClick={() => navigate(basePath)}
                             >
                                 Back to Cars
                             </Button>
@@ -132,7 +147,7 @@ const CarDetail = () => {
                         <Button
                             type="primary"
                             icon={<EditOutlined />}
-                            onClick={() => navigate(`/admin/cars/edit/${car.id}`)}
+                            onClick={() => navigate(`${basePath}/edit/${car.id}`)}
                         >
                             Edit Car
                         </Button>
@@ -184,7 +199,7 @@ const CarDetail = () => {
                                 <strong>Color:</strong> <span style={{ marginLeft: 8 }}>{car.color}</span>
                             </div>
                             <div style={{ marginBottom: 8 }}>
-                                <strong>Fuel Type:</strong> <span style={{ marginLeft: 8 }}>{car.fuelType}</span>
+                                <strong>Fuel Type:</strong> <span style={{ marginLeft: 8 }}>{getFuelTypeLabel(car.fuelType)}</span>
                             </div>
                             <div style={{ marginBottom: 8 }}>
                                 <strong>Fuel Consumption:</strong> <span style={{ marginLeft: 8 }}>{car.fuelConsumption}</span>
@@ -208,24 +223,6 @@ const CarDetail = () => {
                         <div style={{ marginBottom: 24 }}>
                             <div style={{ marginBottom: 8 }}>
                                 <strong>Per Hour:</strong> <span style={{ marginLeft: 8 }}>{formatCurrency(car.pricePerHour)}</span>
-                            </div>
-                            {car.pricePer4Hour && (
-                                <div style={{ marginBottom: 8 }}>
-                                    <strong>Per 4 Hours:</strong> <span style={{ marginLeft: 8 }}>{formatCurrency(car.pricePer4Hour)}</span>
-                                </div>
-                            )}
-                            {car.pricePer8Hour && (
-                                <div style={{ marginBottom: 8 }}>
-                                    <strong>Per 8 Hours:</strong> <span style={{ marginLeft: 8 }}>{formatCurrency(car.pricePer8Hour)}</span>
-                                </div>
-                            )}
-                            {car.pricePer12Hour && (
-                                <div style={{ marginBottom: 8 }}>
-                                    <strong>Per 12 Hours:</strong> <span style={{ marginLeft: 8 }}>{formatCurrency(car.pricePer12Hour)}</span>
-                                </div>
-                            )}
-                            <div style={{ marginBottom: 8 }}>
-                                <strong>Per Day:</strong> <span style={{ marginLeft: 8 }}>{formatCurrency(car.pricePer24Hour)}</span>
                             </div>
                         </div>
                     </Col>

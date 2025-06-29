@@ -79,13 +79,19 @@ const Bookings = () => {
 
     useEffect(() => {
         fetchBookings();
-    }, []);
+    }, [statusFilter]);
 
-    const fetchBookings = async (page = 1, pageSize = 10) => {
+    const fetchBookings = async (page = 1, pageSize = 10, status = statusFilter) => {
         try {
             setLoading(true);
             // API pagination starts from 0, but UI starts from 1
-            const result = await bookingService.getBookings(page - 1, pageSize);
+            let result;
+
+            if (status === 'all') {
+                result = await bookingService.getBookings(page - 1, pageSize);
+            } else {
+                result = await bookingService.getBookingsByStatus(status, page - 1, pageSize);
+            }
 
             if (result.status === 200 && result.data) {
                 // Handle both array response and paginated response
@@ -129,7 +135,13 @@ const Bookings = () => {
 
     const handleTableChange = (paginationInfo) => {
         const { current, pageSize } = paginationInfo;
-        fetchBookings(current, pageSize);
+        fetchBookings(current, pageSize, statusFilter);
+    };
+
+    const handleStatusFilterChange = (status) => {
+        setStatusFilter(status);
+        setPagination(prev => ({ ...prev, current: 1 })); // Reset to first page
+        // fetchBookings will be called automatically by useEffect
     };
 
     const handleViewBooking = (booking) => {
@@ -141,7 +153,7 @@ const Bookings = () => {
             const result = await bookingService.updateBookingStatus(bookingId, 'CONFIRMED');
             if (result.status === 200) {
                 message.success('Booking confirmed successfully');
-                fetchBookings(pagination.current, pagination.pageSize);
+                fetchBookings(pagination.current, pagination.pageSize, statusFilter);
             } else {
                 const errorMessage = result.data?.message || 'Failed to confirm booking';
                 message.error(errorMessage);
@@ -158,7 +170,7 @@ const Bookings = () => {
             const result = await bookingService.cancelBooking(bookingId, 'Cancelled by admin');
             if (result.status === 200) {
                 message.success('Booking cancelled successfully');
-                fetchBookings(pagination.current, pagination.pageSize);
+                fetchBookings(pagination.current, pagination.pageSize, statusFilter);
             } else {
                 const errorMessage = result.data?.message || 'Failed to cancel booking';
                 message.error(errorMessage);
@@ -175,7 +187,7 @@ const Bookings = () => {
             const result = await bookingService.updateBookingStatus(bookingId, 'COMPLETED');
             if (result.status === 200) {
                 message.success('Booking completed successfully');
-                fetchBookings(pagination.current, pagination.pageSize);
+                fetchBookings(pagination.current, pagination.pageSize, statusFilter);
             } else {
                 const errorMessage = result.data?.message || 'Failed to complete booking';
                 message.error(errorMessage);
@@ -192,7 +204,7 @@ const Bookings = () => {
             const result = await bookingService.processRefund(bookingId);
             if (result.status === 200) {
                 message.success('Refund processed successfully');
-                fetchBookings(pagination.current, pagination.pageSize);
+                fetchBookings(pagination.current, pagination.pageSize, statusFilter);
             } else {
                 const errorMessage = result.data?.message || 'Failed to process refund';
                 message.error(errorMessage);
@@ -209,7 +221,7 @@ const Bookings = () => {
             const result = await bookingService.applyExtraCharge(bookingId);
             if (result.status === 200) {
                 message.success('Extra charge applied successfully');
-                fetchBookings(pagination.current, pagination.pageSize);
+                fetchBookings(pagination.current, pagination.pageSize, statusFilter);
             } else {
                 const errorMessage = result.data?.message || 'Failed to apply extra charge';
                 message.error(errorMessage);
@@ -226,7 +238,7 @@ const Bookings = () => {
             const result = await bookingService.updateBookingStatus(bookingId, 'USE_IN');
             if (result.status === 200) {
                 message.success('Booking marked as in use');
-                fetchBookings(pagination.current, pagination.pageSize);
+                fetchBookings(pagination.current, pagination.pageSize, statusFilter);
             } else {
                 const errorMessage = result.data?.message || 'Failed to update booking status';
                 message.error(errorMessage);
@@ -353,7 +365,7 @@ const Bookings = () => {
 
     // Refresh data
     const handleRefresh = () => {
-        fetchBookings(pagination.current, pagination.pageSize);
+        fetchBookings(pagination.current, pagination.pageSize, statusFilter);
         message.success('Dữ liệu đã được làm mới');
     };
 
@@ -373,7 +385,7 @@ const Bookings = () => {
             await Promise.all(promises);
             message.success(`Đã xác nhận ${selectedRowKeys.length} đặt xe`);
             setSelectedRowKeys([]);
-            fetchBookings(pagination.current, pagination.pageSize);
+            fetchBookings(pagination.current, pagination.pageSize, statusFilter);
         } catch (error) {
             console.error('Bulk confirm error:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Lỗi khi xác nhận đặt xe';
@@ -398,7 +410,7 @@ const Bookings = () => {
             await Promise.all(promises);
             message.success(`Đã hủy ${selectedRowKeys.length} đặt xe`);
             setSelectedRowKeys([]);
-            fetchBookings(pagination.current, pagination.pageSize);
+            fetchBookings(pagination.current, pagination.pageSize, statusFilter);
         } catch (error) {
             console.error('Bulk cancel error:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Lỗi khi hủy đặt xe';
@@ -666,9 +678,7 @@ const Bookings = () => {
             booking.car?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
             booking.bookingCode?.toLowerCase().includes(searchText.toLowerCase());
 
-        const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
-
-        return matchesSearch && matchesStatus;
+        return matchesSearch;
     });
 
     return (
@@ -768,7 +778,7 @@ const Bookings = () => {
                                         placeholder="Trạng thái"
                                         style={{ width: 150 }}
                                         value={statusFilter}
-                                        onChange={setStatusFilter}
+                                        onChange={handleStatusFilterChange}
                                         suffixIcon={<FilterOutlined />}
                                     >
                                         <Option value="all">Tất cả</Option>

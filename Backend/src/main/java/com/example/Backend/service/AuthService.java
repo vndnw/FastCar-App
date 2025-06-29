@@ -1,10 +1,7 @@
 package com.example.Backend.service;
 
 
-import com.example.Backend.dto.request.AuthRequest;
-import com.example.Backend.dto.request.RefreshRequest;
-import com.example.Backend.dto.request.RegisterRequest;
-import com.example.Backend.dto.request.UserRequest;
+import com.example.Backend.dto.request.*;
 import com.example.Backend.dto.response.AuthResponse;
 import com.example.Backend.dto.response.AuthValidateResponse;
 import com.example.Backend.dto.response.UserResponse;
@@ -12,6 +9,7 @@ import com.example.Backend.exception.RefreshTokenExpiredException;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.model.enums.TokenType;
 import com.example.Backend.repository.RefreshTokenRepository;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -131,8 +129,15 @@ public class AuthService {
         return userService.checkEmailExists(email);
     }
 
-    public boolean changePassword(String email, String newPassword) {
-        return userService.changePassword(email, newPassword);
+    public boolean setPassword(String email, String newPassword) {
+        return userService.setPassword(email, newPassword);
+    }
+
+    public boolean changePassword(String email, String oldPassword, String newPassword) {
+        if (!userService.checkEmailExists(email)) {
+            throw new ResourceNotFoundException("User not found with email: " + email);
+        }
+        return userService.changePassword(email, oldPassword, newPassword);
     }
 
     public boolean changePasswordForAdmin(String email, String newPassword) {
@@ -160,5 +165,10 @@ public class AuthService {
             log.error("Failed to activate user with email {}", email);
             throw new ResourceNotFoundException("User not found or already activated");
         }
+    }
+
+    public boolean changePassword(@Valid ChangePasswordRequest changePasswordRequest) {
+
+        return false;
     }
 }

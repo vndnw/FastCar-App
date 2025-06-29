@@ -5,10 +5,7 @@ import com.example.Backend.dto.response.*;
 import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.BookingMapper;
 import com.example.Backend.model.*;
-import com.example.Backend.model.enums.BookingStatus;
-import com.example.Backend.model.enums.BookingType;
-import com.example.Backend.model.enums.DriverStatus;
-import com.example.Backend.model.enums.PaymentType;
+import com.example.Backend.model.enums.*;
 import com.example.Backend.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +43,7 @@ public class BookingService {
     private final CarConditionCheckService carConditionCheckService;
     private final VNPAYService vnpayService;
     private final EmailService emailService;
+    private final DocumentService documentService;
 
     @Autowired
     public BookingService(
@@ -58,7 +56,8 @@ public class BookingService {
             LocationService locationService,
             PaymentService paymentService,
             CarConditionCheckService carConditionCheckService,
-            VNPAYService vnpayService, EmailService emailService) {
+            VNPAYService vnpayService, EmailService emailService,
+            DocumentService documentService) {
         this.bookingRepository = bookingRepository;
         this.carRepository = carRepository;
         this.userRepository = userRepository;
@@ -70,10 +69,14 @@ public class BookingService {
         this.carConditionCheckService = carConditionCheckService;
         this.vnpayService = vnpayService;
         this.emailService = emailService;
+        this.documentService = documentService;
     }
 
     public ReservationFeeResponse createBookingIsLogin(HttpServletRequest request, BookingRequest bookingRequest) {
         User currentUser = getCurrentUser();
+        if(documentService.checkIfDocumentExistsByUserAndType(currentUser, DocumentType.CCCD)){
+            throw new BookingException("You must upload your CCCD before booking a car.");
+        }
         BookingResponse bookingResponse = addBooking(currentUser , bookingRequest);
         Payment payment = paymentService.addPayment(bookingResponse.getId(), PaymentRequest.builder()
                 .amount(bookingResponse.getReservationFee())
@@ -90,6 +93,9 @@ public class BookingService {
     public ReservationFeeResponse createBooking(HttpServletRequest request, long userId ,BookingRequest bookingRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        if(!documentService.checkIfDocumentExistsByUserAndType(user, DocumentType.CCCD)){
+            throw new BookingException("You must upload your CCCD before booking a car.");
+        }
         BookingResponse bookingResponse = addBooking(user, bookingRequest);
         Payment payment = paymentService.addPayment(bookingResponse.getId(), PaymentRequest.builder()
                 .amount(bookingResponse.getReservationFee())

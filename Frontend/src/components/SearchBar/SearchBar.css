@@ -1,6 +1,6 @@
 .search-bar-container {
     position: absolute;
-    top: 120px;
+    top: 100px;
     left: 0;
     right: 0;
     z-index: 999;
@@ -9,14 +9,14 @@
 
 .search-bar-container.sticky {
     position: fixed;
-    top: 80px;
+    top: 0px;
     left: 0;
     right: 0;
     z-index: 1000;
 }
 
 .search-bar-wrapper {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -29,7 +29,7 @@
 }
 
 .search-bar-card .ant-card-body {
-    padding: 16px 24px !important;
+    padding: 12px 24px !important;
 }
 
 /* Row và Column Layout */

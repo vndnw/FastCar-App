@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Spin } from 'antd';
 
-const ProtectedRoute = ({ children, requireAdmin = false }) => {
+const ProtectedRoute = ({ children, requireAdmin = false, requireOwner = false }) => {
     const { isAuthenticated, user, loading } = useAuth();
     const location = useLocation();
 
@@ -28,6 +28,11 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
 
     // If admin access is required but user is not admin
     if (requireAdmin && (!user?.roles?.includes('admin'))) {
+        return <Navigate to="/" replace />;
+    }
+
+    // If owner access is required but user is not owner
+    if (requireOwner && (!user?.roles?.includes('owner'))) {
         return <Navigate to="/" replace />;
     }
 

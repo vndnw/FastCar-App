@@ -26,9 +26,27 @@ export const carService = {
         return apiClient.post('/car', carData);
     },
 
-    // Create new car by user
-    createCarByUser: async (userId, carData) => {
-        return apiClient.post(`/user/${userId}/create-car`, carData);
+    // Create new car by user with images
+    createCarByUser: async (userId, carData, files) => {
+        const formData = new FormData();
+        
+        // Add car data as JSON string
+        formData.append('carRequest', new Blob([JSON.stringify(carData)], {
+            type: 'application/json'
+        }));
+        
+        // Add multiple files
+        if (files && files.length > 0) {
+            files.forEach((file) => {
+                formData.append('file', file);
+            });
+        }
+        
+        return apiClient.post(`/user/${userId}/create-car`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
     },
 
     // Update car

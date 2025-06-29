@@ -27,12 +27,25 @@ import CarBrand from "./views/admin/CarBrand";
 import Cars from "./views/admin/Cars";
 import Bookings from "./views/admin/Bookings";
 import BookingDetail from "./views/admin/BookingDetail";
-import Main from "./components/admin/layout/Main";
+import Documents from "./views/admin/Documents";
+import AdminLayout from "./components/admin/layout/AdminLayout";
 import CarEdit from "./views/admin/CarEdit";
 import CarDetailAdmin from "./views/admin/CarDetail";
 
+// Owner Panel
+import OwnerLayout from "./components/layout/OwnerLayout";
+import OwnerDashboard from "./views/owner/OwnerDashboard";
+import OwnerCars from "./views/owner/OwnerCars";
+import OwnerBookings from "./views/owner/OwnerBookings";
+import OwnerNotFound from "./views/owner/OwnerNotFound";
+import OwnerBookingDetail from './views/owner/OwnerBookingDetail';
+
+// 404 Not Found
+import NotFound from "./views/NotFound";
+
 
 import OwnerCar from './views/OwnerCar/OwnerCar';
+import EditCar from './views/OwnerCar/EditCar';
 import MyTrips from './views/MyTrips/MyTrips';
 
 import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
@@ -53,6 +66,7 @@ function App() {
               <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/about" element={<About />} />
               <Route path="/owner-car" element={<OwnerCar />} />
+              <Route path="/edit-car/:carId" element={<EditCar />} />
               <Route path="/booking/:carId" element={<Booking />} />
               <Route path="/payment-callback" element={<PaymentCallback />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -76,7 +90,7 @@ function App() {
             {/* Layout cho trang admin */}
             <Route path="/admin" element={
               <ProtectedRoute requireAdmin={true}>
-                <Main />
+                <AdminLayout />
               </ProtectedRoute>
             }>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
@@ -91,12 +105,30 @@ function App() {
               <Route path="cars/edit/:carId" element={<CarEdit />} />
               <Route path="bookings" element={<Bookings />} />
               <Route path="bookings/:bookingId" element={<BookingDetail />} />
+              <Route path="documents" element={<Documents />} />
               <Route path="*" element={<AdminNotFound />} />
+            </Route>
+
+            {/* Layout cho trang owner */}
+            <Route path="/owner" element={
+              <ProtectedRoute requireOwner={true}>
+                <OwnerLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="/owner/dashboard" replace />} />
+              <Route path="dashboard" element={<OwnerDashboard />} />
+              <Route path="cars" element={<OwnerCars />} />
+              <Route path="cars/add" element={<OwnerCar />} />
+              <Route path="cars/:carId" element={<CarDetailAdmin />} />
+              <Route path="cars/edit/:carId" element={<CarEdit />} />
+              <Route path="bookings" element={<OwnerBookings />} />
+              <Route path="bookings/:bookingId" element={<OwnerBookingDetail />} />
+              <Route path="*" element={<OwnerNotFound />} />
             </Route>
 
 
             {/* Fallback nếu route không khớp */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </CarProvider>
       </BookingProvider>

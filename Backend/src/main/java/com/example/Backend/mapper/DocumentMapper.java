@@ -10,15 +10,22 @@ public class DocumentMapper {
         return DocumentResponse.builder()
                 .id(document.getId())
                 .documentType(document.getDocumentType())
-                .documentNumber(document.getDocumentNumber())
-                .description(document.getDescription())
-                .expiryDate(document.getExpiryDate())
-                .imageBackUrl(document.getImageBackUrl())
-                .imageFrontUrl(document.getImageFrontUrl())
+                .name(document.getName())
+                .gender(document.getGender() != null ? document.getGender() : null)
+                .rankLicense(document.getRankLicense() != null ? document.getRankLicense() : null)
+                .serialNumber(document.getSerialNumber())
+                .dateOfBirth(document.getDateOfBirth())
                 .issueDate(document.getIssueDate())
+                .expiryDate(document.getExpiryDate())
+                .placeOfIssue(document.getPlaceOfIssue())
+                .address(document.getLocation() != null ? document.getLocation().getAddress() : "")
+                .imageBackUrl(document.getImageBackUrl() != null ? document.getImageBackUrl() : "")
+                .imageFrontUrl(document.getImageFrontUrl() != null ? document.getImageFrontUrl() : "")
                 .updateAt(document.getUpdateAt())
                 .active(document.isActive())
+                .status(document.getStatus())
                 .createAt(document.getCreateAt())
                 .build();
     }
+
 }

@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
@@ -118,19 +119,35 @@ public class SecurityConfig {
                 .collect(Collectors.toList());
     }
 
+//    @Bean
+//    public CorsFilter corsFilter() {
+//        CorsConfiguration corsConfiguration = new CorsConfiguration();
+//
+//        log.info("Allowed Origins: {}", allowedOrigins);
+//        corsConfiguration.setAllowedOrigins(allowedOrigins);
+//        corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
+//        corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+//        // corsConfiguration.setAllowCredentials(true);
+//
+//        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+//        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+//        return new CorsFilter(urlBasedCorsConfigurationSource);
+//    }
+
     @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // allowedOrigins đã được khởi tạo qua @PostConstruct, nên nó sẵn sàng dùng
+        configuration.setAllowedOrigins(this.allowedOrigins);
+        configuration.addAllowedMethod(CorsConfiguration.ALL); // Cho phép tất cả các phương thức (GET, POST, OPTIONS,...)
+        configuration.addAllowedHeader(CorsConfiguration.ALL);   // Cho phép tất cả các header
+        // Nếu bạn gửi cookie hoặc token xác thực (ví dụ: JWT trong Authorization header)
+        // từ frontend, bạn cần bỏ comment dòng dưới đây:
+        // configuration.setAllowCredentials(true);
 
-        log.info("Allowed Origins: {}", allowedOrigins);
-        corsConfiguration.setAllowedOrigins(allowedOrigins);
-        corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
-        corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
-        // corsConfiguration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-        return new CorsFilter(urlBasedCorsConfigurationSource);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Áp dụng cấu hình này cho tất cả các đường dẫn API
+        return source;
     }
 
 }

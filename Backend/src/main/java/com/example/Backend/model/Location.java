@@ -38,4 +38,7 @@ public class Location {
 
     @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
     private List<User> user;
+
+    @OneToOne(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Document document; // Thêm quan hệ với Document nếu cần thiết
 }

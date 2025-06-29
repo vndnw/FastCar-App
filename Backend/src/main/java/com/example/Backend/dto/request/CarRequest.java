@@ -30,9 +30,6 @@ public class CarRequest {
     private String licensePlate;
     private String fuelConsumption;//  fuel_consumption/100km
     private double pricePerHour;
-    private double pricePer4Hour;
-    private double pricePer8Hour;
-    private double pricePer12Hour;
-    private double pricePer24Hour;
     private String description;
+    private List<String> images;
 }

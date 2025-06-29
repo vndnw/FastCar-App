@@ -53,6 +53,17 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
+// Fuel type mapping function
+const getFuelTypeLabel = (fuelType) => {
+    const fuelTypeMap = {
+        'OIL': 'Oil',
+        'HYBRID': 'Hybrid',
+        'ELECTRIC': 'Electric',
+        'GASOLINE': 'Gasoline'
+    };
+    return fuelTypeMap[fuelType] || fuelType;
+};
+
 const Cars = () => {
     const { user } = useAuth(); // Get current user from auth context
     const navigate = useNavigate();
@@ -117,10 +128,6 @@ const Cars = () => {
                     carType: car.carType,
                     licensePlate: car.licensePlate,
                     pricePerHour: car.pricePerHour,
-                    pricePer4Hour: car.pricePer4Hour,
-                    pricePer8Hour: car.pricePer8Hour,
-                    pricePer12Hour: car.pricePer12Hour,
-                    pricePer24Hour: car.pricePer24Hour,
                     fuelType: car.fuelType,
                     fuelConsumption: car.fuelConsumption,
                     status: car.status,
@@ -297,10 +304,6 @@ const Cars = () => {
                 licensePlate: values.licensePlate,
                 fuelConsumption: values.fuelConsumption,
                 pricePerHour: values.pricePerHour,
-                pricePer4Hour: values.pricePer4Hour,
-                pricePer8Hour: values.pricePer8Hour,
-                pricePer12Hour: values.pricePer12Hour,
-                pricePer24Hour: values.pricePer24Hour,
                 description: values.description
             };
 
@@ -392,10 +395,6 @@ const Cars = () => {
                         carType: car.carType,
                         licensePlate: car.licensePlate,
                         pricePerHour: car.pricePerHour,
-                        pricePer4Hour: car.pricePer4Hour,
-                        pricePer8Hour: car.pricePer8Hour,
-                        pricePer12Hour: car.pricePer12Hour,
-                        pricePer24Hour: car.pricePer24Hour,
                         fuelType: car.fuelType,
                         fuelConsumption: car.fuelConsumption,
                         status: car.status,
@@ -470,12 +469,25 @@ const Cars = () => {
         switch (carType) {
             case 'STANDARD':
                 return 'blue';
-            case 'PREMIUM':
-                return 'purple';
             case 'LUXURY':
                 return 'gold';
-            case 'ECONOMY':
-                return 'green';
+            case 'SUPER_LUXURY':
+                return 'magenta';
+            default:
+                return 'default';
+        }
+    };
+
+    const getFuelTypeColor = (fuelType) => {
+        switch (fuelType) {
+            case 'OIL':
+                return 'volcano';
+            case 'GASOLINE':
+                return 'orange';
+            case 'ELECTRIC':
+                return 'cyan';
+            case 'HYBRID':
+                return 'lime';
             default:
                 return 'default';
         }
@@ -547,9 +559,12 @@ const Cars = () => {
                         <Tag color={getCarTypeColor(record.carType)}>
                             {record.carType}
                         </Tag>
+                        <Tag color={getFuelTypeColor(record.fuelType)}>
+                            {getFuelTypeLabel(record.fuelType)}
+                        </Tag>
                     </div>
                     <div style={{ fontSize: 12, color: '#666' }}>
-                        {record.seats} seats • {record.fuelType}
+                        {record.seats} seats
                     </div>
                     <div style={{ fontSize: 11, color: '#999' }}>
                         {record.fuelConsumption}
@@ -565,9 +580,6 @@ const Cars = () => {
                 <div>
                     <div style={{ fontWeight: 'bold', fontSize: 13 }}>
                         {formatCurrency(record.pricePerHour)}/hour
-                    </div>
-                    <div style={{ fontSize: 11, color: '#666' }}>
-                        Daily: {formatCurrency(record.pricePer24Hour)}
                     </div>
                 </div>
             ),

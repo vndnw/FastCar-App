@@ -25,7 +25,7 @@ import {
     UploadOutlined,
     DeleteOutlined
 } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { carService } from '../../../services/carService';
 import { carBrandService } from '../../../services/carBrandService';
 import { featureService } from '../../../services/featureService';
@@ -38,6 +38,11 @@ const { Option } = Select;
 const CarEdit = () => {
     const navigate = useNavigate();
     const { carId } = useParams();
+    const location = useLocation();
+
+    // Determine if we're in admin or owner context
+    const isOwnerContext = location.pathname.includes('/owner/');
+    const basePath = isOwnerContext ? '/owner/cars' : '/admin/cars';
 
     const [form] = Form.useForm();
     const [car, setCar] = useState(null);
@@ -48,6 +53,11 @@ const CarEdit = () => {
     const [carFeatures, setCarFeatures] = useState([]);
     const [fileList, setFileList] = useState([]); // For file upload
     const [currentImages, setCurrentImages] = useState([]); // Current car images
+
+    // Feature creation modal state
+    const [featureModalVisible, setFeatureModalVisible] = useState(false);
+    const [featureCreateLoading, setFeatureCreateLoading] = useState(false);
+    const [featureForm] = Form.useForm();
 
     useEffect(() => {
         fetchCarDetail();
@@ -80,10 +90,6 @@ const CarEdit = () => {
                     licensePlate: carData.licensePlate,
                     fuelConsumption: carData.fuelConsumption,
                     pricePerHour: carData.pricePerHour,
-                    pricePer4Hour: carData.pricePer4Hour,
-                    pricePer8Hour: carData.pricePer8Hour,
-                    pricePer12Hour: carData.pricePer12Hour,
-                    pricePer24Hour: carData.pricePer24Hour,
                     description: carData.description,
                     // Handle location data - parse address into separate fields if needed
                     street: carData.location?.street || (carData.location?.address ? carData.location.address.split(',')[0]?.trim() : ''),
@@ -98,12 +104,12 @@ const CarEdit = () => {
                 });
             } else {
                 message.error(result.data?.message || 'Failed to fetch car details');
-                navigate('/admin/cars');
+                navigate(basePath);
             }
         } catch (error) {
             console.error('Error fetching car details:', error);
             message.error(error.response?.data?.message || 'Failed to fetch car details');
-            navigate('/admin/cars');
+            navigate(basePath);
         } finally {
             setInitialLoading(false);
         }
@@ -171,17 +177,12 @@ const CarEdit = () => {
                 type: values.type,
                 licensePlate: values.licensePlate,
                 pricePerHour: values.pricePerHour,
-                pricePer4Hour: values.pricePer4Hour,
-                pricePer8Hour: values.pricePer8Hour,
-                pricePer12Hour: values.pricePer12Hour,
-                pricePer24Hour: values.pricePer24Hour,
                 fuelType: values.fuelType,
                 fuelConsumption: values.fuelConsumption,
                 color: values.color,
                 description: values.description,
                 carFeatures: values.carFeatures || [],
                 location: {
-                    id: values.locationId,
                     address: values.address,
                     latitude: values.latitude,
                     longitude: values.longitude,
@@ -275,13 +276,36 @@ const CarEdit = () => {
         }
     };
 
+    // Handle feature creation
+    const handleCreateFeature = async (values) => {
+        try {
+            setFeatureCreateLoading(true);
+            const result = await featureService.createFeature(values);
+
+            if (result.status === 200 || result.status === 201) {
+                message.success('Feature created successfully!');
+                setFeatureModalVisible(false);
+                featureForm.resetFields();
+                // Refresh features list
+                await fetchCarFeatures();
+            } else {
+                message.error(result.data?.message || 'Failed to create feature');
+            }
+        } catch (error) {
+            console.error('Error creating feature:', error);
+            message.error(error.response?.data?.message || 'Failed to create feature');
+        } finally {
+            setFeatureCreateLoading(false);
+        }
+    };
+
     if (!car) {
         return (
             <Card>
                 <div style={{ textAlign: 'center', padding: '50px 0' }}>
                     <CarOutlined style={{ fontSize: 48, color: '#ccc', marginBottom: 16 }} />
                     <Title level={4} style={{ color: '#666' }}>Car not found</Title>
-                    <Button type="primary" onClick={() => navigate('/admin/cars')}>
+                    <Button type="primary" onClick={() => navigate(basePath)}>
                         Back to Cars
                     </Button>
                 </div>
@@ -309,7 +333,7 @@ const CarEdit = () => {
                         <Space>
                             <Button
                                 icon={<ArrowLeftOutlined />}
-                                onClick={() => navigate('/admin/cars')}
+                                onClick={() => navigate(basePath)}
                             >
                                 Back to Cars
                             </Button>
@@ -439,11 +463,9 @@ const CarEdit = () => {
                                 rules={[{ required: true, message: 'Please select car type' }]}
                             >
                                 <Select placeholder="Select car type">
-                                    <Option value="ECONOMY">Economy</Option>
-                                    <Option value="STANDARD">Standard</Option>
-                                    <Option value="PREMIUM">Premium</Option>
-                                    <Option value="LUXURY">Luxury</Option>
                                     <Option value="SUPER_LUXURY">Super Luxury</Option>
+                                    <Option value="LUXURY">Luxury</Option>
+                                    <Option value="STANDARD">Standard</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -476,66 +498,6 @@ const CarEdit = () => {
                                 />
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
-                            <Form.Item
-                                label="Price per 4 Hours"
-                                name="pricePer4Hour"
-                            >
-                                <InputNumber
-                                    placeholder="Price per 4 hours"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Row gutter={16}>
-                        <Col span={8}>
-                            <Form.Item
-                                label="Price per 8 Hours"
-                                name="pricePer8Hour"
-                            >
-                                <InputNumber
-                                    placeholder="Price per 8 hours"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item
-                                label="Price per 12 Hours"
-                                name="pricePer12Hour"
-                            >
-                                <InputNumber
-                                    placeholder="Price per 12 hours"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item
-                                label="Price per Day"
-                                name="pricePer24Hour"
-                                rules={[{ required: true, message: 'Please enter daily price' }]}
-                            >
-                                <InputNumber
-                                    placeholder="Price per day"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
                     </Row>
 
                     <Divider>Vehicle Details</Divider>
@@ -548,10 +510,10 @@ const CarEdit = () => {
                                 rules={[{ required: true, message: 'Please select fuel type' }]}
                             >
                                 <Select placeholder="Select fuel type">
-                                    <Option value="GASOLINE">Gasoline</Option>
-                                    <Option value="DIESEL">Diesel</Option>
-                                    <Option value="ELECTRIC">Electric</Option>
+                                    <Option value="OIL">Oil</Option>
                                     <Option value="HYBRID">Hybrid</Option>
+                                    <Option value="ELECTRIC">Electric</Option>
+                                    <Option value="GASOLINE">Gasoline</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -629,7 +591,19 @@ const CarEdit = () => {
                         </Col>
                     </Row>
 
-                    <Divider>Features</Divider>
+                    <Divider>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                            <span>Features</span>
+                            <Button
+                                type="primary"
+                                size="small"
+                                icon={<PlusOutlined />}
+                                onClick={() => setFeatureModalVisible(true)}
+                            >
+                                Add Feature
+                            </Button>
+                        </div>
+                    </Divider>
 
                     <Row gutter={16}>
                         <Col span={24}>
@@ -772,7 +746,7 @@ const CarEdit = () => {
 
                     <Form.Item style={{ marginTop: 32, textAlign: 'right' }}>
                         <Space size="middle">
-                            <Button size="large" onClick={() => navigate('/admin/cars')}>
+                            <Button size="large" onClick={() => navigate(basePath)}>
                                 Cancel
                             </Button>
                             <Button
@@ -791,6 +765,55 @@ const CarEdit = () => {
                     </Form.Item>
                 </Form>
             </Card>
+
+            {/* Feature Creation Modal */}
+            <Modal
+                title="Create New Feature"
+                open={featureModalVisible}
+                onCancel={() => {
+                    setFeatureModalVisible(false);
+                    featureForm.resetFields();
+                }}
+                footer={null}
+                destroyOnClose
+            >
+                <Form
+                    form={featureForm}
+                    layout="vertical"
+                    onFinish={handleCreateFeature}
+                >
+                    <Form.Item
+                        label="Feature Name"
+                        name="name"
+                        rules={[{ required: true, message: 'Please enter feature name' }]}
+                    >
+                        <Input placeholder="Enter feature name" />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Description"
+                        name="description"
+                    >
+                        <TextArea
+                            rows={4}
+                            placeholder="Enter feature description"
+                        />
+                    </Form.Item>
+
+                    <Form.Item style={{ textAlign: 'right' }}>
+                        <Button onClick={() => setFeatureModalVisible(false)} style={{ marginRight: 8 }}>
+                            Cancel
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={featureCreateLoading}
+                        >
+                            Create Feature
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };

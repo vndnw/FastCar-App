@@ -3,11 +3,10 @@ import apiClient from '../utils/apiClient';
 // Car Brand API service
 export const carBrandService = {
     // Get all car brands with pagination
-    getCarBrands: async (page = 0, size = 10, sort = 'id,desc') => {
+    getCarBrands: async (page = 0, size = 100) => {
         const params = new URLSearchParams({
             page: page.toString(),
-            size: size.toString(),
-            sort: sort
+            size: size.toString()
         });
 
         return apiClient.get(`/carbrand?${params}`);

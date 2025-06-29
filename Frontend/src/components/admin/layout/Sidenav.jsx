@@ -132,6 +132,24 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  const document = [
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      key={0}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4 3C3.44772 3 3 3.44772 3 4V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V4C17 3.44772 16.5523 3 16 3H4ZM5 6C5 5.44772 5.44772 5 6 5H14C14.5523 5 15 5.44772 15 6C15 6.55228 14.5523 7 14 7H6C5.44772 7 5 6.55228 5 6ZM5 9C5 8.44772 5.44772 8 6 8H14C14.5523 8 15 8.44772 15 9C15 9.55228 14.5523 10 14 10H6C5.44772 10 5 9.55228 5 9ZM5 12C5 11.4477 5.44772 11 6 11H10C10.5523 11 11 11.4477 11 12C11 12.5523 10.5523 13 10 13H6C5.44772 13 5 12.5523 5 12Z"
+        fill={color}
+      />
+    </svg>,
+  ];
+
 
   return (
     <>
@@ -218,6 +236,19 @@ function Sidenav({ color }) {
             <span className="label">Bookings</span>
           </NavLink>
         </Menu.Item>
+        <Menu.Item key="14">
+          <NavLink to="/admin/documents">
+            <span
+              className="icon"
+              style={{
+                background: page === "admin/documents" ? color : "",
+              }}
+            >
+              {document}
+            </span>
+            <span className="label">Documents</span>
+          </NavLink>
+        </Menu.Item>
 
       </Menu>
       <div className="aside-footer">
@@ -232,9 +263,11 @@ function Sidenav({ color }) {
           </span>
           <h6>Need Help?</h6>
           <p>Please check our docs</p>
-          <Button type="primary" className="ant-btn-sm ant-btn-block">
-            DOCUMENTATION
-          </Button>
+          <a href="https://github.com/Vo-Xuan-Duong/BookingACar" target="_blank" rel="noopener noreferrer">
+            <Button type="primary" className="ant-btn-sm ant-btn-block">
+              DOCUMENTATION
+            </Button>
+          </a>
         </div>
       </div>
     </>

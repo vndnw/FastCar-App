@@ -1,4 +1,5 @@
 import apiClient from '../utils/apiClient';
+import { carService } from './carService';
 
 // Booking service
 export const bookingService = {
@@ -98,7 +99,7 @@ export const bookingService = {
     },
 
     // Get user booking history
-    getUserBookingHistory: async (userId, page = 0, size = 9999) => {
+    getUserBookingHistory: async (userId, page = 0, size = 10) => {
         const params = new URLSearchParams({
             userId: userId.toString(),
             page: page.toString(),
@@ -106,6 +107,87 @@ export const bookingService = {
         });
 
         return apiClient.get(`/booking/history?${params}`);
+    },
+
+    // Check-in booking (condition check)
+    checkInBooking: async (bookingId, conditionData) => {
+        return apiClient.post(`/booking/${bookingId}/condition-check`, conditionData);
+    },
+
+    // Check-out booking
+    checkOutBooking: async (bookingId, checkoutData) => {
+        return apiClient.post(`/booking/${bookingId}/checkout`, checkoutData);
+    },
+
+    // Get all bookings for cars owned by the current user
+    getOwnerBookings: async (userId, page = 0, size = 10) => {
+        try {
+            console.log('getOwnerBookings called with:', { userId, page, size });
+
+            // First, get all cars owned by the user
+            const carsResponse = await carService.getCarsByUserId(userId);
+            console.log('Cars response:', carsResponse);
+
+            const ownedCars = carsResponse.data || [];
+            console.log('Owned cars:', ownedCars);
+
+            if (ownedCars.length === 0) {
+                console.log('No cars found for user', userId);
+                return {
+                    status: 200,
+                    data: {
+                        content: [],
+                        totalElements: 0,
+                        totalPages: 0,
+                        size: size,
+                        number: page
+                    }
+                };
+            }
+
+            // Then, get bookings for each car
+            console.log('Fetching bookings for', ownedCars.length, 'cars');
+            const bookingPromises = ownedCars.map(car => {
+                console.log('Fetching bookings for car ID:', car.id);
+                return apiClient.get(`/booking/car/${car.id}`);
+            });
+
+            const bookingResponses = await Promise.all(bookingPromises);
+            console.log('Booking responses:', bookingResponses);
+
+            // Flatten all bookings into a single array
+            const allBookings = bookingResponses.flatMap(response => {
+                const bookings = response.data?.content || response.data || [];
+                console.log('Bookings from response:', bookings);
+                return bookings;
+            });
+
+            console.log('All bookings combined:', allBookings);
+
+            // Sort bookings by creation date (most recent first)
+            allBookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            // Apply pagination
+            const startIndex = page * size;
+            const endIndex = startIndex + size;
+            const paginatedBookings = allBookings.slice(startIndex, endIndex);
+
+            console.log('Final paginated bookings:', paginatedBookings);
+
+            return {
+                status: 200,
+                data: {
+                    content: paginatedBookings,
+                    totalElements: allBookings.length,
+                    totalPages: Math.ceil(allBookings.length / size),
+                    size: size,
+                    number: page
+                }
+            };
+        } catch (error) {
+            console.error('Error fetching owner bookings:', error);
+            throw error;
+        }
     }
 };
 

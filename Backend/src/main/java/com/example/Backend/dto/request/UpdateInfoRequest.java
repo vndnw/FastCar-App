@@ -21,5 +21,4 @@ public class UpdateInfoRequest {
     private LocationRequest address;
     private String profilePicture;
     private LocalDate dateOfBirth;
-    private BankInformationRequest bankInformation;
 }

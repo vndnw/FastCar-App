@@ -2,6 +2,8 @@ package com.example.Backend.model;
 
 import com.example.Backend.model.enums.DocumentStatus;
 import com.example.Backend.model.enums.DocumentType;
+import com.example.Backend.model.enums.RankLicense;
+import com.example.Backend.model.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,20 +25,29 @@ public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     @ManyToOne
-    @JoinColumn(name = "car_id")
-    private Car car;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
-    private String documentNumber;
+    private String serialNumber;
+    private String name;
+    private LocalDate dateOfBirth;
     private LocalDate issueDate;
     private LocalDate expiryDate;
+    private String placeOfIssue;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "location_id")
+    private Location location;
+
     private String imageFrontUrl;
     private String imageBackUrl;
-    @Column(columnDefinition = "TEXT")
-    private String description;
+
+    private RankLicense rankLicense;
+    private Gender gender;
+
     @Enumerated(EnumType.STRING)
     private DocumentStatus status;
     @Column(columnDefinition = "boolean default false")

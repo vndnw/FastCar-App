@@ -101,6 +101,7 @@ public class PaymentService {
 
             if(payment.getType() == PaymentType.RENTAL) {
                 emailService.sendMailCheckIn(booking);
+                emailService.sendMailContract(booking);
             }
 
         } else if ("failed".equalsIgnoreCase(status)) {

@@ -535,7 +535,6 @@ function UserPage() {
                   latitude: values.address?.latitude || 0.1,
                   longitude: values.address?.longitude || 0.1,
                 },
-                profilePicture: values.profilePicture || '',
                 dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
                 roles: values.roles || ['user']
               }; const result = await userService.createUser(newUser);
@@ -635,14 +634,6 @@ function UserPage() {
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Profile Picture URL"
-                name="profilePicture"
-              >
-                <Input placeholder="Enter profile picture URL" />
-              </Form.Item>
-            </Col>
             <Col span={12}>
               <Form.Item
                 label="Date of Birth"

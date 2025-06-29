@@ -12,7 +12,7 @@ const Footer = () => {
             <div className="footer-column">
               <div className="navbar-logo" style={{ cursor: 'pointer' }}>
                 <CarOutlined />
-                CarRental
+                FastCar
               </div>
               <div className="footer-no-link">CÔNG TY TNHH ABCDE VIỆT NAM</div>
               <div className="footer-no-link">Mã số thuế: 123456789. Cấp ngày: 12/12/2024</div>
