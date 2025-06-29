@@ -39,7 +39,7 @@ const CarCard = ({ car, isInCarousel = false }) => {
         <Card hoverable
             onClick={handleCardClick}
             style={cardStyle}
-            bodyStyle={{ padding: '16px' }}
+            styles={{ body: { padding: '16px' } }}
             cover={
                 <div style={{ position: 'relative' }}>
                     <img
