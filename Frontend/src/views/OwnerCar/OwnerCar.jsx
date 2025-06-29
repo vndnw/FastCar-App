@@ -168,8 +168,7 @@ const OwnerCar = () => {
                 display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center', 
-                minHeight: '100vh',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                minHeight: '100vh'
             }}>
                 <Card style={{ 
                     borderRadius: '16px', 
@@ -186,7 +185,6 @@ const OwnerCar = () => {
     return (
         <div className="owner-car-page" style={{
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
             padding: '20px'
         }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -207,7 +205,6 @@ const OwnerCar = () => {
                         overflow: 'hidden'
                     }}
                     headStyle={{
-                        background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
                         color: 'white',
                         borderBottom: 'none',
                         padding: '24px'
@@ -444,7 +441,6 @@ const OwnerCar = () => {
                                                 borderRadius: '24px',
                                                 fontSize: '16px',
                                                 fontWeight: '600',
-                                                background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
                                                 border: 'none',
                                                 boxShadow: '0 4px 16px rgba(24, 144, 255, 0.3)'
                                             }}

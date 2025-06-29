@@ -52,7 +52,7 @@
 
 .booking-detail-modal .ant-descriptions-item-label {
     font-weight: 600;
-    color: #1890ff;
+    color: #51c09f;
 }
 
 .booking-detail-modal .ant-descriptions-item-content {
@@ -92,7 +92,7 @@
 .booking-summary-value {
     font-size: 16px;
     font-weight: 600;
-    color: #1890ff;
+    color: #51c09f;
 }
 
 /* Tab Menu Styles */
@@ -152,7 +152,7 @@
 .idcard-tab .ant-card-head-title,
 .license-tab .ant-card-head-title {
     font-weight: 600;
-    color: #1890ff;
+    color: #51c09f;
 }
 
 /* Responsive Tab Styles */
@@ -201,16 +201,16 @@
 
 .profile-menu .ant-menu-item:hover {
     background: #e6f7ff;
-    color: #1890ff;
+    color: #51c09f;
 }
 
 .profile-menu .ant-menu-item-selected {
-    background: #1890ff;
+    background: #51c09f;
     color: white;
 }
 
 .profile-menu .ant-menu-item-selected:hover {
-    background: #40a9ff;
+    background: #51c09f;
     color: white;
 }
 

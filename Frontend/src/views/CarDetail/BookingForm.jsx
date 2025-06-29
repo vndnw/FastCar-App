@@ -399,7 +399,6 @@ const BookingForm = ({ car }) => {
                     block
                     icon={<GiftOutlined />}
                     style={{
-                        background: '#52c41a',
                         border: 'none',
                         fontWeight: 600,
                         marginBottom: couponError ? 4 : 0
