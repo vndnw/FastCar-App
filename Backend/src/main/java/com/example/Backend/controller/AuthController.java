@@ -156,10 +156,10 @@ public class AuthController {
         }
         return ResponseEntity.ok(responseData);
     }
-    
+
     @PatchMapping("/set-password")
-    public ResponseEntity<?> changePassword(@RequestParam String email, @RequestParam String newPassword) {
-        if(authService.setPassword(email, newPassword)) {
+    public ResponseEntity<?> changePassword(@RequestBody SetPasswordNew setPasswordNew) {
+        if(authService.setPassword(setPasswordNew.getEmail(), setPasswordNew.getNewPassword())) {
             ResponseData<?> responseData = ResponseData.builder()
                     .status(200)
                     .message("Password changed successfully")
