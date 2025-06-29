@@ -201,7 +201,7 @@ public class UserService {
         return true; // Role added successfully
     }
 
-    public boolean changePassword(String email, String newPassword) {
+    public boolean setPassword(String email, String newPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if(!user.isRequiredChangePassword()){
@@ -211,6 +211,8 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
+
+
 
     public boolean forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
@@ -237,5 +239,14 @@ public class UserService {
     }
 
 
-
+    public boolean changePassword(String email, String oldPassword, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true; // Password changed successfully
+    }
 }

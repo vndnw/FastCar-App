@@ -157,9 +157,10 @@ public class AuthController {
         return ResponseEntity.ok(responseData);
     }
 
-    @PatchMapping("/change-password")
+    @PreAuthorize("hasRole('user')")
+    @PatchMapping("/set-password")
     public ResponseEntity<?> changePassword(@RequestParam String email, @RequestParam String newPassword) {
-        if(authService.changePassword(email, newPassword)) {
+        if(authService.setPassword(email, newPassword)) {
             ResponseData<?> responseData = ResponseData.builder()
                     .status(200)
                     .message("Password changed successfully")
@@ -175,4 +176,17 @@ public class AuthController {
             return ResponseEntity.badRequest().body(responseData);
         }
     }
+
+    @PreAuthorize("hasRole('user')")
+    @PatchMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+        boolean isChanged = authService.changePassword(changePasswordRequest);
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(isChanged ? 200 : 400)
+                .message(isChanged ? "Password changed successfully" : "Failed to change password")
+                .data(null)
+                .build();
+        return ResponseEntity.status(responseData.getStatus()).body(responseData);
+    }
+
 }
