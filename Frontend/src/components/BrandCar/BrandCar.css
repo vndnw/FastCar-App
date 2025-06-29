@@ -1,0 +1,115 @@
+/* src/components/BrandCar/BrandCar.css */
+
+.brand-car-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.brand-car-title {
+    text-align: center;
+    margin-bottom: 30px !important;
+    font-weight: 600;
+    color: #333;
+}
+
+.brand-scroll-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.brand-list-container {
+    display: flex;
+    overflow-x: scroll;
+    /* Cho phép cuộn ngang */
+    scroll-behavior: smooth;
+    padding: 10px 0;
+    gap: 20px;
+    /* Khoảng cách giữa các item */
+
+    /* Ẩn thanh cuộn mặc định */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* Ẩn thanh cuộn cho Chrome, Safari và Opera */
+.brand-list-container::-webkit-scrollbar {
+    display: none;
+}
+
+.brand-item-wrapper {
+    flex: 0 0 auto;
+    /* Ngăn các item bị co lại */
+}
+
+.brand-card {
+    width: 150px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.brand-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.brand-card .ant-card-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-logo {
+    max-height: 50px;
+    max-width: 90px;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+.brand-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background-color: white;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.scroll-arrow.left {
+    left: -20px;
+}
+
+.scroll-arrow.right {
+    right: -20px;
+}
+
+/* Ẩn nút cuộn trên màn hình nhỏ */
+@media (max-width: 768px) {
+    .scroll-arrow {
+        display: none;
+    }
+
+    .brand-car-container {
+        padding: 10px;
+    }
+}

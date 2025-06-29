@@ -4,6 +4,7 @@ import { Spin, Alert, Empty } from 'antd';
 import './Home.css';
 import CarSection from '../../components/CarSection/CarSection';
 import { carService } from '../../services/carService';
+import BrandCar from '../../components/BrandCar/BrandCar';
 
 // Cache đơn giản để tránh gọi API không cần thiết
 const cache = new Map();
@@ -64,7 +65,7 @@ const Home = () => {
         // Gọi API nếu không có cache
         const response = await apiCall();
         const data = response?.data?.data?.content || response?.data?.content || [];
-        
+
         if (isMountedRef.current) {
           setCachedData(cacheKey, data);
           setLoadingStates(prev => ({ ...prev, [loadingKey]: false }));
@@ -83,7 +84,7 @@ const Home = () => {
     const fetchAll = async () => {
       try {
         setError(null);
-        
+
         // Khởi tạo loading states
         setLoadingStates({
           luxury: true,
@@ -103,7 +104,7 @@ const Home = () => {
           const superLuxuryResult = superLuxuryData.status === 'fulfilled' ? superLuxuryData.value : [];
           const luxuryResult = luxuryData.status === 'fulfilled' ? luxuryData.value : [];
           const standardResult = standardData.status === 'fulfilled' ? standardData.value : [];
-          
+
           // Set riêng biệt các loại xe
           setSuperLuxuryCars(superLuxuryResult);
           setLuxuryCars(luxuryResult);
@@ -113,7 +114,7 @@ const Home = () => {
         // Kiểm tra nếu tất cả đều fail
         const allFailed = [superLuxuryData, luxuryData, standardData]
           .every(result => result.status === 'rejected');
-        
+
         if (allFailed) {
           throw new Error('Không thể tải dữ liệu xe');
         }
@@ -129,7 +130,7 @@ const Home = () => {
         }
       }
     };
-    
+
     fetchAll();
   }, []);
   const handleViewMoreRegular = useCallback(() => {
@@ -144,9 +145,9 @@ const Home = () => {
   const regularCarsSection = useMemo(() => {
     if (loadingStates.standard) {
       return (
-        <div style={{ 
-          padding: '40px 20px', 
-          textAlign: 'center' 
+        <div style={{
+          padding: '40px 20px',
+          textAlign: 'center'
         }}>
           <Spin size="large" tip="Đang tải xe có ngay..." />
         </div>
@@ -162,12 +163,12 @@ const Home = () => {
         backgroundColor="#f5f5f5"
       />
     ) : (
-      <div style={{ 
-        padding: '40px 20px', 
-        textAlign: 'center' 
+      <div style={{
+        padding: '40px 20px',
+        textAlign: 'center'
       }}>
-        <Empty 
-          description="Hiện tại không có xe nào" 
+        <Empty
+          description="Hiện tại không có xe nào"
           style={{ margin: '40px 0' }}
         />
       </div>
@@ -177,9 +178,9 @@ const Home = () => {
   const luxuryCarsSection = useMemo(() => {
     if (loadingStates.luxury || loadingStates.superLuxury) {
       return (
-        <div style={{ 
-          padding: '40px 20px', 
-          textAlign: 'center' 
+        <div style={{
+          padding: '40px 20px',
+          textAlign: 'center'
         }}>
           <Spin size="large" tip="Đang tải xe cao cấp..." />
         </div>
@@ -198,12 +199,12 @@ const Home = () => {
         backgroundColor="#fafafa"
       />
     ) : (
-      <div style={{ 
-        padding: '40px 20px', 
-        textAlign: 'center' 
+      <div style={{
+        padding: '40px 20px',
+        textAlign: 'center'
       }}>
-        <Empty 
-          description="Hiện tại không có xe cao cấp nào" 
+        <Empty
+          description="Hiện tại không có xe cao cấp nào"
           style={{ margin: '40px 0' }}
         />
       </div>
@@ -213,11 +214,11 @@ const Home = () => {
   // Nếu đang loading toàn bộ
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px' 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '400px'
       }}>
         <Spin size="large" tip="Đang khởi tạo..." />
       </div>
@@ -227,9 +228,9 @@ const Home = () => {
   // Nếu có lỗi nghiêm trọng
   if (error) {
     return (
-      <div style={{ 
-        padding: '40px 20px', 
-        textAlign: 'center' 
+      <div style={{
+        padding: '40px 20px',
+        textAlign: 'center'
       }}>
         <Alert
           message="Lỗi tải dữ liệu"
@@ -237,7 +238,7 @@ const Home = () => {
           type="error"
           showIcon
           action={
-            <button 
+            <button
               onClick={() => window.location.reload()}
               style={{
                 background: '#ff4d4f',
@@ -263,6 +264,8 @@ const Home = () => {
 
       {/* Section 2: Xe sang & Siêu xe */}
       {luxuryCarsSection}
+      {/* Hãng xe */}
+      <BrandCar />
     </div>
   );
 };
