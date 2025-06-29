@@ -122,12 +122,19 @@ export const bookingService = {
     // Get all bookings for cars owned by the current user
     getOwnerBookings: async (userId, page = 0, size = 10) => {
         try {
+            console.log('getOwnerBookings called with:', { userId, page, size });
+
             // First, get all cars owned by the user
             const carsResponse = await carService.getCarsByUserId(userId);
+            console.log('Cars response:', carsResponse);
+
             const ownedCars = carsResponse.data || [];
+            console.log('Owned cars:', ownedCars);
 
             if (ownedCars.length === 0) {
+                console.log('No cars found for user', userId);
                 return {
+                    status: 200,
                     data: {
                         content: [],
                         totalElements: 0,
@@ -139,16 +146,23 @@ export const bookingService = {
             }
 
             // Then, get bookings for each car
-            const bookingPromises = ownedCars.map(car =>
-                apiClient.get(`/booking/car/${car.id}`)
-            );
+            console.log('Fetching bookings for', ownedCars.length, 'cars');
+            const bookingPromises = ownedCars.map(car => {
+                console.log('Fetching bookings for car ID:', car.id);
+                return apiClient.get(`/booking/car/${car.id}`);
+            });
 
             const bookingResponses = await Promise.all(bookingPromises);
+            console.log('Booking responses:', bookingResponses);
 
             // Flatten all bookings into a single array
-            const allBookings = bookingResponses.flatMap(response =>
-                response.data?.content || response.data || []
-            );
+            const allBookings = bookingResponses.flatMap(response => {
+                const bookings = response.data?.content || response.data || [];
+                console.log('Bookings from response:', bookings);
+                return bookings;
+            });
+
+            console.log('All bookings combined:', allBookings);
 
             // Sort bookings by creation date (most recent first)
             allBookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -158,7 +172,10 @@ export const bookingService = {
             const endIndex = startIndex + size;
             const paginatedBookings = allBookings.slice(startIndex, endIndex);
 
+            console.log('Final paginated bookings:', paginatedBookings);
+
             return {
+                status: 200,
                 data: {
                     content: paginatedBookings,
                     totalElements: allBookings.length,

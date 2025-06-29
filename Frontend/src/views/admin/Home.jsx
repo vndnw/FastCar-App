@@ -37,6 +37,7 @@ import { message } from "antd";
 import Echart from "../../components/admin/chart/EChart";
 import LineChart from "../../components/admin/chart/LineChart";
 import { adminService } from "../../services/adminService";
+import { documentService } from "../../services/documentService";
 
 function Home() {
   const { Title, Text } = Typography;
@@ -51,6 +52,9 @@ function Home() {
   const [pendingBookings, setPendingBookings] = useState([]);
   const [pendingBookingsLoading, setPendingBookingsLoading] = useState(false);
   const [newUsersData, setNewUsersData] = useState(null);
+  const [pendingDocumentsModalVisible, setPendingDocumentsModalVisible] = useState(false);
+  const [pendingDocuments, setPendingDocuments] = useState([]);
+  const [pendingDocumentsLoading, setPendingDocumentsLoading] = useState(false);
 
   // Fetch dashboard data
   useEffect(() => {
@@ -167,6 +171,65 @@ function Home() {
     fetchPendingBookings();
   };
 
+  // Fetch pending documents
+  const fetchPendingDocuments = async () => {
+    try {
+      setPendingDocumentsLoading(true);
+      const result = await adminService.getDocumentsPendingApproval();
+      console.log('Pending documents result:', result);
+      setPendingDocuments(result.content || []);
+
+    } catch (error) {
+      console.error('Error fetching pending documents:', error);
+      message.error(error.response?.data?.message || 'Failed to load pending documents');
+      setPendingDocuments([]);
+    } finally {
+      setPendingDocumentsLoading(false);
+    }
+  };
+
+  // Show pending documents modal
+  const showPendingDocumentsModal = () => {
+    setPendingDocumentsModalVisible(true);
+    fetchPendingDocuments();
+  };
+
+  // Handle document approval
+  const handleApproveDocument = async (documentId) => {
+    try {
+      const result = await documentService.updateDocumentStatus(documentId, 'APPROVED');
+      if (result.status === 200) {
+        message.success('Document approved successfully');
+        fetchPendingDocuments();
+        const dashboardResponse = await adminService.getDashboard();
+        setDashboardData(dashboardResponse);
+      } else {
+        message.error(result.data?.message || 'Failed to approve document');
+      }
+    } catch (error) {
+      console.error('Error approving document:', error);
+      message.error(error.response?.data?.message || 'Failed to approve document');
+    }
+  };
+
+  // Handle document rejection
+  const handleRejectDocument = async (documentId) => {
+    try {
+      const result = await documentService.updateDocumentStatus(documentId, 'REJECTED');
+      if (result.status === 200) {
+        message.success('Document rejected successfully');
+        fetchPendingDocuments();
+        const dashboardResponse = await adminService.getDashboard();
+        setDashboardData(dashboardResponse);
+      } else {
+        message.error(result.data?.message || 'Failed to reject document');
+      }
+    } catch (error) {
+      console.error('Error rejecting document:', error);
+      message.error(error.response?.data?.message || 'Failed to reject document');
+    }
+  };
+
   // Statistics data with improved styling
   const statisticsData = [
     {
@@ -226,7 +289,8 @@ function Home() {
       count: dashboardData?.documentsPendingApproval || 0,
       icon: <FileTextOutlined />,
       color: "#1890ff",
-      clickable: false
+      onClick: showPendingDocumentsModal,
+      clickable: true
     },
     {
       title: "Bookings Awaiting Action",
@@ -923,6 +987,180 @@ function Home() {
                 >
                   Manage
                 </Button>
+              ),
+            },
+          ]}
+        />
+      </Modal>
+
+      {/* Pending Documents Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FileTextOutlined style={{ color: '#1890ff' }} />
+            <span>Documents Pending Approval</span>
+          </div>
+        }
+        open={pendingDocumentsModalVisible}
+        onCancel={() => setPendingDocumentsModalVisible(false)}
+        width={1200}
+        footer={null}
+        style={{ top: 20 }}
+      >
+        <Table
+          dataSource={pendingDocuments}
+          loading={pendingDocumentsLoading}
+          rowKey="id"
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} documents`,
+          }}
+          columns={[
+            {
+              title: 'Document Info',
+              key: 'documentInfo',
+              width: '30%',
+              render: (_, record) => (
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <Tag
+                      color={record.documentType === 'LICENSE' ? 'blue' : 'green'}
+                      icon={record.documentType === 'LICENSE' ? <FileTextOutlined /> : <UserOutlined />}
+                    >
+                      {record.documentType}
+                    </Tag>
+                    <Text style={{ fontWeight: 500, fontSize: 13 }}>
+                      {record.serialNumber}
+                    </Text>
+                  </div>
+                  <Text style={{ fontWeight: 600, color: '#1f2937', display: 'block', fontSize: 14 }}>
+                    {record.name}
+                  </Text>
+                  {record.documentType === 'LICENSE' && record.rankLicense && (
+                    <Text style={{ color: '#6b7280', fontSize: 12 }}>
+                      Hạng: {record.rankLicense}
+                    </Text>
+                  )}
+                  {record.documentType === 'CCCD' && record.gender && (
+                    <Text style={{ color: '#6b7280', fontSize: 12 }}>
+                      Giới tính: {record.gender}
+                    </Text>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: 'Dates',
+              key: 'dates',
+              width: '25%',
+              render: (_, record) => (
+                <div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text style={{ fontSize: 12, color: '#6b7280', display: 'block' }}>
+                      <strong>Sinh:</strong> {new Date(record.dateOfBirth).toLocaleDateString('vi-VN')}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: '#6b7280', display: 'block' }}>
+                      <strong>Cấp:</strong> {new Date(record.issueDate).toLocaleDateString('vi-VN')}
+                    </Text>
+                    <Text style={{
+                      fontSize: 12,
+                      color: new Date(record.expiryDate) < new Date() ? '#f5222d' : '#6b7280',
+                      display: 'block'
+                    }}>
+                      <strong>Hết hạn:</strong> {new Date(record.expiryDate).toLocaleDateString('vi-VN')}
+                      {new Date(record.expiryDate) < new Date() && ' (Expired)'}
+                    </Text>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              title: 'Location & Status',
+              key: 'location',
+              width: '20%',
+              render: (_, record) => (
+                <div>
+                  <Text style={{ fontSize: 12, color: '#6b7280', display: 'block', marginBottom: 4 }}>
+                    <strong>Nơi cấp:</strong> {record.placeOfIssue}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: '#9ca3af', display: 'block', marginBottom: 8 }}>
+                    {record.address}
+                  </Text>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <Tag color={record.status === 'PENDING' ? 'orange' : record.status === 'APPROVED' ? 'green' : 'red'}>
+                      {record.status}
+                    </Tag>
+                  </div>
+                  <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 4 }}>
+                    Tạo: {new Date(record.createAt).toLocaleDateString('vi-VN')}
+                  </Text>
+                </div>
+              ),
+            },
+            {
+              title: 'Images',
+              key: 'images',
+              width: '15%',
+              render: (_, record) => (
+                <div>
+                  <div style={{ display: 'flex', gap: 4, flexDirection: 'column' }}>
+                    {record.imageFrontUrl && (
+                      <div style={{ width: 60, height: 35, borderRadius: 4, overflow: 'hidden' }}>
+                        <Image
+                          width={60}
+                          height={35}
+                          src={record.imageFrontUrl}
+                          style={{ objectFit: 'cover' }}
+                          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+                        />
+                      </div>
+                    )}
+                    {record.imageBackUrl && (
+                      <div style={{ width: 60, height: 35, borderRadius: 4, overflow: 'hidden' }}>
+                        <Image
+                          width={60}
+                          height={35}
+                          src={record.imageBackUrl}
+                          style={{ objectFit: 'cover' }}
+                          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {!record.imageFrontUrl && !record.imageBackUrl && (
+                    <Text style={{ fontSize: 11, color: '#9ca3af' }}>No images</Text>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: 'Actions',
+              key: 'actions',
+              width: '15%',
+              render: (_, record) => (
+                <Space size="small" direction="vertical" style={{ width: '100%' }}>
+                  <Button
+                    type="primary"
+                    icon={<CheckOutlined />}
+                    onClick={() => handleApproveDocument(record.id)}
+                    size="small"
+                    block
+                    style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    danger
+                    icon={<CloseOutlined />}
+                    onClick={() => handleRejectDocument(record.id)}
+                    size="small"
+                    block
+                  >
+                    Reject
+                  </Button>
+                </Space>
               ),
             },
           ]}

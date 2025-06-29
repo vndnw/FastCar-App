@@ -9,6 +9,7 @@ export { default as carBrandService } from './carBrandService';
 export { default as featureService } from './featureService';
 export { default as bankInformationService } from './bankInformationService';
 export { default as imageService } from './imageService';
+export { default as documentService } from './documentService';
 
 // Export API client
 export { default as apiClient } from '../utils/apiClient';

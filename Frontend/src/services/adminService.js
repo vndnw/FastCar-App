@@ -31,6 +31,15 @@ export const adminService = {
         return apiClient.patch(`/car/${carId}/update-status/UNAVAILABLE`);
     },
 
+    // Get documents pending approval
+    getDocumentsPendingApproval: async () => {
+        return apiClient.get('/admin/document-pending-approval?page=0&size=9999');
+    },
+
+    // Get document statistics
+    getDocumentStats: async () => {
+        return apiClient.get('/admin/document-stats');
+    },
 };
 
 export default adminService;

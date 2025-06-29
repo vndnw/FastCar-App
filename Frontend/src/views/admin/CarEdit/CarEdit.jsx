@@ -54,6 +54,11 @@ const CarEdit = () => {
     const [fileList, setFileList] = useState([]); // For file upload
     const [currentImages, setCurrentImages] = useState([]); // Current car images
 
+    // Feature creation modal state
+    const [featureModalVisible, setFeatureModalVisible] = useState(false);
+    const [featureCreateLoading, setFeatureCreateLoading] = useState(false);
+    const [featureForm] = Form.useForm();
+
     useEffect(() => {
         fetchCarDetail();
         fetchCarBrands();
@@ -178,7 +183,6 @@ const CarEdit = () => {
                 description: values.description,
                 carFeatures: values.carFeatures || [],
                 location: {
-                    id: values.locationId,
                     address: values.address,
                     latitude: values.latitude,
                     longitude: values.longitude,
@@ -269,6 +273,29 @@ const CarEdit = () => {
         } catch (error) {
             console.error('Error removing all images:', error);
             message.error(error.response?.data?.message || 'Failed to remove all images');
+        }
+    };
+
+    // Handle feature creation
+    const handleCreateFeature = async (values) => {
+        try {
+            setFeatureCreateLoading(true);
+            const result = await featureService.createFeature(values);
+
+            if (result.status === 200 || result.status === 201) {
+                message.success('Feature created successfully!');
+                setFeatureModalVisible(false);
+                featureForm.resetFields();
+                // Refresh features list
+                await fetchCarFeatures();
+            } else {
+                message.error(result.data?.message || 'Failed to create feature');
+            }
+        } catch (error) {
+            console.error('Error creating feature:', error);
+            message.error(error.response?.data?.message || 'Failed to create feature');
+        } finally {
+            setFeatureCreateLoading(false);
         }
     };
 
@@ -436,11 +463,9 @@ const CarEdit = () => {
                                 rules={[{ required: true, message: 'Please select car type' }]}
                             >
                                 <Select placeholder="Select car type">
-                                    <Option value="ECONOMY">Economy</Option>
-                                    <Option value="STANDARD">Standard</Option>
-                                    <Option value="PREMIUM">Premium</Option>
-                                    <Option value="LUXURY">Luxury</Option>
                                     <Option value="SUPER_LUXURY">Super Luxury</Option>
+                                    <Option value="LUXURY">Luxury</Option>
+                                    <Option value="STANDARD">Standard</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -485,10 +510,10 @@ const CarEdit = () => {
                                 rules={[{ required: true, message: 'Please select fuel type' }]}
                             >
                                 <Select placeholder="Select fuel type">
-                                    <Option value="GASOLINE">Gasoline</Option>
-                                    <Option value="DIESEL">Diesel</Option>
-                                    <Option value="ELECTRIC">Electric</Option>
+                                    <Option value="OIL">Oil</Option>
                                     <Option value="HYBRID">Hybrid</Option>
+                                    <Option value="ELECTRIC">Electric</Option>
+                                    <Option value="GASOLINE">Gasoline</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -566,7 +591,19 @@ const CarEdit = () => {
                         </Col>
                     </Row>
 
-                    <Divider>Features</Divider>
+                    <Divider>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                            <span>Features</span>
+                            <Button
+                                type="primary"
+                                size="small"
+                                icon={<PlusOutlined />}
+                                onClick={() => setFeatureModalVisible(true)}
+                            >
+                                Add Feature
+                            </Button>
+                        </div>
+                    </Divider>
 
                     <Row gutter={16}>
                         <Col span={24}>
@@ -728,6 +765,55 @@ const CarEdit = () => {
                     </Form.Item>
                 </Form>
             </Card>
+
+            {/* Feature Creation Modal */}
+            <Modal
+                title="Create New Feature"
+                open={featureModalVisible}
+                onCancel={() => {
+                    setFeatureModalVisible(false);
+                    featureForm.resetFields();
+                }}
+                footer={null}
+                destroyOnClose
+            >
+                <Form
+                    form={featureForm}
+                    layout="vertical"
+                    onFinish={handleCreateFeature}
+                >
+                    <Form.Item
+                        label="Feature Name"
+                        name="name"
+                        rules={[{ required: true, message: 'Please enter feature name' }]}
+                    >
+                        <Input placeholder="Enter feature name" />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Description"
+                        name="description"
+                    >
+                        <TextArea
+                            rows={4}
+                            placeholder="Enter feature description"
+                        />
+                    </Form.Item>
+
+                    <Form.Item style={{ textAlign: 'right' }}>
+                        <Button onClick={() => setFeatureModalVisible(false)} style={{ marginRight: 8 }}>
+                            Cancel
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={featureCreateLoading}
+                        >
+                            Create Feature
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };

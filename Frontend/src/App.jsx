@@ -27,6 +27,7 @@ import CarBrand from "./views/admin/CarBrand";
 import Cars from "./views/admin/Cars";
 import Bookings from "./views/admin/Bookings";
 import BookingDetail from "./views/admin/BookingDetail";
+import Documents from "./views/admin/Documents";
 import AdminLayout from "./components/admin/layout/AdminLayout";
 import CarEdit from "./views/admin/CarEdit";
 import CarDetailAdmin from "./views/admin/CarDetail";
@@ -37,6 +38,7 @@ import OwnerDashboard from "./views/owner/OwnerDashboard";
 import OwnerCars from "./views/owner/OwnerCars";
 import OwnerBookings from "./views/owner/OwnerBookings";
 import OwnerNotFound from "./views/owner/OwnerNotFound";
+import OwnerBookingDetail from './views/owner/OwnerBookingDetail';
 
 // 404 Not Found
 import NotFound from "./views/NotFound";
@@ -103,6 +105,7 @@ function App() {
               <Route path="cars/edit/:carId" element={<CarEdit />} />
               <Route path="bookings" element={<Bookings />} />
               <Route path="bookings/:bookingId" element={<BookingDetail />} />
+              <Route path="documents" element={<Documents />} />
               <Route path="*" element={<AdminNotFound />} />
             </Route>
 
@@ -119,7 +122,7 @@ function App() {
               <Route path="cars/:carId" element={<CarDetailAdmin />} />
               <Route path="cars/edit/:carId" element={<CarEdit />} />
               <Route path="bookings" element={<OwnerBookings />} />
-              <Route path="bookings/:bookingId" element={<BookingDetail />} />
+              <Route path="bookings/:bookingId" element={<OwnerBookingDetail />} />
               <Route path="*" element={<OwnerNotFound />} />
             </Route>
 
