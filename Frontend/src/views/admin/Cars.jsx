@@ -117,10 +117,6 @@ const Cars = () => {
                     carType: car.carType,
                     licensePlate: car.licensePlate,
                     pricePerHour: car.pricePerHour,
-                    pricePer4Hour: car.pricePer4Hour,
-                    pricePer8Hour: car.pricePer8Hour,
-                    pricePer12Hour: car.pricePer12Hour,
-                    pricePer24Hour: car.pricePer24Hour,
                     fuelType: car.fuelType,
                     fuelConsumption: car.fuelConsumption,
                     status: car.status,
@@ -297,10 +293,6 @@ const Cars = () => {
                 licensePlate: values.licensePlate,
                 fuelConsumption: values.fuelConsumption,
                 pricePerHour: values.pricePerHour,
-                pricePer4Hour: values.pricePer4Hour,
-                pricePer8Hour: values.pricePer8Hour,
-                pricePer12Hour: values.pricePer12Hour,
-                pricePer24Hour: values.pricePer24Hour,
                 description: values.description
             };
 
@@ -392,10 +384,6 @@ const Cars = () => {
                         carType: car.carType,
                         licensePlate: car.licensePlate,
                         pricePerHour: car.pricePerHour,
-                        pricePer4Hour: car.pricePer4Hour,
-                        pricePer8Hour: car.pricePer8Hour,
-                        pricePer12Hour: car.pricePer12Hour,
-                        pricePer24Hour: car.pricePer24Hour,
                         fuelType: car.fuelType,
                         fuelConsumption: car.fuelConsumption,
                         status: car.status,
@@ -565,9 +553,6 @@ const Cars = () => {
                 <div>
                     <div style={{ fontWeight: 'bold', fontSize: 13 }}>
                         {formatCurrency(record.pricePerHour)}/hour
-                    </div>
-                    <div style={{ fontSize: 11, color: '#666' }}>
-                        Daily: {formatCurrency(record.pricePer24Hour)}
                     </div>
                 </div>
             ),

@@ -232,9 +232,11 @@ function Sidenav({ color }) {
           </span>
           <h6>Need Help?</h6>
           <p>Please check our docs</p>
-          <Button type="primary" className="ant-btn-sm ant-btn-block">
-            DOCUMENTATION
-          </Button>
+          <a href="https://github.com/Vo-Xuan-Duong/BookingACar" target="_blank" rel="noopener noreferrer">
+            <Button type="primary" className="ant-btn-sm ant-btn-block">
+              DOCUMENTATION
+            </Button>
+          </a>
         </div>
       </div>
     </>

@@ -27,9 +27,19 @@ import CarBrand from "./views/admin/CarBrand";
 import Cars from "./views/admin/Cars";
 import Bookings from "./views/admin/Bookings";
 import BookingDetail from "./views/admin/BookingDetail";
-import Main from "./components/admin/layout/Main";
+import AdminLayout from "./components/admin/layout/AdminLayout";
 import CarEdit from "./views/admin/CarEdit";
 import CarDetailAdmin from "./views/admin/CarDetail";
+
+// Owner Panel
+import OwnerLayout from "./components/layout/OwnerLayout";
+import OwnerDashboard from "./views/owner/OwnerDashboard";
+import OwnerCars from "./views/owner/OwnerCars";
+import OwnerBookings from "./views/owner/OwnerBookings";
+import OwnerNotFound from "./views/owner/OwnerNotFound";
+
+// 404 Not Found
+import NotFound from "./views/NotFound";
 
 
 import OwnerCar from './views/OwnerCar/OwnerCar';
@@ -78,7 +88,7 @@ function App() {
             {/* Layout cho trang admin */}
             <Route path="/admin" element={
               <ProtectedRoute requireAdmin={true}>
-                <Main />
+                <AdminLayout />
               </ProtectedRoute>
             }>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
@@ -96,9 +106,26 @@ function App() {
               <Route path="*" element={<AdminNotFound />} />
             </Route>
 
+            {/* Layout cho trang owner */}
+            <Route path="/owner" element={
+              <ProtectedRoute requireOwner={true}>
+                <OwnerLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="/owner/dashboard" replace />} />
+              <Route path="dashboard" element={<OwnerDashboard />} />
+              <Route path="cars" element={<OwnerCars />} />
+              <Route path="cars/add" element={<OwnerCar />} />
+              <Route path="cars/:carId" element={<CarDetailAdmin />} />
+              <Route path="cars/edit/:carId" element={<CarEdit />} />
+              <Route path="bookings" element={<OwnerBookings />} />
+              <Route path="bookings/:bookingId" element={<BookingDetail />} />
+              <Route path="*" element={<OwnerNotFound />} />
+            </Route>
+
 
             {/* Fallback nếu route không khớp */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </CarProvider>
       </BookingProvider>

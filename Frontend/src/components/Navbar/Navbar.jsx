@@ -47,6 +47,14 @@ const Navbar = () => {
       icon: <CarOutlined />,
       onClick: () => navigate('/my-trips'),
     },
+    ...(user?.roles?.includes('owner') ? [
+      {
+        key: 'owner-panel',
+        label: 'Quản lý xe của tôi',
+        icon: <SettingOutlined />,
+        onClick: () => navigate('/owner/dashboard'),
+      },
+    ] : []),
     ...(isAdmin() ? [
       {
         key: 'admin',

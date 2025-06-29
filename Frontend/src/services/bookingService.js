@@ -1,4 +1,5 @@
 import apiClient from '../utils/apiClient';
+import { carService } from './carService';
 
 // Booking service
 export const bookingService = {
@@ -106,6 +107,70 @@ export const bookingService = {
         });
 
         return apiClient.get(`/booking/history?${params}`);
+    },
+
+    // Check-in booking (condition check)
+    checkInBooking: async (bookingId, conditionData) => {
+        return apiClient.post(`/booking/${bookingId}/condition-check`, conditionData);
+    },
+
+    // Check-out booking
+    checkOutBooking: async (bookingId, checkoutData) => {
+        return apiClient.post(`/booking/${bookingId}/checkout`, checkoutData);
+    },
+
+    // Get all bookings for cars owned by the current user
+    getOwnerBookings: async (userId, page = 0, size = 10) => {
+        try {
+            // First, get all cars owned by the user
+            const carsResponse = await carService.getCarsByUserId(userId);
+            const ownedCars = carsResponse.data || [];
+
+            if (ownedCars.length === 0) {
+                return {
+                    data: {
+                        content: [],
+                        totalElements: 0,
+                        totalPages: 0,
+                        size: size,
+                        number: page
+                    }
+                };
+            }
+
+            // Then, get bookings for each car
+            const bookingPromises = ownedCars.map(car =>
+                apiClient.get(`/booking/car/${car.id}`)
+            );
+
+            const bookingResponses = await Promise.all(bookingPromises);
+
+            // Flatten all bookings into a single array
+            const allBookings = bookingResponses.flatMap(response =>
+                response.data?.content || response.data || []
+            );
+
+            // Sort bookings by creation date (most recent first)
+            allBookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            // Apply pagination
+            const startIndex = page * size;
+            const endIndex = startIndex + size;
+            const paginatedBookings = allBookings.slice(startIndex, endIndex);
+
+            return {
+                data: {
+                    content: paginatedBookings,
+                    totalElements: allBookings.length,
+                    totalPages: Math.ceil(allBookings.length / size),
+                    size: size,
+                    number: page
+                }
+            };
+        } catch (error) {
+            console.error('Error fetching owner bookings:', error);
+            throw error;
+        }
     }
 };
 
