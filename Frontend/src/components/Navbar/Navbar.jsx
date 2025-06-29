@@ -82,7 +82,7 @@ const Navbar = () => {
               style={{ cursor: 'pointer' }}
             >
               <CarOutlined />
-              CarRental
+              FastCar
             </div>
           </div>
 
