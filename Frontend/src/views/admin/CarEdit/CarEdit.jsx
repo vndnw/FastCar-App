@@ -25,7 +25,7 @@ import {
     UploadOutlined,
     DeleteOutlined
 } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { carService } from '../../../services/carService';
 import { carBrandService } from '../../../services/carBrandService';
 import { featureService } from '../../../services/featureService';
@@ -38,6 +38,11 @@ const { Option } = Select;
 const CarEdit = () => {
     const navigate = useNavigate();
     const { carId } = useParams();
+    const location = useLocation();
+
+    // Determine if we're in admin or owner context
+    const isOwnerContext = location.pathname.includes('/owner/');
+    const basePath = isOwnerContext ? '/owner/cars' : '/admin/cars';
 
     const [form] = Form.useForm();
     const [car, setCar] = useState(null);
@@ -80,10 +85,6 @@ const CarEdit = () => {
                     licensePlate: carData.licensePlate,
                     fuelConsumption: carData.fuelConsumption,
                     pricePerHour: carData.pricePerHour,
-                    pricePer4Hour: carData.pricePer4Hour,
-                    pricePer8Hour: carData.pricePer8Hour,
-                    pricePer12Hour: carData.pricePer12Hour,
-                    pricePer24Hour: carData.pricePer24Hour,
                     description: carData.description,
                     // Handle location data - parse address into separate fields if needed
                     street: carData.location?.street || (carData.location?.address ? carData.location.address.split(',')[0]?.trim() : ''),
@@ -98,12 +99,12 @@ const CarEdit = () => {
                 });
             } else {
                 message.error(result.data?.message || 'Failed to fetch car details');
-                navigate('/admin/cars');
+                navigate(basePath);
             }
         } catch (error) {
             console.error('Error fetching car details:', error);
             message.error(error.response?.data?.message || 'Failed to fetch car details');
-            navigate('/admin/cars');
+            navigate(basePath);
         } finally {
             setInitialLoading(false);
         }
@@ -171,10 +172,6 @@ const CarEdit = () => {
                 type: values.type,
                 licensePlate: values.licensePlate,
                 pricePerHour: values.pricePerHour,
-                pricePer4Hour: values.pricePer4Hour,
-                pricePer8Hour: values.pricePer8Hour,
-                pricePer12Hour: values.pricePer12Hour,
-                pricePer24Hour: values.pricePer24Hour,
                 fuelType: values.fuelType,
                 fuelConsumption: values.fuelConsumption,
                 color: values.color,
@@ -281,7 +278,7 @@ const CarEdit = () => {
                 <div style={{ textAlign: 'center', padding: '50px 0' }}>
                     <CarOutlined style={{ fontSize: 48, color: '#ccc', marginBottom: 16 }} />
                     <Title level={4} style={{ color: '#666' }}>Car not found</Title>
-                    <Button type="primary" onClick={() => navigate('/admin/cars')}>
+                    <Button type="primary" onClick={() => navigate(basePath)}>
                         Back to Cars
                     </Button>
                 </div>
@@ -309,7 +306,7 @@ const CarEdit = () => {
                         <Space>
                             <Button
                                 icon={<ArrowLeftOutlined />}
-                                onClick={() => navigate('/admin/cars')}
+                                onClick={() => navigate(basePath)}
                             >
                                 Back to Cars
                             </Button>
@@ -469,66 +466,6 @@ const CarEdit = () => {
                             >
                                 <InputNumber
                                     placeholder="Price per hour"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item
-                                label="Price per 4 Hours"
-                                name="pricePer4Hour"
-                            >
-                                <InputNumber
-                                    placeholder="Price per 4 hours"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Row gutter={16}>
-                        <Col span={8}>
-                            <Form.Item
-                                label="Price per 8 Hours"
-                                name="pricePer8Hour"
-                            >
-                                <InputNumber
-                                    placeholder="Price per 8 hours"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item
-                                label="Price per 12 Hours"
-                                name="pricePer12Hour"
-                            >
-                                <InputNumber
-                                    placeholder="Price per 12 hours"
-                                    min={0}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item
-                                label="Price per Day"
-                                name="pricePer24Hour"
-                                rules={[{ required: true, message: 'Please enter daily price' }]}
-                            >
-                                <InputNumber
-                                    placeholder="Price per day"
                                     min={0}
                                     formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                     parser={value => value.replace(/\$\s?|(,*)/g, '')}
@@ -772,7 +709,7 @@ const CarEdit = () => {
 
                     <Form.Item style={{ marginTop: 32, textAlign: 'right' }}>
                         <Space size="middle">
-                            <Button size="large" onClick={() => navigate('/admin/cars')}>
+                            <Button size="large" onClick={() => navigate(basePath)}>
                                 Cancel
                             </Button>
                             <Button

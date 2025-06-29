@@ -655,12 +655,6 @@ function Home() {
                       currency: 'VND'
                     }).format(record.pricePerHour)}/hour
                   </Text>
-                  <Text style={{ fontSize: 11, color: '#6b7280' }}>
-                    Daily: {new Intl.NumberFormat('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND'
-                    }).format(record.pricePer24Hour)}
-                  </Text>
                 </div>
               ),
             },
