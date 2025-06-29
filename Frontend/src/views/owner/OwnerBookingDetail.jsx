@@ -31,7 +31,6 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { bookingService } from '../../services/bookingService';
-import { conditionCheckUtils } from '../../utils/conditionCheckUtils';
 
 const { Title, Text } = Typography;
 

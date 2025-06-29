@@ -23,6 +23,17 @@ import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
+// Fuel type mapping function
+const getFuelTypeLabel = (fuelType) => {
+    const fuelTypeMap = {
+        'OIL': 'Oil',
+        'HYBRID': 'Hybrid',
+        'ELECTRIC': 'Electric',
+        'GASOLINE': 'Gasoline'
+    };
+    return fuelTypeMap[fuelType] || fuelType;
+};
+
 const CarDetail = () => {
     const navigate = useNavigate();
     const { carId } = useParams();
@@ -107,9 +118,7 @@ const CarDetail = () => {
 
     const getCarTypeColor = (carType) => {
         const colors = {
-            'ECONOMY': 'cyan',
             'STANDARD': 'blue',
-            'PREMIUM': 'purple',
             'LUXURY': 'gold',
             'SUPER_LUXURY': 'magenta'
         };
@@ -190,7 +199,7 @@ const CarDetail = () => {
                                 <strong>Color:</strong> <span style={{ marginLeft: 8 }}>{car.color}</span>
                             </div>
                             <div style={{ marginBottom: 8 }}>
-                                <strong>Fuel Type:</strong> <span style={{ marginLeft: 8 }}>{car.fuelType}</span>
+                                <strong>Fuel Type:</strong> <span style={{ marginLeft: 8 }}>{getFuelTypeLabel(car.fuelType)}</span>
                             </div>
                             <div style={{ marginBottom: 8 }}>
                                 <strong>Fuel Consumption:</strong> <span style={{ marginLeft: 8 }}>{car.fuelConsumption}</span>

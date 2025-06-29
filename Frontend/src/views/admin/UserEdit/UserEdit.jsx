@@ -81,7 +81,6 @@ function UserEdit() {
                     lastName: userData.lastName,
                     email: userData.email,
                     phone: userData.phone,
-                    profilePicture: userData.profilePicture,
                     dateOfBirth: userData.dateOfBirth ? dayjs(userData.dateOfBirth) : null,
                     roles: userData.roles || ['user'],
                     address: addressData,
@@ -175,7 +174,6 @@ function UserEdit() {
                 firstName: values.firstName,
                 lastName: values.lastName,
                 phone: values.phone || '',
-                profilePicture: values.profilePicture,
                 dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
                 roles: values.roles || ['user'],
                 address: {
@@ -359,14 +357,6 @@ function UserEdit() {
                             </Row>
 
                             <Row gutter={16}>
-                                <Col span={12}>
-                                    <Form.Item
-                                        label="Profile Picture URL"
-                                        name="profilePicture"
-                                    >
-                                        <Input placeholder="Enter profile picture URL" />
-                                    </Form.Item>
-                                </Col>
                                 <Col span={12}>
                                     <Form.Item
                                         label="Date of Birth"

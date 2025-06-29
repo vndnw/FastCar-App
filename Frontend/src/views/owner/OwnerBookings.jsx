@@ -61,26 +61,34 @@ function OwnerBookings() {
     const fetchBookings = async (page = 1, pageSize = 10) => {
         try {
             setLoading(true);
+            console.log('Fetching bookings for user:', user.id, 'page:', page, 'pageSize:', pageSize);
+
             // Use getOwnerBookings to fetch bookings for all cars owned by the user
             const result = await bookingService.getOwnerBookings(user.id, page - 1, pageSize);
+            console.log('API response:', result);
 
             if (result.status === 200 && result.data) {
                 const bookingsData = result.data.content || [];
+                console.log('Fetched bookings data:', bookingsData);
                 setBookings(bookingsData);
-                console.log('Fetched bookings:', bookingsData);
                 setPagination(prev => ({
                     ...prev,
                     current: page,
                     pageSize: pageSize,
                     total: result.data.totalElements || 0,
                 }));
+
+                if (bookingsData.length === 0) {
+                    console.log('No bookings found for this user');
+                }
             } else {
+                console.error('API response error:', result);
                 message.error('Failed to fetch bookings');
                 setBookings([]);
             }
         } catch (error) {
             console.error('Error fetching bookings:', error);
-            message.error('Failed to fetch bookings');
+            message.error('Failed to fetch bookings: ' + error.message);
             setBookings([]);
         } finally {
             setLoading(false);

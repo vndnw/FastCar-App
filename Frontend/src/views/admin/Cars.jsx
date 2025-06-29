@@ -53,6 +53,17 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
+// Fuel type mapping function
+const getFuelTypeLabel = (fuelType) => {
+    const fuelTypeMap = {
+        'OIL': 'Oil',
+        'HYBRID': 'Hybrid',
+        'ELECTRIC': 'Electric',
+        'GASOLINE': 'Gasoline'
+    };
+    return fuelTypeMap[fuelType] || fuelType;
+};
+
 const Cars = () => {
     const { user } = useAuth(); // Get current user from auth context
     const navigate = useNavigate();
@@ -458,12 +469,25 @@ const Cars = () => {
         switch (carType) {
             case 'STANDARD':
                 return 'blue';
-            case 'PREMIUM':
-                return 'purple';
             case 'LUXURY':
                 return 'gold';
-            case 'ECONOMY':
-                return 'green';
+            case 'SUPER_LUXURY':
+                return 'magenta';
+            default:
+                return 'default';
+        }
+    };
+
+    const getFuelTypeColor = (fuelType) => {
+        switch (fuelType) {
+            case 'OIL':
+                return 'volcano';
+            case 'GASOLINE':
+                return 'orange';
+            case 'ELECTRIC':
+                return 'cyan';
+            case 'HYBRID':
+                return 'lime';
             default:
                 return 'default';
         }
@@ -535,9 +559,12 @@ const Cars = () => {
                         <Tag color={getCarTypeColor(record.carType)}>
                             {record.carType}
                         </Tag>
+                        <Tag color={getFuelTypeColor(record.fuelType)}>
+                            {getFuelTypeLabel(record.fuelType)}
+                        </Tag>
                     </div>
                     <div style={{ fontSize: 12, color: '#666' }}>
-                        {record.seats} seats • {record.fuelType}
+                        {record.seats} seats
                     </div>
                     <div style={{ fontSize: 11, color: '#999' }}>
                         {record.fuelConsumption}
