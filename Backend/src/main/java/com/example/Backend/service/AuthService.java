@@ -151,7 +151,7 @@ public class AuthService {
         String otp = otpService.generateOtp(email);
         log.info("OTP forgot password email "+ email +": " + otp);
         emailService.sendOTPEmail(email, otp);
-        return userService.forgotPassword(email);
+        return true;
     }
 
     public boolean verifyOtpPassword(String email, String otp) {

@@ -156,8 +156,7 @@ public class AuthController {
         }
         return ResponseEntity.ok(responseData);
     }
-
-    @PreAuthorize("hasRole('user')")
+    
     @PatchMapping("/set-password")
     public ResponseEntity<?> changePassword(@RequestParam String email, @RequestParam String newPassword) {
         if(authService.setPassword(email, newPassword)) {
