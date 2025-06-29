@@ -98,7 +98,7 @@ const Register = ({ onClose }) => {
           <form className="register-form" onSubmit={handleSubmit}>
             <h2 className="register-title">Đăng ký</h2>
             <div className="form-group">
-              <label>TÊN</label>
+              <label>Tên</label>
               <input
                 type="text"
                 name="firstName"
