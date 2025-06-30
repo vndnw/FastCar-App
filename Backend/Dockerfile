@@ -19,6 +19,5 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # --- KẾT THÚC THÊM ---
 
 COPY --from=build /app/target/*.jar app.jar
-COPY .env .env
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
