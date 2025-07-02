@@ -6,6 +6,7 @@ import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarConditionCheckMapper;
 import com.example.Backend.model.Booking;
 import com.example.Backend.model.ConditionCheck;
+import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.model.enums.CheckStatus;
 import com.example.Backend.repository.BookingRepository;
 import com.example.Backend.repository.CarConditionCheckRepository;
@@ -33,9 +34,10 @@ public class CarConditionCheckService {
     public CarConditionCheckResponse createCarConditionCheck(long bookingId , @NotNull CarConditionCheckRequest carConditionCheckRequest) {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
+        booking.setStatus(BookingStatus.CHECKED);
 
         ConditionCheck conditionCheck = new ConditionCheck();
-        conditionCheck.setBooking(booking);
+        conditionCheck.setBooking(bookingRepository.save(booking));
         conditionCheck.setCar(booking.getCar());
         conditionCheck.setType(carConditionCheckRequest.getCheckType());
         conditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
