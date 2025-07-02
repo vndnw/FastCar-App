@@ -84,4 +84,22 @@ public class ImageController {
         }
     }
 
+    @PostMapping("/upload-image")
+    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            String imageUrl = cloudinaryService.uploadImage(file);
+            if (imageUrl == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image upload failed");
+            }
+            ResponseData<String> response = ResponseData.<String>builder()
+                    .status(200)
+                    .message("Image uploaded successfully")
+                    .data(imageUrl)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image: " + e.getMessage());
+        }
+    }
+
 }

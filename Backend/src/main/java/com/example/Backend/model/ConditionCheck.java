@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -38,13 +39,7 @@ public class ConditionCheck {
     private String interiorStatus;
     private String damageNote;
 
-    private String imageFrontUrl;
-    private String imageRearUrl;
-    private String imageLeftUrl;
-    private String imageRightUrl;
-    private String imageOdoUrl;
-    private String imageFuelUrl;
-    private String imageOtherUrl;
+    private List<String> images;
 
     @Enumerated(EnumType.STRING)
     private CheckStatus status;

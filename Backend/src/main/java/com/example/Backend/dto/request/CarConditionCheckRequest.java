@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @Builder
@@ -16,11 +18,5 @@ public class CarConditionCheckRequest {
     private String fuelLevel;
     private String interiorStatus;
     private String damageNote;
-    private String imageFrontUrl;
-    private String imageRearUrl;
-    private String imageLeftUrl;
-    private String imageRightUrl;
-    private String imageOdoUrl;
-    private String imageFuelUrl;
-    private String imageOtherUrl;
+    private List<String> images; // Danh sách các hình ảnh liên quan đến kiểm tra tình trạng xe
 }

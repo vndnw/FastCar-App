@@ -121,6 +121,8 @@ public class BookingService {
                 .build());
         List<Long> transactionIds = List.of(paymentRental.getId(), paymentDeposit.getId());
 
+        emailService.sendMailCheckIn(booking);
+
         String paymentUrl = vnpayService.generatePayUrl(null, paymentRental.getAmount().add(paymentDeposit.getAmount()), paymentRental.getExternalRef());
 
         return RentalFeeResponse.builder()
