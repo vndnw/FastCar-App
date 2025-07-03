@@ -245,7 +245,7 @@ const BookingForm = ({ car }) => {
             <div
                 onClick={showModal}
                 style={{
-                    border: `1.5px solid ${timeError ? '#ff4d4f' : '#52c41a'}`,
+                    border: `1.5px solid ${timeError ? '#ff4d4f' : '#51c09f'}`,
                     borderRadius: 12,
                     padding: 16,
                     marginBottom: 16,
