@@ -7,25 +7,26 @@
 }
 
 .car-detail-header {
-    background: #2c3e50;
+    background: white;
     padding: 16px 0;
-    margin-bottom: 24px;
-    margin-top: 50px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+    border-bottom: 1px solid #1c1111;
 }
 
 .back-button {
+    background: #51c09f !important;
     color: white !important;
-    font-size: 20px;
-    font-weight: 500;
-    margin-left: 24px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: color 0.3s ease;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
 }
 
 .back-button:hover {
-    color: #52c41a !important;
+    background: #07dc9c !important;
+    color: white !important;
 }
 
 .car-detail-loading {

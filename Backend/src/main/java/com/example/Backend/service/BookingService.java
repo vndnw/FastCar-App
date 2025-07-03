@@ -138,7 +138,9 @@ public class BookingService {
     public BookingResponse createCheckout(long bookingId, @NotNull CheckoutRequest checkoutRequest) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
 
-        carConditionCheckService.createCarConditionCheck(bookingId, checkoutRequest.getCarConditionCheck());
+        if(checkoutRequest.getCarConditionCheck() != null) {
+            carConditionCheckService.createCarConditionCheck(bookingId, checkoutRequest.getCarConditionCheck());
+        }
 
         BigDecimal depositAmount = booking.getDepositAmount();
         List<ExtraChargeRequest> extraCharges = checkoutRequest.getExtraCharges();
