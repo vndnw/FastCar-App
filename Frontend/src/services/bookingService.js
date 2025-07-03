@@ -110,9 +110,32 @@ export const bookingService = {
     },
 
     // Check-in booking (condition check)
-    checkInBooking: async (bookingId, conditionData) => {
-        return apiClient.post(`/booking/${bookingId}/condition-check`, conditionData);
+    checkInBooking: async (bookingId, conditionData, imageFiles = []) => {
+        const formData = new FormData();
+
+        // Gắn phần JSON conditionData dưới dạng Blob
+        const conditionBlob = new Blob([JSON.stringify(conditionData)], {
+            type: 'application/json',
+        });
+        formData.append('conditionCheck', conditionBlob);
+
+        // Gắn từng ảnh (nếu có)
+        imageFiles.forEach((file) => {
+            formData.append('images', file);
+        });
+
+        return apiClient.post(`/booking/${bookingId}/condition-check`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
     },
+
+    // Check-in booking (simple check-in)
+    simpleCheckIn: async (bookingId) => {
+        return apiClient.post(`/booking/${bookingId}/checkin`);
+    },
+
 
     // Check-out booking
     checkOutBooking: async (bookingId, checkoutData) => {

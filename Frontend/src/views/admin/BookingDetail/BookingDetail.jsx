@@ -29,8 +29,9 @@ import {
     PhoneOutlined,
     MailOutlined
 } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import { bookingService } from '../../../services/bookingService';
+import dayjs from 'dayjs';
+import Meta from '../../../components/Meta';
 
 const { Title, Text } = Typography;
 
@@ -352,7 +353,12 @@ const BookingDetail = () => {
     }
 
     return (
-        <div style={{ padding: '24px' }}>
+        <>
+            <Meta 
+                title={`Booking Details #${booking?.id || 'Booking'} - Admin Dashboard`} 
+                description={`Detailed view of booking information, customer details, and reservation status for booking #${booking?.id || 'this booking'}`}
+            />
+            <div style={{ padding: '24px' }}>
             {/* Header */}
             <div style={{ marginBottom: 24 }}>
                 <Button
@@ -642,7 +648,8 @@ const BookingDetail = () => {
                     </Card>
                 </Col>
             </Row>
-        </div>
+            </div>
+        </>
     );
 };
 

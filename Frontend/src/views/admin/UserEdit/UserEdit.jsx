@@ -27,6 +27,7 @@ import { userService } from "../../../services/userService";
 import { roleService } from "../../../services/roleService";
 import { bankInformationService } from "../../../services/bankInformationService";
 import dayjs from 'dayjs';
+import Meta from '../../../components/Meta';
 
 const { Title, Text } = Typography;
 
@@ -275,7 +276,12 @@ function UserEdit() {
     }
 
     return (
-        <div>
+        <>
+            <Meta 
+                title={`Edit User - ${user?.fullName || user?.email || 'User'} - Admin Dashboard`} 
+                description={`Edit user account information and settings for ${user?.fullName || user?.email || 'this user'}`}
+            />
+            <div>
             {/* Header */}
             <Card style={{ marginBottom: 24 }}>
                 <Row justify="space-between" align="middle">
@@ -549,7 +555,8 @@ function UserEdit() {
 
 
             </Form>
-        </div>
+            </div>
+        </>
     );
 }
 

@@ -5,8 +5,10 @@ import com.example.Backend.dto.request.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.example.Backend.dto.response.BookingResponse;
 import com.example.Backend.dto.response.CarBookingScheduleResponse;
@@ -15,10 +17,7 @@ import com.example.Backend.dto.response.ReservationFeeResponse;
 import com.example.Backend.model.Payment;
 import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.model.enums.PaymentType;
-import com.example.Backend.service.BookingService;
-import com.example.Backend.service.CarConditionCheckService;
-import com.example.Backend.service.PaymentService;
-import com.example.Backend.service.VNPAYService;
+import com.example.Backend.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/booking")
@@ -38,16 +38,19 @@ public class BookingController {
     private final CarConditionCheckService carConditionCheckService;
     private final PaymentService paymentService;
     private final VNPAYService vnpayService;
+    private final CloudinaryService cloudinaryService;
 
     @Autowired
     public BookingController(BookingService bookingService,
                              CarConditionCheckService carConditionCheckService  ,
                              PaymentService paymentService,
-                             VNPAYService vnpayService) {
+                             VNPAYService vnpayService,
+                             CloudinaryService cloudinaryService) {
         this.bookingService = bookingService;
         this.carConditionCheckService = carConditionCheckService;
         this.paymentService = paymentService;
         this.vnpayService = vnpayService;
+        this.cloudinaryService = cloudinaryService;
     }
     @PreAuthorize("hasRole('admin')")
     @PostMapping
@@ -224,7 +227,25 @@ public class BookingController {
     @PostMapping("/{bookingId}/condition-check")
     public ResponseEntity<ResponseData<?>> createCarConditionCheckBefore(
             @PathVariable Long bookingId,
-            @RequestBody CarConditionCheckRequest carConditionCheckRequest) {
+            @RequestPart("conditionCheck") CarConditionCheckRequest carConditionCheckRequest,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+            ) {
+
+        List<String> imageUrls = new ArrayList<>();
+
+        for(MultipartFile file : images) {
+            try{
+                String imageUrl = cloudinaryService.uploadImage(file);
+                imageUrls.add(imageUrl);
+            } catch (Exception e) {
+                return new ResponseEntity<>(ResponseData.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message("Error uploading images: " + e.getMessage())
+                        .build(), HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        carConditionCheckRequest.setImages(imageUrls);
 
         ResponseData<?> response = ResponseData.builder()
                 .status(HttpStatus.CREATED.value())

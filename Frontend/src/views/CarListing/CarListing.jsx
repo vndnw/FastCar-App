@@ -15,23 +15,23 @@ const { Option } = Select;
 const CarListing = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    
+
     // Support backward compatibility with old "category" parameter
     const rawCarType = searchParams.get('carType') || CarTypeUtils.convertCategoryToCarType(searchParams.get('category'));
-    
+
     // Validate carType
     const carType = useMemo(() => {
         if (!rawCarType) return null;
-        
+
         const validCarTypes = ['LUXURY', 'STANDARD'];
         const normalizedCarType = rawCarType.toUpperCase();
-        
+
         console.log('🚗 Validating carType:', { rawCarType, normalizedCarType, validCarTypes });
-        
+
         if (validCarTypes.includes(normalizedCarType)) {
             return normalizedCarType;
         }
-        
+
         console.warn('Invalid carType received:', rawCarType, 'Using null instead');
         return null;
     }, [rawCarType]);
@@ -64,7 +64,7 @@ const CarListing = () => {
     const [totalCars, setTotalCars] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    
+
     // Additional filter states
     const [selectedBrands, setSelectedBrands] = useState([]); // Array of brand IDs
     const [selectedSeats, setSelectedSeats] = useState([]);
@@ -83,7 +83,7 @@ const CarListing = () => {
 
             const response = await carService.searchCars(searchCriteria, page, 12, sort);
             console.log('API Response:', response.data.content);
-            
+
             if (response?.data?.content) {
                 let newCars = response.data.content;
                 const totalElements = response.data.totalElements;
@@ -124,7 +124,7 @@ const CarListing = () => {
 
         // Handle carType - ưu tiên carType từ URL params, sau đó mới đến activeFilters
         console.log('🔧 buildSearchCriteria - inputs:', { carType, activeFilters });
-        
+
         if (carType) {
             // Nếu có carType từ URL params, luôn sử dụng nó
             criteria.carType = carType;
@@ -134,7 +134,7 @@ const CarListing = () => {
             const luxuryFilters = activeFilters.filter(f => f === 'luxury');
             const standardFilters = activeFilters.filter(f => f === 'standard');
             const isAllFilter = activeFilters.includes('all');
-            
+
             if (isAllFilter) {
                 // Khi chọn "Tất cả", không set carType để lấy tất cả loại xe
                 console.log('🔧 buildSearchCriteria - ALL filter active, no carType restriction');
@@ -188,7 +188,7 @@ const CarListing = () => {
         if (location) {
             const cityName = LocationUtils.slugToCity(location);
             const coordinates = LocationUtils.getCityCoordinates(cityName);
-            
+
             if (coordinates) {
                 criteria.latitude = coordinates.latitude;
                 criteria.longitude = coordinates.longitude;
@@ -211,12 +211,12 @@ const CarListing = () => {
     useEffect(() => {
         // Debug logging
         console.log('CarListing params:', { carType, location, pickupDate, returnDate });
-        
+
         const criteria = buildSearchCriteria();
         console.log('Search criteria:', criteria);
-        
+
         searchCarsWithAPI(criteria, 0, true);
-        
+
         // Set activeFilters based on carType from URL params
         if (carType === 'LUXURY') {
             console.log('🔧 Setting activeFilters to [luxury] based on URL carType=LUXURY');
@@ -229,7 +229,7 @@ const CarListing = () => {
             console.log('🔧 Setting activeFilters to [all] - no specific carType from URL');
             setActiveFilters(['all']);
         }
-        
+
         // Load available brands for filter
         loadAvailableBrands();
     }, [carType, location, pickupDate, returnDate]);
@@ -238,12 +238,12 @@ const CarListing = () => {
     useEffect(() => {
         // Skip if it's the initial load or no filters
         if (activeFilters.length === 0) return;
-        
+
         console.log('🔄 activeFilters changed, triggering search:', activeFilters);
-        
+
         const criteria = buildSearchCriteria();
         console.log('🔄 Search criteria from activeFilters change:', criteria);
-        
+
         searchCarsWithAPI(criteria, 0, true);
     }, [activeFilters]);
 
@@ -308,13 +308,13 @@ const CarListing = () => {
     const getFilterOptions = useMemo(() => {
         // Base filters theo hình design
         const baseFilters = [
-            { key: 'all', label: 'Tất cả', icon: null, color: '#52c41a', bgColor: '#f6ffed', borderColor: '#52c41a' },
-            { key: 'luxury', label: 'Xe xịn', icon: '⭐', color: '#fa8c16', bgColor: '#fff7e6', borderColor: '#fa8c16' },
-            { key: 'standard', label: 'Xe thường', icon: '🚗', color: '#1890ff', bgColor: '#e6f7ff', borderColor: '#1890ff' },
-            { key: 'seats', label: 'Số chỗ', icon: '🪑', color: '#722ed1', bgColor: '#f9f0ff', borderColor: '#722ed1' },
-            { key: 'brand', label: 'Hãng xe', icon: '🏷️', color: '#13c2c2', bgColor: '#e6fffb', borderColor: '#13c2c2' },
-            { key: 'fuel', label: 'Nhiên liệu', icon: '⛽', color: '#f5222d', bgColor: '#fff1f0', borderColor: '#f5222d' },
-            { key: 'location', label: 'Khu vực xe', icon: '📍', color: '#eb2f96', bgColor: '#fff0f6', borderColor: '#eb2f96' },
+            { key: 'all', label: 'Tất cả', icon: null, color: '#51c09f', bgColor: '#f0fdf9', borderColor: '#51c09f' },
+            { key: 'luxury', label: 'Xe xịn', icon: null, color: '#51c09f', bgColor: '#f0fdf9', borderColor: '#51c09f' },
+            { key: 'standard', label: 'Xe thường', icon: null, color: '#51c09f', bgColor: '#f0fdf9', borderColor: '#51c09f' },
+            { key: 'seats', label: 'Số chỗ', icon: null, color: '#51c09f', bgColor: '#f0fdf9', borderColor: '#51c09f' },
+            { key: 'brand', label: 'Hãng xe', icon: null, color: '#51c09f', bgColor: '#f0fdf9', borderColor: '#51c09f' },
+            { key: 'fuel', label: 'Nhiên liệu', icon: null, color: '#51c09f', bgColor: '#f0fdf9', borderColor: '#51c09f' },
+            { key: 'location', label: 'Khu vực xe', icon: null, color: '#51c09f', bgColor: '#f0fdf9', borderColor: '#51c09f' },
         ];
 
         return baseFilters;
@@ -324,24 +324,24 @@ const CarListing = () => {
     // Helper function to clear URL params
     const clearURLParams = useCallback(() => {
         const newSearchParams = new URLSearchParams();
-        
+
         // Giữ lại location và date params nếu có
         // if (location) newSearchParams.set('location', location);
         // if (pickupDate) newSearchParams.set('pickupDate', pickupDate);
         // if (pickupTime) newSearchParams.set('pickupTime', pickupTime);
         // if (returnDate) newSearchParams.set('returnDate', returnDate);
         // if (returnTime) newSearchParams.set('returnTime', returnTime);
-        
+
         // Xóa carType và category params
         // Không set lại carType hoặc category
-        
+
         navigate(`/car-listing?${newSearchParams.toString()}`, { replace: true });
     }, [location, pickupDate, pickupTime, returnDate, returnTime, navigate]);
 
     // Xử lý click filter - cập nhật logic
     const handleFilterClick = useCallback((filterKey) => {
         console.log('🎯 Filter clicked:', filterKey, 'Current activeFilters:', activeFilters);
-        
+
         // Special handling for advanced filters - show specific drawer
         if (filterKey === 'seats') {
             setActiveFilterDrawer('seats');
@@ -431,18 +431,18 @@ const CarListing = () => {
             setSelectedLocations([]);
             setPriceRange([0, 5000000]);
             setActiveFilters(['all']);
-            
+
             // Clear URL params
             clearURLParams();
-            
+
             // Search tất cả xe mà không bị giới hạn bởi carType
             const criteria = {};
-            
+
             // Chỉ giữ lại location và date filters, bỏ carType
             if (location) {
                 const cityName = LocationUtils.slugToCity(location);
                 const coordinates = LocationUtils.getCityCoordinates(cityName);
-                
+
                 if (coordinates) {
                     criteria.latitude = coordinates.latitude;
                     criteria.longitude = coordinates.longitude;
@@ -457,7 +457,7 @@ const CarListing = () => {
                 criteria.startDate = pickupDate;
                 criteria.endDate = returnDate;
             }
-            
+
             searchCarsWithAPI(criteria, 0, true);
         } else {
             // Reset specific filter
@@ -475,7 +475,7 @@ const CarListing = () => {
                     setSelectedLocations([]);
                     break;
             }
-            
+
             const criteria = buildSearchCriteria();
             searchCarsWithAPI(criteria, 0, true);
         }
@@ -585,7 +585,7 @@ const CarListing = () => {
             const today = new Date();
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
-            
+
             dateTimeDisplay = `08h00, ${today.toLocaleDateString('vi-VN')} đến 20h00, ${tomorrow.toLocaleDateString('vi-VN')}`;
         }
 
@@ -616,9 +616,9 @@ const CarListing = () => {
                             </div>
                         </Col>
                         <Col flex="200px">
-                            <Button 
-                                type="primary" 
-                                size="large" 
+                            <Button
+                                type="primary"
+                                size="large"
                                 className="search-button"
                                 onClick={handleSearchClick}
                                 loading={loading}
@@ -674,22 +674,22 @@ const CarListing = () => {
                                 >
                                     {filter.icon && <span className="filter-icon" style={{ fontSize: '16px' }}>{filter.icon}</span>}
                                     <span>{filter.label}</span>
-                                    {(selectedBrands.length > 0 && filter.key === 'brand') && 
+                                    {(selectedBrands.length > 0 && filter.key === 'brand') &&
                                         <span style={{ fontSize: '12px', background: 'rgba(255,255,255,0.3)', borderRadius: '10px', padding: '2px 6px' }}>
                                             {selectedBrands.length}
                                         </span>
                                     }
-                                    {(selectedSeats.length > 0 && filter.key === 'seats') && 
+                                    {(selectedSeats.length > 0 && filter.key === 'seats') &&
                                         <span style={{ fontSize: '12px', background: 'rgba(255,255,255,0.3)', borderRadius: '10px', padding: '2px 6px' }}>
                                             {selectedSeats.length}
                                         </span>
                                     }
-                                    {(selectedFuelTypes.length > 0 && filter.key === 'fuel') && 
+                                    {(selectedFuelTypes.length > 0 && filter.key === 'fuel') &&
                                         <span style={{ fontSize: '12px', background: 'rgba(255,255,255,0.3)', borderRadius: '10px', padding: '2px 6px' }}>
                                             {selectedFuelTypes.length}
                                         </span>
                                     }
-                                    {(selectedLocations.length > 0 && filter.key === 'location') && 
+                                    {(selectedLocations.length > 0 && filter.key === 'location') &&
                                         <span style={{ fontSize: '12px', background: 'rgba(255,255,255,0.3)', borderRadius: '10px', padding: '2px 6px' }}>
                                             {selectedLocations.length}
                                         </span>
@@ -705,9 +705,9 @@ const CarListing = () => {
                             <div
                                 style={{
                                     borderRadius: '20px',
-                                    border: `1px solid ${activeAdvancedFiltersCount > 0 ? '#52c41a' : '#d9d9d9'}`,
+                                    border: `1px solid ${activeAdvancedFiltersCount > 0 ? '#51c09f' : '#d9d9d9'}`,
                                     padding: '8px 16px',
-                                    backgroundColor: activeAdvancedFiltersCount > 0 ? '#52c41a' : '#fff',
+                                    backgroundColor: activeAdvancedFiltersCount > 0 ? '#51c09f' : '#fff',
                                     color: activeAdvancedFiltersCount > 0 ? '#fff' : '#666',
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -722,8 +722,8 @@ const CarListing = () => {
                                 onClick={() => setShowAdvancedFilters(true)}
                                 onMouseEnter={(e) => {
                                     if (activeAdvancedFiltersCount === 0) {
-                                        e.target.style.borderColor = '#52c41a';
-                                        e.target.style.color = '#52c41a';
+                                        e.target.style.borderColor = '#51c09f';
+                                        e.target.style.color = '#51c09f';
                                     }
                                 }}
                                 onMouseLeave={(e) => {
@@ -762,19 +762,19 @@ const CarListing = () => {
                             marginBottom: '20px',
                             padding: '12px 16px',
                             background: '#f6ffed',
-                            border: '1px solid #b7eb8f',
+                            border: '1px solid #51c09f',
                             borderRadius: '8px',
                             display: 'flex',
                             alignItems: 'center',
                             flexWrap: 'wrap',
                             gap: '8px'
                         }}>
-                            <span style={{ color: '#52c41a', fontWeight: '500' }}>
+                            <span style={{ color: '#51c09f', fontWeight: '500' }}>
                                 Đang lọc:
                             </span>
                             {activeFilters.filter(f => f !== 'all').map(filter => (
                                 <span key={filter} style={{
-                                    background: '#52c41a',
+                                    background: '#51c09f',
                                     color: 'white',
                                     padding: '4px 8px',
                                     borderRadius: '12px',
@@ -786,7 +786,7 @@ const CarListing = () => {
                             ))}
                             {getActiveFiltersSummary && (
                                 <span style={{
-                                    background: '#1890ff',
+                                    background: '#51c09f',
                                     color: 'white',
                                     padding: '4px 8px',
                                     borderRadius: '12px',
@@ -809,18 +809,18 @@ const CarListing = () => {
                                     setSelectedFuelTypes([]);
                                     setSelectedLocations([]);
                                     setPriceRange([0, 5000000]);
-                                    
+
                                     // Clear URL params
                                     clearURLParams();
-                                    
+
                                     // Search tất cả xe mà không bị giới hạn bởi carType
                                     const criteria = {};
-                                    
+
                                     // Chỉ giữ lại location và date filters, bỏ carType
                                     if (location) {
                                         const cityName = LocationUtils.slugToCity(location);
                                         const coordinates = LocationUtils.getCityCoordinates(cityName);
-                                        
+
                                         if (coordinates) {
                                             criteria.latitude = coordinates.latitude;
                                             criteria.longitude = coordinates.longitude;
@@ -835,7 +835,7 @@ const CarListing = () => {
                                         criteria.startDate = pickupDate;
                                         criteria.endDate = returnDate;
                                     }
-                                    
+
                                     searchCarsWithAPI(criteria, 0, true);
                                 }}
                                 style={{ marginLeft: 'auto', color: '#666' }}
@@ -880,7 +880,7 @@ const CarListing = () => {
                                 </span>
                             </div>
                             {hasMore && (
-                                <span style={{ fontSize: '14px', color: '#52c41a' }}>
+                                <span style={{ fontSize: '14px', color: '#51c09f' }}>
                                     Còn {(totalCars - filteredCars.length).toLocaleString()} xe khác
                                 </span>
                             )}
@@ -915,9 +915,9 @@ const CarListing = () => {
                     {/* Show more button */}
                     {hasMore && filteredCars.length >= 8 && (
                         <div style={{ textAlign: 'center', marginTop: 40 }}>
-                            <Button 
+                            <Button
                                 className="load-more-button"
-                                size="large" 
+                                size="large"
                                 style={{ padding: '0 40px' }}
                                 onClick={handleLoadMore}
                                 loading={loading}
@@ -949,18 +949,18 @@ const CarListing = () => {
                                     setSelectedFuelTypes([]);
                                     setSelectedLocations([]);
                                     setPriceRange([0, 5000000]);
-                                    
+
                                     // Clear URL params
                                     clearURLParams();
-                                    
+
                                     // Search tất cả xe mà không bị giới hạn bởi carType
                                     const criteria = {};
-                                    
+
                                     // Chỉ giữ lại location và date filters, bỏ carType
                                     if (location) {
                                         const cityName = LocationUtils.slugToCity(location);
                                         const coordinates = LocationUtils.getCityCoordinates(cityName);
-                                        
+
                                         if (coordinates) {
                                             criteria.latitude = coordinates.latitude;
                                             criteria.longitude = coordinates.longitude;
@@ -975,7 +975,7 @@ const CarListing = () => {
                                         criteria.startDate = pickupDate;
                                         criteria.endDate = returnDate;
                                     }
-                                    
+
                                     searchCarsWithAPI(criteria, 0, true);
                                 }}
                                 className="search-button"
@@ -988,7 +988,7 @@ const CarListing = () => {
             </div>
 
             {/* Individual Filter Drawers */}
-            
+
             {/* Brand Filter Drawer */}
             <Drawer
                 title={
@@ -1004,8 +1004,8 @@ const CarListing = () => {
                 footer={
                     <div style={{ textAlign: 'right' }}>
                         <Space>
-                            <Button 
-                                icon={<ClearOutlined />} 
+                            <Button
+                                icon={<ClearOutlined />}
                                 onClick={() => handleResetAdvancedFilters('brand')}
                                 type="text"
                             >
@@ -1014,8 +1014,8 @@ const CarListing = () => {
                             <Button onClick={closeFilterDrawer}>
                                 Hủy
                             </Button>
-                            <Button 
-                                type="primary" 
+                            <Button
+                                type="primary"
                                 onClick={() => handleAdvancedFilterChange('brand')}
                                 loading={loading}
                             >
@@ -1050,8 +1050,8 @@ const CarListing = () => {
                 footer={
                     <div style={{ textAlign: 'right' }}>
                         <Space>
-                            <Button 
-                                icon={<ClearOutlined />} 
+                            <Button
+                                icon={<ClearOutlined />}
                                 onClick={() => handleResetAdvancedFilters('seats')}
                                 type="text"
                             >
@@ -1060,8 +1060,8 @@ const CarListing = () => {
                             <Button onClick={closeFilterDrawer}>
                                 Hủy
                             </Button>
-                            <Button 
-                                type="primary" 
+                            <Button
+                                type="primary"
                                 onClick={() => handleAdvancedFilterChange('seats')}
                                 loading={loading}
                             >
@@ -1102,8 +1102,8 @@ const CarListing = () => {
                 footer={
                     <div style={{ textAlign: 'right' }}>
                         <Space>
-                            <Button 
-                                icon={<ClearOutlined />} 
+                            <Button
+                                icon={<ClearOutlined />}
                                 onClick={() => handleResetAdvancedFilters('fuel')}
                                 type="text"
                             >
@@ -1112,8 +1112,8 @@ const CarListing = () => {
                             <Button onClick={closeFilterDrawer}>
                                 Hủy
                             </Button>
-                            <Button 
-                                type="primary" 
+                            <Button
+                                type="primary"
                                 onClick={() => handleAdvancedFilterChange('fuel')}
                                 loading={loading}
                             >
@@ -1153,8 +1153,8 @@ const CarListing = () => {
                 footer={
                     <div style={{ textAlign: 'right' }}>
                         <Space>
-                            <Button 
-                                icon={<ClearOutlined />} 
+                            <Button
+                                icon={<ClearOutlined />}
                                 onClick={() => handleResetAdvancedFilters('location')}
                                 type="text"
                             >
@@ -1163,8 +1163,8 @@ const CarListing = () => {
                             <Button onClick={closeFilterDrawer}>
                                 Hủy
                             </Button>
-                            <Button 
-                                type="primary" 
+                            <Button
+                                type="primary"
                                 onClick={() => handleAdvancedFilterChange('location')}
                                 loading={loading}
                             >
@@ -1203,8 +1203,8 @@ const CarListing = () => {
                 width={400}
                 extra={
                     <Space>
-                        <Button 
-                            icon={<ClearOutlined />} 
+                        <Button
+                            icon={<ClearOutlined />}
                             onClick={() => handleResetAdvancedFilters()}
                             type="text"
                         >
@@ -1218,8 +1218,8 @@ const CarListing = () => {
                             <Button onClick={() => setShowAdvancedFilters(false)}>
                                 Hủy
                             </Button>
-                            <Button 
-                                type="primary" 
+                            <Button
+                                type="primary"
                                 onClick={() => handleAdvancedFilterChange('all')}
                                 loading={loading}
                             >
@@ -1259,8 +1259,8 @@ const CarListing = () => {
                             🔧 Bộ lọc khác
                         </h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <Button 
-                                block 
+                            <Button
+                                block
                                 onClick={() => {
                                     setShowAdvancedFilters(false);
                                     setActiveFilterDrawer('brand');
@@ -1269,8 +1269,8 @@ const CarListing = () => {
                             >
                                 🏷️ Hãng xe {selectedBrands.length > 0 && `(${selectedBrands.length})`}
                             </Button>
-                            <Button 
-                                block 
+                            <Button
+                                block
                                 onClick={() => {
                                     setShowAdvancedFilters(false);
                                     setActiveFilterDrawer('seats');
@@ -1279,8 +1279,8 @@ const CarListing = () => {
                             >
                                 🪑 Số chỗ ngồi {selectedSeats.length > 0 && `(${selectedSeats.length})`}
                             </Button>
-                            <Button 
-                                block 
+                            <Button
+                                block
                                 onClick={() => {
                                     setShowAdvancedFilters(false);
                                     setActiveFilterDrawer('fuel');
@@ -1289,8 +1289,8 @@ const CarListing = () => {
                             >
                                 ⛽ Nhiên liệu {selectedFuelTypes.length > 0 && `(${selectedFuelTypes.length})`}
                             </Button>
-                            <Button 
-                                block 
+                            <Button
+                                block
                                 onClick={() => {
                                     setShowAdvancedFilters(false);
                                     setActiveFilterDrawer('location');

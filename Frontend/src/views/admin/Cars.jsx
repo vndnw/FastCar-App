@@ -48,6 +48,7 @@ import { imageService } from "../../services/imageService";
 import { useAuth } from "../../contexts/AuthContext";
 import FeatureDisplay from "../../components/FeatureDisplay";
 import dayjs from 'dayjs';
+import Meta from "../../components/Meta";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -814,7 +815,14 @@ const Cars = () => {
                                         name="carBrandId"
                                         rules={[{ required: true, message: 'Please select car brand' }]}
                                     >
-                                        <Select placeholder="Select car brand">
+                                        <Select 
+                                            virtual={false} 
+                                            placeholder="Select car brand"
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                option?.children?.toLowerCase().includes(input.toLowerCase())
+                                            }
+                                        >
                                             {carBrands.map(brand => (
                                                 <Option key={brand.id} value={brand.id}>
                                                     {brand.name}
@@ -1222,6 +1230,10 @@ const Cars = () => {
 
     return (
         <>
+            <Meta
+                title="Cars Management - Admin Dashboard"
+                description="Manage vehicle inventory, car specifications, features, and availability settings"
+            />
             <Tabs defaultActiveKey="all" items={tabItems} />
 
             {/* Feature Create Modal */}

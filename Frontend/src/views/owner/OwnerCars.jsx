@@ -18,7 +18,9 @@ import {
     EditOutlined,
     DeleteOutlined,
     EyeOutlined,
-    CarOutlined
+    CarOutlined,
+    CheckCircleOutlined,
+    StopOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -93,9 +95,37 @@ function OwnerCars() {
         });
     };
 
+    const handleToggleAvailability = async (carId, currentStatus, carName) => {
+        const newStatus = currentStatus === 'AVAILABLE' ? 'UNAVAILABLE' : 'AVAILABLE';
+        const action = newStatus === 'AVAILABLE' ? 'make available' : 'make unavailable';
+
+        confirm({
+            title: 'Change Car Status',
+            content: `Are you sure you want to ${action} "${carName}"?`,
+            okText: 'Yes, Change',
+            okType: newStatus === 'AVAILABLE' ? 'primary' : 'default',
+            cancelText: 'Cancel',
+            onOk: async () => {
+                try {
+                    const result = await carService.updateCarStatus(carId, newStatus);
+                    if (result.status === 200) {
+                        message.success(`Car "${carName}" is now ${newStatus.toLowerCase()}!`);
+                        fetchCars();
+                    } else {
+                        message.error(result.data?.message || 'Failed to update car status');
+                    }
+                } catch (error) {
+                    console.error('Error updating car status:', error);
+                    message.error('Failed to update car status');
+                }
+            },
+        });
+    };
+
     const getStatusColor = (status) => {
         const statusColors = {
             'AVAILABLE': 'green',
+            'UNAVAILABLE': 'red',
             'RENTED': 'blue',
             'MAINTENANCE': 'orange',
             'PENDING': 'gold',
@@ -195,11 +225,22 @@ function OwnerCars() {
         {
             title: 'Status',
             key: 'status',
-            width: '15%',
+            width: '20%',
             render: (_, record) => (
-                <Tag color={getStatusColor(record.status)} style={{ fontSize: 12 }}>
-                    {record.status}
-                </Tag>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Tag color={getStatusColor(record.status)} style={{ fontSize: 12 }}>
+                        {record.status}
+                    </Tag>
+                    {(record.status === 'AVAILABLE' || record.status === 'UNAVAILABLE') && (
+                        <Button
+                            type={record.status === 'AVAILABLE' ? 'default' : 'primary'}
+                            icon={record.status === 'AVAILABLE' ? <StopOutlined /> : <CheckCircleOutlined />}
+                            size="small"
+                            onClick={() => handleToggleAvailability(record.id, record.status, record.name)}
+                            title={record.status === 'AVAILABLE' ? 'Make Unavailable' : 'Make Available'}
+                        />
+                    )}
+                </div>
             ),
         },
         {
@@ -217,30 +258,27 @@ function OwnerCars() {
             key: 'actions',
             width: '15%',
             render: (_, record) => (
-                <Space size="small">
+                <Space size={4}>
                     <Button
                         type="primary"
                         icon={<EyeOutlined />}
                         size="small"
                         onClick={() => navigate(`/owner/cars/${record.id}`)}
-                    >
-                        View
-                    </Button>
+                        title="View Details"
+                    />
                     <Button
                         icon={<EditOutlined />}
                         size="small"
                         onClick={() => navigate(`/owner/cars/edit/${record.id}`)}
-                    >
-                        Edit
-                    </Button>
+                        title="Edit Car"
+                    />
                     <Button
                         danger
                         icon={<DeleteOutlined />}
                         size="small"
                         onClick={() => handleDeleteCar(record.id, record.name)}
-                    >
-                        Delete
-                    </Button>
+                        title="Delete Car"
+                    />
                 </Space>
             ),
         },
@@ -253,6 +291,7 @@ function OwnerCars() {
     // Calculate statistics
     const totalCars = cars.length;
     const availableCars = cars.filter(car => car.status === 'AVAILABLE').length;
+    const unavailableCars = cars.filter(car => car.status === 'UNAVAILABLE').length;
     const rentedCars = cars.filter(car => car.status === 'RENTED').length;
     const pendingCars = cars.filter(car => car.status === 'PENDING').length;
 
@@ -283,7 +322,7 @@ function OwnerCars() {
 
             {/* Statistics Row */}
             <Row gutter={16} style={{ marginBottom: 24 }}>
-                <Col xs={12} sm={6}>
+                <Col xs={12} sm={6} lg={4}>
                     <Card>
                         <Statistic
                             title="Total Cars"
@@ -293,7 +332,7 @@ function OwnerCars() {
                         />
                     </Card>
                 </Col>
-                <Col xs={12} sm={6}>
+                <Col xs={12} sm={6} lg={4}>
                     <Card>
                         <Statistic
                             title="Available"
@@ -302,7 +341,16 @@ function OwnerCars() {
                         />
                     </Card>
                 </Col>
-                <Col xs={12} sm={6}>
+                <Col xs={12} sm={6} lg={4}>
+                    <Card>
+                        <Statistic
+                            title="Unavailable"
+                            value={unavailableCars}
+                            valueStyle={{ color: '#ff4d4f' }}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={12} sm={6} lg={4}>
                     <Card>
                         <Statistic
                             title="Rented"
@@ -311,7 +359,7 @@ function OwnerCars() {
                         />
                     </Card>
                 </Col>
-                <Col xs={12} sm={6}>
+                <Col xs={12} sm={6} lg={4}>
                     <Card>
                         <Statistic
                             title="Pending"

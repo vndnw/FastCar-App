@@ -27,6 +27,7 @@ import {
 } from '@ant-design/icons';
 import { documentService } from '../../services/documentService';
 import dayjs from 'dayjs';
+import Meta from '../../components/Meta';
 
 const { Title, Text } = Typography;
 
@@ -341,8 +342,13 @@ const Documents = () => {
     ];
 
     return (
-        <div>
+        <>
+            <Meta 
+                title="Documents Management - Admin Dashboard" 
+                description="Review and manage user submitted documents, verification, and approvals"
+            />
             <div>
+                <div>
                 <Title level={2}>Document Management</Title>
                 <Text type="secondary">Manage and review user submitted documents</Text>
             </div>
@@ -450,7 +456,8 @@ const Documents = () => {
                     </div>
                 )}
             </Modal>
-        </div>
+            </div>
+        </>
     );
 };
 

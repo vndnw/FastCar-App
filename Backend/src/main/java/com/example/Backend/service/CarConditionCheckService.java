@@ -6,6 +6,7 @@ import com.example.Backend.exception.ResourceNotFoundException;
 import com.example.Backend.mapper.CarConditionCheckMapper;
 import com.example.Backend.model.Booking;
 import com.example.Backend.model.ConditionCheck;
+import com.example.Backend.model.enums.BookingStatus;
 import com.example.Backend.model.enums.CheckStatus;
 import com.example.Backend.repository.BookingRepository;
 import com.example.Backend.repository.CarConditionCheckRepository;
@@ -33,22 +34,17 @@ public class CarConditionCheckService {
     public CarConditionCheckResponse createCarConditionCheck(long bookingId , @NotNull CarConditionCheckRequest carConditionCheckRequest) {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
+        booking.setStatus(BookingStatus.CHECKED);
 
         ConditionCheck conditionCheck = new ConditionCheck();
-        conditionCheck.setBooking(booking);
+        conditionCheck.setBooking(bookingRepository.save(booking));
         conditionCheck.setCar(booking.getCar());
         conditionCheck.setType(carConditionCheckRequest.getCheckType());
         conditionCheck.setOdometer(carConditionCheckRequest.getOdometer());
         conditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
         conditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
         conditionCheck.setDamageNote(carConditionCheckRequest.getDamageNote());
-        conditionCheck.setImageFrontUrl(carConditionCheckRequest.getImageFrontUrl());
-        conditionCheck.setImageRearUrl(carConditionCheckRequest.getImageRearUrl());
-        conditionCheck.setImageLeftUrl(carConditionCheckRequest.getImageLeftUrl());
-        conditionCheck.setImageRightUrl(carConditionCheckRequest.getImageRightUrl());
-        conditionCheck.setImageOdoUrl(carConditionCheckRequest.getImageOdoUrl());
-        conditionCheck.setImageFuelUrl(carConditionCheckRequest.getImageFuelUrl());
-        conditionCheck.setImageOtherUrl(carConditionCheckRequest.getImageOtherUrl());
+        conditionCheck.setImages(carConditionCheckRequest.getImages());
         conditionCheck.setStatus(CheckStatus.PENDING);
         conditionCheck.setChecked(false);
 
@@ -76,13 +72,8 @@ public class CarConditionCheckService {
         return carConditionCheckMapper.mapToResponse(conditionCheck);
     }
 
-    public boolean isCarConditionCheckExists(long bookingId) {
-        if(carConditionCheckRepository.existsByBookingId(bookingId)){
-            return true;
-        } else {
-            //thực hiện gửi mail hoặc thông báo cho chủ xe
-            return false;
-        }
+    public boolean isCarConditionCheckExists(long bookingId) {//thực hiện gửi mail hoặc thông báo cho chủ xe
+        return carConditionCheckRepository.existsByBookingId(bookingId);
     }
 
     public void deleteCarConditionCheckById(long id) {
@@ -107,13 +98,7 @@ public class CarConditionCheckService {
         conditionCheck.setFuelLevel(carConditionCheckRequest.getFuelLevel());
         conditionCheck.setInteriorStatus(carConditionCheckRequest.getInteriorStatus());
         conditionCheck.setDamageNote(carConditionCheckRequest.getDamageNote());
-        conditionCheck.setImageFrontUrl(carConditionCheckRequest.getImageFrontUrl());
-        conditionCheck.setImageRearUrl(carConditionCheckRequest.getImageRearUrl());
-        conditionCheck.setImageLeftUrl(carConditionCheckRequest.getImageLeftUrl());
-        conditionCheck.setImageRightUrl(carConditionCheckRequest.getImageRightUrl());
-        conditionCheck.setImageOdoUrl(carConditionCheckRequest.getImageOdoUrl());
-        conditionCheck.setImageFuelUrl(carConditionCheckRequest.getImageFuelUrl());
-        conditionCheck.setImageOtherUrl(carConditionCheckRequest.getImageOtherUrl());
+        conditionCheck.setImages(carConditionCheckRequest.getImages());
 
         return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(conditionCheck));
     }
@@ -125,4 +110,5 @@ public class CarConditionCheckService {
         conditionCheck.setChecked(true);
         return carConditionCheckMapper.mapToResponse(carConditionCheckRepository.save(conditionCheck));
     }
+
 }

@@ -41,12 +41,6 @@ const Navbar = () => {
       icon: <ProfileOutlined />,
       onClick: () => navigate('/user-profile'),
     },
-    {
-      key: 'my-trips',
-      label: 'Chuyến của tôi',
-      icon: <CarOutlined />,
-      onClick: () => navigate('/my-trips'),
-    },
     ...(user?.roles?.includes('owner') ? [
       {
         key: 'owner-panel',

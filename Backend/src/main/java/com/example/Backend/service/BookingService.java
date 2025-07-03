@@ -121,6 +121,8 @@ public class BookingService {
                 .build());
         List<Long> transactionIds = List.of(paymentRental.getId(), paymentDeposit.getId());
 
+        emailService.sendMailCheckIn(booking);
+
         String paymentUrl = vnpayService.generatePayUrl(null, paymentRental.getAmount().add(paymentDeposit.getAmount()), paymentRental.getExternalRef());
 
         return RentalFeeResponse.builder()
@@ -136,7 +138,9 @@ public class BookingService {
     public BookingResponse createCheckout(long bookingId, @NotNull CheckoutRequest checkoutRequest) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
 
-        carConditionCheckService.createCarConditionCheck(bookingId, checkoutRequest.getCarConditionCheck());
+        if(checkoutRequest.getCarConditionCheck() != null) {
+            carConditionCheckService.createCarConditionCheck(bookingId, checkoutRequest.getCarConditionCheck());
+        }
 
         BigDecimal depositAmount = booking.getDepositAmount();
         List<ExtraChargeRequest> extraCharges = checkoutRequest.getExtraCharges();
@@ -163,6 +167,9 @@ public class BookingService {
 
         booking.setTotalExtraCharges(totalExtraCharges);
         booking.setTotalRefunded(totalRefunded);
+
+        Car car = booking.getCar();
+        car.getName(); // Gọi trước để ép Hibernate fetch (hoặc dùng Hibernate.initialize)
 
         emailService.sendMailCheckOut(booking);
 
