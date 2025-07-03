@@ -20,6 +20,7 @@ import {
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { carService } from '../../../services/carService';
 import dayjs from 'dayjs';
+import Meta from '../../../components/Meta';
 
 const { Title, Text } = Typography;
 
@@ -126,7 +127,12 @@ const CarDetail = () => {
     };
 
     return (
-        <div>
+        <>
+            <Meta 
+                title={`Car Details - ${car?.name || 'Vehicle'} - Admin Dashboard`} 
+                description={`Detailed view of ${car?.name || 'vehicle'} including specifications, pricing, and availability status`}
+            />
+            <div>
             {/* Header */}
             <Card style={{ marginBottom: 24 }}>
                 <Row justify="space-between" align="middle">
@@ -290,7 +296,8 @@ const CarDetail = () => {
                     </div>
                 )}
             </Card>
-        </div>
+            </div>
+        </>
     );
 };
 

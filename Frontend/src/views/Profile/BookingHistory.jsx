@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Table, Card, Tag, Button, Modal, Descriptions, 
-    Spin, Empty, message, Space, Typography
+    Table, Card, Tag, Button, Modal, Descriptions,
+    Spin, Empty, message, Space, Typography, Popconfirm,
+    Divider, Alert
 } from 'antd';
-import { 
-    EyeOutlined, ClockCircleOutlined, CheckCircleOutlined, 
-    CloseCircleOutlined, CarOutlined, CalendarOutlined 
+import {
+    EyeOutlined, ClockCircleOutlined, CheckCircleOutlined,
+    CloseCircleOutlined, CarOutlined, CalendarOutlined, LoginOutlined,
+    CreditCardOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { bookingService } from '../../services';
@@ -17,6 +19,22 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
     const [loading, setLoading] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [detailModalVisible, setDetailModalVisible] = useState(false);
+
+    // Add CSS animation for countdown pulse effect
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                from { transform: scale(1); opacity: 1; }
+                to { transform: scale(1.1); opacity: 0.7; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
 
     useEffect(() => {
         if ((visible || embedded) && userId) {
@@ -46,12 +64,130 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
         setDetailModalVisible(true);
     };
 
+    const handleCheckIn = async (bookingId) => {
+        try {
+            const response = await bookingService.simpleCheckIn(bookingId);
+
+            // Check if response contains payment URL
+            if (response.data && response.data.paymentUrl) {
+                const { rentalFee, depositFee, totalFee, paymentUrl } = response.data;
+
+                let countdown = 5;
+                let countdownInterval;
+
+                // Show payment information modal (mandatory payment with auto redirect)
+                const modal = Modal.info({
+                    title: (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <CreditCardOutlined style={{ color: '#52c41a' }} />
+                            Check-in thành công! Chuyển đến thanh toán
+                        </div>
+                    ),
+                    width: 500,
+                    icon: null,
+                    content: (
+                        <div style={{ marginTop: 16 }}>
+                            <Alert
+                                message="Check-in thành công!"
+                                description="Hệ thống sẽ tự động chuyển bạn đến trang thanh toán để hoàn tất quy trình."
+                                type="success"
+                                showIcon
+                                style={{ marginBottom: 16 }}
+                            />
+
+                            <Alert
+                                message={
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span>Tự động chuyển hướng sau</span>
+                                        <span id="countdown" style={{
+                                            color: '#ff4d4f',
+                                            fontWeight: 'bold',
+                                            fontSize: '18px',
+                                            minWidth: '20px',
+                                            textAlign: 'center'
+                                        }}>
+                                            {countdown}
+                                        </span>
+                                        <span>giây</span>
+                                    </div>
+                                }
+                                type="info"
+                                showIcon
+                                style={{ marginBottom: 16 }}
+                            />
+
+                            <Divider />
+                            <div style={{ marginBottom: 8 }}>
+                                <strong>Chi tiết thanh toán:</strong>
+                            </div>
+                            <div style={{ paddingLeft: 16, marginBottom: 8 }}>
+                                <div>• Phí thuê xe: <span style={{ fontWeight: 600 }}>{rentalFee?.toLocaleString('vi-VN')} VNĐ</span></div>
+                                <div>• Tiền cọc: <span style={{ fontWeight: 600 }}>{depositFee?.toLocaleString('vi-VN')} VNĐ</span></div>
+                                <Divider style={{ margin: '8px 0' }} />
+                                <div>• <strong>Tổng cộng: <span style={{ color: '#ff4d4f', fontWeight: 700 }}>{totalFee?.toLocaleString('vi-VN')} VNĐ</span></strong></div>
+                            </div>
+                            <Alert
+                                message="Lưu ý"
+                                description="Bạn bắt buộc phải hoàn tất thanh toán để xác nhận việc check-in."
+                                type="warning"
+                                showIcon
+                                style={{ marginTop: 16 }}
+                            />
+                        </div>
+                    ),
+                    okText: 'Thanh toán ngay',
+                    onOk: () => {
+                        // Clear countdown when user clicks button
+                        if (countdownInterval) {
+                            clearInterval(countdownInterval);
+                        }
+                        // Mandatory redirect to payment URL
+                        window.location.href = paymentUrl;
+                    },
+                    // Remove cancel option to make payment mandatory
+                    closable: false,
+                    maskClosable: false
+                });
+
+                // Start countdown timer
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    const countdownElement = document.getElementById('countdown');
+                    if (countdownElement) {
+                        countdownElement.textContent = countdown;
+                        // Add pulsing effect when countdown is low
+                        if (countdown <= 3) {
+                            countdownElement.style.animation = 'pulse 0.5s ease-in-out infinite alternate';
+                        }
+                    }
+
+                    // Auto redirect when countdown reaches 0
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        modal.destroy();
+                        window.location.href = paymentUrl;
+                    }
+                }, 1000);
+
+                fetchBookingHistory(); // Refresh the data
+            } else {
+                message.success('Check-in thành công!');
+                fetchBookingHistory(); // Refresh the data
+            }
+        } catch (error) {
+            console.error('Error during check-in:', error);
+            message.error('Không thể check-in. Vui lòng thử lại.');
+        }
+    };
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'PENDING':
                 return 'orange';
             case 'CONFIRMED':
                 return 'blue';
+            case 'CHECKED_IN':
+                return 'cyan';
             case 'COMPLETED':
                 return 'green';
             case 'CANCELLED':
@@ -67,6 +203,8 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
                 return 'Chờ xác nhận';
             case 'CONFIRMED':
                 return 'Đã xác nhận';
+            case 'CHECKED_IN':
+                return 'Đã check-in';
             case 'COMPLETED':
                 return 'Hoàn thành';
             case 'CANCELLED':
@@ -82,6 +220,8 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
                 return <ClockCircleOutlined />;
             case 'CONFIRMED':
                 return <CheckCircleOutlined />;
+            case 'CHECKED_IN':
+                return <LoginOutlined />;
             case 'COMPLETED':
                 return <CheckCircleOutlined />;
             case 'CANCELLED':
@@ -151,13 +291,40 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
             title: 'Thao tác',
             key: 'actions',
             render: (_, record) => (
-                <Button 
-                    type="link" 
-                    icon={<EyeOutlined />}
-                    onClick={() => showBookingDetail(record)}
-                >
-                    Chi tiết
-                </Button>
+                <Space>
+                    <Button
+                        type="link"
+                        icon={<EyeOutlined />}
+                        onClick={() => showBookingDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                    {record.status === 'CHECKED' && (
+                        <Popconfirm
+                            title="Xác nhận check-in"
+                            description="Sau khi check-in, bạn sẽ bắt buộc phải thanh toán ngay lập tức"
+                            onConfirm={() => handleCheckIn(record.id)}
+                            okText="Xác nhận"
+                            cancelText="Hủy"
+                        >
+                            <Button
+                                type="primary"
+                                size="small"
+                                icon={<LoginOutlined />}
+                                onMouseEnter={(e) => {
+                                    e.target.style.transform = 'translateY(-1px)';
+                                    e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.transform = 'translateY(0)';
+                                    e.target.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                                }}
+                            >
+                                Check-in
+                            </Button>
+                        </Popconfirm>
+                    )}
+                </Space>
             ),
         },
     ];
@@ -190,13 +357,14 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
     const getBookingStats = () => {
         const total = bookings.length;
         const completed = bookings.filter(b => b.status === 'COMPLETED').length;
+        const checkedIn = bookings.filter(b => b.status === 'CHECKED_IN').length;
         const pending = bookings.filter(b => b.status === 'PENDING').length;
         const cancelled = bookings.filter(b => b.status === 'CANCELLED').length;
         const totalSpent = bookings
             .filter(b => b.status === 'COMPLETED')
             .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
-        return { total, completed, pending, cancelled, totalSpent };
+        return { total, completed, checkedIn, pending, cancelled, totalSpent };
     };
 
     return (
@@ -224,6 +392,10 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
                                             <div className="booking-summary-item">
                                                 <div className="booking-summary-label">Đã hoàn thành</div>
                                                 <div className="booking-summary-value">{stats.completed}</div>
+                                            </div>
+                                            <div className="booking-summary-item">
+                                                <div className="booking-summary-label">Đã check-in</div>
+                                                <div className="booking-summary-value">{stats.checkedIn}</div>
                                             </div>
                                             <div className="booking-summary-item">
                                                 <div className="booking-summary-label">Đang chờ</div>
@@ -296,6 +468,10 @@ const BookingHistory = ({ userId, visible, onClose, embedded = false }) => {
                                                 <div className="booking-summary-item">
                                                     <div className="booking-summary-label">Đã hoàn thành</div>
                                                     <div className="booking-summary-value">{stats.completed}</div>
+                                                </div>
+                                                <div className="booking-summary-item">
+                                                    <div className="booking-summary-label">Đã check-in</div>
+                                                    <div className="booking-summary-value">{stats.checkedIn}</div>
                                                 </div>
                                                 <div className="booking-summary-item">
                                                     <div className="booking-summary-label">Đang chờ</div>

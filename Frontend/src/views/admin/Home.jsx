@@ -38,6 +38,7 @@ import Echart from "../../components/admin/chart/EChart";
 import LineChart from "../../components/admin/chart/LineChart";
 import { adminService } from "../../services/adminService";
 import { documentService } from "../../services/documentService";
+import Meta from "../../components/Meta";
 
 function Home() {
   const { Title, Text } = Typography;
@@ -303,8 +304,13 @@ function Home() {
   ];
 
   return (
-    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
-      {loading ? (
+    <>
+      <Meta 
+        title="Admin Dashboard - BookingACar" 
+        description="Comprehensive admin dashboard for managing car bookings, users, and system statistics"
+      />
+      <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
+        {loading ? (
         <div style={{
           display: 'flex',
           justifyContent: 'center',
@@ -1173,7 +1179,8 @@ function Home() {
           box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
       `}</style>
-    </div >
+      </div >
+    </>
   );
 }
 

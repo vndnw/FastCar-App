@@ -6,7 +6,8 @@ export const carBrandService = {
     getCarBrands: async (page = 0, size = 100) => {
         const params = new URLSearchParams({
             page: page.toString(),
-            size: size.toString()
+            size: size.toString(),
+            sort: 'name,asc'
         });
 
         return apiClient.get(`/carbrand?${params}`);

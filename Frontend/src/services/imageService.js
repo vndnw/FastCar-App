@@ -44,6 +44,18 @@ export const imageService = {
         return apiClient.delete(`/image/delete/car/${carId}`);
     },
 
+    // Upload general image
+    uploadImage: async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        return apiClient.post('/image/upload-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
 
 };
 
