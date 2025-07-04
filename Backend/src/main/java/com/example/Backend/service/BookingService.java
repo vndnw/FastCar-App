@@ -168,6 +168,9 @@ public class BookingService {
         booking.setTotalExtraCharges(totalExtraCharges);
         booking.setTotalRefunded(totalRefunded);
 
+        Car car = booking.getCar();
+        car.getName(); // Gọi trước để ép Hibernate fetch (hoặc dùng Hibernate.initialize)
+
         emailService.sendMailCheckOut(booking);
 
         return bookingMapper.mapToResponse(bookingRepository.save(booking));

@@ -46,11 +46,10 @@ import NotFound from "./views/NotFound";
 
 import OwnerCar from './views/OwnerCar/OwnerCar';
 import EditCar from './views/OwnerCar/EditCar';
-import MyTrips from './views/MyTrips/MyTrips';
 
-import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
 import { BookingProvider } from './contexts/BookingContext';
 import { CarProvider } from './contexts/CarContext';
+import DefaultMeta from './components/DefaultMeta';
 
 
 
@@ -59,6 +58,7 @@ function App() {
     <AuthProvider>
       <BookingProvider>
         <CarProvider>
+          <DefaultMeta />
           <Routes>
             {/* Layout cho trang người dùng */}
             <Route element={<UserLayout />}>
@@ -71,19 +71,8 @@ function App() {
               <Route path="/payment-callback" element={<PaymentCallback />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-failure" element={<PaymentFailure />} />
-              <Route path="/my-trips" element={<MyTrips />} />
-              <Route path="/login" element={
-                <RedirectIfAuthenticated>
-                  <Login />
-                </RedirectIfAuthenticated>
-              }
-              />
-              <Route path="/register" element={
-                <RedirectIfAuthenticated>
-                  <Register />
-                </RedirectIfAuthenticated>
-              }
-              />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route path="/car-listing" element={<CarListing />} />
               <Route path="/car-detail/:carId" element={<CarDetail />} />
             </Route>

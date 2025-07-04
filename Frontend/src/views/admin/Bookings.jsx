@@ -41,6 +41,7 @@ import {
 import dayjs from 'dayjs';
 import * as XLSX from 'xlsx';
 import { bookingService } from '../../services/bookingService';
+import Meta from '../../components/Meta';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -683,6 +684,10 @@ const Bookings = () => {
 
     return (
         <>
+            <Meta 
+                title="Bookings Management - Admin Dashboard" 
+                description="Manage and monitor all car booking requests, approvals, and customer reservations"
+            />
             {/* Statistics Cards */}
             {/*
             <div style={{ marginBottom: 24 }}>

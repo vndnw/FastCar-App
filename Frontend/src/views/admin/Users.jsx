@@ -28,6 +28,7 @@ import { roleService } from "../../services/roleService";
 import { authService } from "../../services/authService";
 import dayjs from 'dayjs';
 import { Users } from "lucide-react";
+import Meta from "../../components/Meta";
 
 
 const { Title } = Typography;
@@ -433,6 +434,10 @@ function UserPage() {
 
   return (
     <>
+      <Meta 
+        title="Users Management - Admin Dashboard" 
+        description="Manage user accounts, roles, permissions, and user access controls"
+      />
       <div className="tabled">
         <Row gutter={[24, 0]}>
           <Col xs="24" xl={24}>

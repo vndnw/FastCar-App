@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import Meta from '../../../components/Meta';
 
 const AdminNotFound = () => {
     const navigate = useNavigate();
@@ -14,62 +15,69 @@ const AdminNotFound = () => {
     };
 
     return (
-        <div style={{
-            minHeight: '70vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '40px 20px',
-            background: '#f0f2f5'
-        }}>
-            <Result
-                status="404"
-                title="404"
-                subTitle="Trang quản trị bạn đang tìm kiếm không tồn tại."
-                style={{
-                    background: 'white',
-                    borderRadius: '8px',
-                    padding: '48px 32px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-                    maxWidth: '500px',
-                    width: '100%'
-                }}
-                extra={
-                    <div style={{
-                        display: 'flex',
-                        gap: '16px',
-                        justifyContent: 'center',
-                        flexWrap: 'wrap'
-                    }}>
-                        <Button
-                            type="primary"
-                            onClick={handleGoToDashboard}
-                            style={{
-                                height: '36px',
-                                padding: '0 20px',
-                                fontSize: '14px',
-                                borderRadius: '4px',
-                                fontWeight: '500'
-                            }}
-                        >
-                            Về Dashboard
-                        </Button>
-                        <Button
-                            onClick={handleGoBack}
-                            style={{
-                                height: '36px',
-                                padding: '0 20px',
-                                fontSize: '14px',
-                                borderRadius: '4px',
-                                fontWeight: '500'
-                            }}
-                        >
-                            Quay lại
-                        </Button>
-                    </div>
-                }
+        <>
+            <Meta
+                title="404 - Page Not Found - Admin Dashboard"
+                description="The admin page you are looking for does not exist. Return to admin dashboard."
             />
-        </div>
+            <div style={{
+                minHeight: '70vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px 20px',
+                background: '#f0f2f5'
+            }}>
+                <Meta title="404 Not Found" description="Trang quản trị không tồn tại" />
+                <Result
+                    status="404"
+                    title="404"
+                    subTitle="Trang quản trị bạn đang tìm kiếm không tồn tại."
+                    style={{
+                        background: 'white',
+                        borderRadius: '8px',
+                        padding: '48px 32px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                        maxWidth: '500px',
+                        width: '100%'
+                    }}
+                    extra={
+                        <div style={{
+                            display: 'flex',
+                            gap: '16px',
+                            justifyContent: 'center',
+                            flexWrap: 'wrap'
+                        }}>
+                            <Button
+                                type="primary"
+                                onClick={handleGoToDashboard}
+                                style={{
+                                    height: '36px',
+                                    padding: '0 20px',
+                                    fontSize: '14px',
+                                    borderRadius: '4px',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                Về Dashboard
+                            </Button>
+                            <Button
+                                onClick={handleGoBack}
+                                style={{
+                                    height: '36px',
+                                    padding: '0 20px',
+                                    fontSize: '14px',
+                                    borderRadius: '4px',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                Quay lại
+                            </Button>
+                        </div>
+                    }
+                />
+            </div>
+        </>
     );
 };
 

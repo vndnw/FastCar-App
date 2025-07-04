@@ -35,6 +35,7 @@ import {
 import { useState, useEffect } from "react";
 import { carBrandService } from "../../services/carBrandService";
 import dayjs from 'dayjs';
+import Meta from "../../components/Meta";
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -298,6 +299,10 @@ const CarBrand = () => {
 
     return (
         <>
+            <Meta 
+                title="Car Brands Management - Admin Dashboard" 
+                description="Manage automotive brands, logos, and manufacturer information for the fleet"
+            />
             <div className="tabled">
                 <Row gutter={[24, 0]}>
                     <Col xs="24" xl={24}>

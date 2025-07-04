@@ -30,6 +30,7 @@ import { carService } from '../../../services/carService';
 import { carBrandService } from '../../../services/carBrandService';
 import { featureService } from '../../../services/featureService';
 import { imageService } from '../../../services/imageService';
+import Meta from '../../../components/Meta';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -325,7 +326,12 @@ const CarEdit = () => {
     }
 
     return (
-        <div>
+        <>
+            <Meta 
+                title={`Edit Car - ${car?.name || 'Vehicle'} - Admin Dashboard`} 
+                description={`Edit vehicle details, specifications, pricing, and availability for ${car?.name || 'this vehicle'}`}
+            />
+            <div>
             {/* Header */}
             <Card style={{ marginBottom: 24 }}>
                 <Row justify="space-between" align="middle">
@@ -814,7 +820,8 @@ const CarEdit = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-        </div>
+            </div>
+        </>
     );
 };
 

@@ -31,6 +31,7 @@ import {
 import { useState, useEffect } from "react";
 import { discountService } from "../../services/discountService";
 import dayjs from 'dayjs';
+import Meta from "../../components/Meta";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -351,6 +352,10 @@ const Discount = () => {
 
     return (
         <>
+            <Meta 
+                title="Discounts Management - Admin Dashboard" 
+                description="Manage promotional codes, discount rates, and special offers for car bookings"
+            />
             <div className="tabled">
                 <Row gutter={[24, 0]}>
                     <Col xs="24" xl={24}>
