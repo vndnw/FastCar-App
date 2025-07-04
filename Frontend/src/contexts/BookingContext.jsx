@@ -44,7 +44,12 @@ export const BookingProvider = ({ children }) => {
     } catch (err) {
       setLoading(false);
       // Xử lý lỗi từ API
-      const errorMessage = err.response?.data?.message || 'Không thể đặt xe!';
+      let errorMessage = err?.message;
+      if (errorMessage === 'You must upload your CCCD before booking a car.') {
+        errorMessage = 'Bạn cần tải lên CCCD của mình trước khi đặt xe.';
+      } else {
+        errorMessage = errorMessage || 'Đặt xe không thành công. Vui lòng thử lại sau.';
+      }
       setError(errorMessage);
       // Trả về kết quả thất bại và thông báo lỗi.
       return { success: false, error: errorMessage };

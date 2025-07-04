@@ -3,8 +3,8 @@ import {
     Form, Input, Button, Row, Col, message, Card, Avatar,
     DatePicker, Upload, Descriptions, Spin, Alert, Divider, Space, Menu, Empty, Tabs, Modal
 } from 'antd';
-import { 
-    UserOutlined, UploadOutlined, EditOutlined, PlusOutlined, 
+import {
+    UserOutlined, UploadOutlined, EditOutlined, PlusOutlined,
     HistoryOutlined, BankOutlined, CarOutlined, IdcardOutlined,
     SafetyCertificateOutlined
 } from '@ant-design/icons';
@@ -47,11 +47,11 @@ const UserProfile = () => {
             icon: <HistoryOutlined />,
             label: 'Lịch sử booking'
         },
-        {
+        ...(user?.roles?.includes('owner') ? [{
             key: 'mycars',
             icon: <CarOutlined />,
             label: 'Xe của tôi'
-        }
+        }] : []),
     ];
 
     useEffect(() => {
@@ -139,9 +139,9 @@ const UserProfile = () => {
                     <div style={{ textAlign: 'center' }}>
                         <Avatar size={120} src={user.profilePicture} icon={<UserOutlined />} />
                         <div style={{ marginTop: 16 }}>
-                            <Upload 
-                                name="file" 
-                                showUploadList={false} 
+                            <Upload
+                                name="file"
+                                showUploadList={false}
                                 customRequest={customUpload}
                                 accept="image/*"
                                 beforeUpload={(file) => {
@@ -185,13 +185,13 @@ const UserProfile = () => {
                                         <Descriptions.Item label="Tên chủ tài khoản">{user.bankInformation?.accountHolderName}</Descriptions.Item>
                                     </Descriptions>
                                 ) : (
-                                    <Empty 
+                                    <Empty
                                         description="Chưa có thông tin ngân hàng"
                                         style={{ padding: '20px 0' }}
                                     />
                                 )}
-                                <Button 
-                                    type="primary" 
+                                <Button
+                                    type="primary"
                                     icon={hasBankInfo ? <EditOutlined /> : <PlusOutlined />}
                                     onClick={() => setIsBankModalVisible(true)}
                                     style={{ marginTop: 16 }}
@@ -222,7 +222,7 @@ const UserProfile = () => {
                 <BookingHistory
                     userId={user?.id}
                     visible={true}
-                    onClose={() => {}}
+                    onClose={() => { }}
                     embedded={true}
                 />
             </Card>
@@ -239,7 +239,7 @@ const UserProfile = () => {
         <div className="profile-page-container">
             <Row gutter={[32, 32]}>
                 <Col xs={24} md={6}>
-                    <Menu 
+                    <Menu
                         mode="vertical"
                         selectedKeys={[activeTab]}
                         onClick={handleMenuClick}
@@ -282,30 +282,30 @@ const UserProfile = () => {
                 <Form form={form} layout="vertical" onFinish={handleFormFinish}>
                     <Row gutter={24}>
                         <Col span={12}>
-                            <Form.Item 
-                                name="firstName" 
-                                label="Tên" 
+                            <Form.Item
+                                name="firstName"
+                                label="Tên"
                                 rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
                             >
                                 <Input placeholder="Nhập tên" />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item 
-                                name="lastName" 
-                                label="Họ" 
+                            <Form.Item
+                                name="lastName"
+                                label="Họ"
                                 rules={[{ required: true, message: 'Vui lòng nhập họ' }]}
                             >
                                 <Input placeholder="Nhập họ" />
                             </Form.Item>
                         </Col>
                     </Row>
-                    
+
                     <Row gutter={24}>
                         <Col span={12}>
-                            <Form.Item 
-                                name="email" 
-                                label="Email" 
+                            <Form.Item
+                                name="email"
+                                label="Email"
                                 rules={[
                                     { required: true, message: 'Vui lòng nhập email' },
                                     { type: 'email', message: 'Email không hợp lệ' }
@@ -315,9 +315,9 @@ const UserProfile = () => {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item 
-                                name="phone" 
-                                label="Số điện thoại" 
+                            <Form.Item
+                                name="phone"
+                                label="Số điện thoại"
                                 rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
                             >
                                 <Input placeholder="Nhập số điện thoại" />
@@ -327,20 +327,20 @@ const UserProfile = () => {
 
                     <Row gutter={24}>
                         <Col span={12}>
-                            <Form.Item 
-                                name="dateOfBirth" 
+                            <Form.Item
+                                name="dateOfBirth"
                                 label="Ngày sinh"
                             >
-                                <DatePicker 
-                                    placeholder="Chọn ngày sinh" 
+                                <DatePicker
+                                    placeholder="Chọn ngày sinh"
                                     style={{ width: '100%' }}
                                     format="DD/MM/YYYY"
                                 />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item 
-                                name={['address', 'address']} 
+                            <Form.Item
+                                name={['address', 'address']}
                                 label="Địa chỉ"
                             >
                                 <Input.TextArea rows={2} placeholder="Nhập địa chỉ" />
