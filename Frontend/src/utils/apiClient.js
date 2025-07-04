@@ -1,10 +1,10 @@
 import axios from 'axios';
 import tokenManager from './tokenManager';
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 // Create axios instance with base configuration
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/v1',
-    // baseURL: 'https://devtutorial.io.vn/api/v1',
+    baseURL: BASE_URL,
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ apiClient.interceptors.response.use(
 
                         try {
                             // Try to refresh the token
-                            const response = await axios.post('http://localhost:8080/api/v1/auth/refresh', {
+                            const response = await axios.post(`${BASE_URL}/auth/refresh`, {
                                 refreshToken: refreshToken
                             });
 

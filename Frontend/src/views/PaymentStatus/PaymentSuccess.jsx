@@ -48,7 +48,7 @@ export const PaymentSuccess = () => {
                     <Button type="primary" key="home" onClick={() => navigate('/')}>
                         Về trang chủ
                     </Button>,
-                    <Button key="bookings" onClick={() => navigate('/my-bookings')}>
+                    <Button key="bookings" onClick={() => navigate('/user-profile')}>
                         Xem lịch sử đặt xe
                     </Button>,
                 ]}
