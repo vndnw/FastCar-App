@@ -311,6 +311,17 @@ public class UserController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ResponseData<?>> searchUser(UserSearchCriteriaRequest criteria,
+                                                      @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        ResponseData<?> responseData = ResponseData.builder()
+                .status(HttpStatus.OK.value())
+                .message("Successfully searched")
+                .data(userService.searchUsers(criteria, pageable))
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasRole('user')")
     @PostMapping("/{id}/bank-information")
     public ResponseEntity<?> addBankInformation(@PathVariable Long id, BankInformationRequest bankInformationRequest) {

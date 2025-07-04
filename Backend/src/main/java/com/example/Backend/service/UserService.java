@@ -12,6 +12,7 @@ import com.example.Backend.model.User;
 import com.example.Backend.model.enums.DocumentStatus;
 import com.example.Backend.repository.RoleRepository;
 import com.example.Backend.repository.UserRepository;
+import com.example.Backend.repository.specification.UserSpecification;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -222,6 +223,15 @@ public class UserService {
 //        userRepository.save(user);
 //        return true; // Password reset initiated successfully
 //    }
+
+    public Page<UserResponse> searchUsers(UserSearchCriteriaRequest criteria, Pageable pageable) {
+        Page<User> users = userRepository.findAll(UserSpecification.buildSearchSpecification(criteria), pageable);
+        if (users.isEmpty()) {
+            throw new ResourceNotFoundException("No users found matching the criteria");
+        }
+        return users.map(userMapper::mapToResponse);
+    }
+
 
     public boolean verifyOtpPassword(String email) {
         User user = userRepository.findByEmail(email)

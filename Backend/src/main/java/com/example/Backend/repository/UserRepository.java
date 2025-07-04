@@ -7,6 +7,7 @@ import com.example.Backend.model.enums.CarStatus;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhone(String phone);
 
     Page<User> findByCreatedAtAfter(LocalDateTime createdAtAfter, Pageable pageable);
+
+    Page<User> findAll(Specification<User> spec, Pageable pageable);
 
 //    Page<User> searchUser(String name, String email, String phone, Pageable pageable);
 }
