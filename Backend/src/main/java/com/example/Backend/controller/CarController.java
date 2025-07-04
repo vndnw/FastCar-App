@@ -5,6 +5,7 @@ import com.example.Backend.dto.request.*;
 import com.example.Backend.model.enums.CarStatus;
 import com.example.Backend.service.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -99,7 +100,7 @@ public class CarController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchCars(CarSearchCriteriaRequest criteria, Pageable pageable) {
+    public ResponseEntity<?> searchCars(CarSearchCriteriaRequest criteria,@PageableDefault(page = 0, size = 10) Pageable pageable) {
         ResponseData<?> responseData = ResponseData.builder()
                 .status(200)
                 .message("Search results found")
