@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserSearchCriteriaRequest {
-    private String name;
+    private String fistName;
+    private String lastName;
     private String email;
-    private String phoneNumber;
-    private String role;
-    private Boolean isActive;
+    private String phone;
+    private Boolean active;
 }
 
