@@ -71,6 +71,24 @@ export const userService = {    // Get all users with pagination
         return apiClient.get(`/user/search?${params}`);
     },
 
+    // Advanced search users with structured parameters
+    advancedSearchUsers: async (searchParams, page = 0, size = 10, sort = ['email,asc']) => {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            size: size.toString(),
+            sort: Array.isArray(sort) ? sort.join(',') : sort
+        });
+
+        // Add search parameters to URL params
+        Object.entries(searchParams).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                params.append(key, value.toString());
+            }
+        });
+
+        return apiClient.get(`/user/search?${params}`);
+    },
+
     bookCar: async (userId, payload, token) => {
         return apiClient.post(`/user/${userId}/book-car`, payload, {
             headers: { Authorization: `Bearer ${token}` }
@@ -80,29 +98,29 @@ export const userService = {    // Get all users with pagination
     // Create car for user
     createCarByUser: async (userId, carData, files) => {
         const formData = new FormData();
-        
+
         // Add car data as JSON string to FormData with name "carData"
         formData.append('carData', new Blob([JSON.stringify(carData)], {
             type: 'application/json'
         }));
-        
+
         // Add files to FormData with name "files"
         if (files && files.length > 0) {
             files.forEach((file) => {
                 formData.append('files', file);
             });
         }
-        
+
         return apiClient.post(`/user/${userId}/create-car`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
     },
 
-     getUserCars: async (userId) => {
+    getUserCars: async (userId) => {
         // apiClient sẽ tự động đính kèm token xác thực
         return apiClient.get(`/user/${userId}/list-car`); // Giả sử đây là endpoint của bạn
     },
-     
+
     getCCCD: async (userId) => {
         return apiClient.get(`/user/${userId}/cccd`);
     },
@@ -110,12 +128,12 @@ export const userService = {    // Get all users with pagination
     getLicense: async (userId) => {
         return apiClient.get(`/user/${userId}/license`);
     },
-    
+
     // Update avatar for user
     updateAvatar: async (newFormData) => {
         const formData = new FormData();
         formData.append('avatar', newFormData);
-        
+
         return apiClient.patch(`/user/me/update-avatar`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -139,7 +157,7 @@ export const userService = {    // Get all users with pagination
         }));
         formData.append('imageFront', imageFront);
         formData.append('imageBack', imageBack);
-        
+
         return apiClient.post(`/user/${userId}/add-cccd`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -150,7 +168,7 @@ export const userService = {    // Get all users with pagination
         formData.append('documentRequest', new Blob([JSON.stringify(documentRequest)], {
             type: 'application/json'
         }));
-        
+
         // Only append images if they are not null
         if (imageFront) {
             formData.append('imageFront', imageFront);
@@ -158,7 +176,7 @@ export const userService = {    // Get all users with pagination
         if (imageBack) {
             formData.append('imageBack', imageBack);
         }
-        
+
         return apiClient.put(`/user/${userId}/update-cccd`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -171,7 +189,7 @@ export const userService = {    // Get all users with pagination
         }));
         formData.append('imageFront', imageFront);
         formData.append('imageBack', imageBack);
-        
+
         return apiClient.post(`/user/${userId}/add-license`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -182,7 +200,7 @@ export const userService = {    // Get all users with pagination
         formData.append('documentRequest', new Blob([JSON.stringify(documentRequest)], {
             type: 'application/json'
         }));
-        
+
         // Only append images if they are not null
         if (imageFront) {
             formData.append('imageFront', imageFront);
@@ -190,7 +208,7 @@ export const userService = {    // Get all users with pagination
         if (imageBack) {
             formData.append('imageBack', imageBack);
         }
-        
+
         return apiClient.put(`/user/${userId}/update-license`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });

@@ -21,6 +21,7 @@ import {
     CloseOutlined,
     DeleteOutlined,
     FileTextOutlined,
+    FileDoneOutlined,
     UserOutlined,
     IdcardOutlined,
     DownloadOutlined
@@ -343,119 +344,123 @@ const Documents = () => {
 
     return (
         <>
-            <Meta 
-                title="Documents Management - Admin Dashboard" 
+            <Meta
+                title="Documents Management - Admin Dashboard"
                 description="Review and manage user submitted documents, verification, and approvals"
             />
             <div>
-                <div>
-                <Title level={2}>Document Management</Title>
-                <Text type="secondary">Manage and review user submitted documents</Text>
-            </div>
+                {/* Documents Table */}
+                <Card
+                    variant={false}
+                    className="criclebox tablespace mb-24"
+                    title={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <FileDoneOutlined style={{ marginRight: 8, fontSize: 20 }} />
+                            Document Management
+                        </div>
+                    }
+                >
+                    <Table
+                        columns={columns}
+                        dataSource={documents}
+                        loading={loading}
+                        pagination={{
+                            current: pagination.current,
+                            pageSize: pagination.pageSize,
+                            total: pagination.total,
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                            showTotal: (total, range) =>
+                                `${range[0]}-${range[1]} of ${total} documents`,
+                        }}
+                        onChange={handleTableChange}
+                        scroll={{ x: 1200 }}
+                    />
+                </Card>
 
-            {/* Documents Table */}
-            <Card>
-                <Table
-                    columns={columns}
-                    dataSource={documents}
-                    loading={loading}
-                    pagination={{
-                        current: pagination.current,
-                        pageSize: pagination.pageSize,
-                        total: pagination.total,
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                        showTotal: (total, range) =>
-                            `${range[0]}-${range[1]} of ${total} documents`,
-                    }}
-                    onChange={handleTableChange}
-                    scroll={{ x: 1200 }}
-                />
-            </Card>
-
-            {/* Document Detail Modal */}
-            <Modal
-                title="Document Details"
-                visible={detailModalVisible}
-                onCancel={() => setDetailModalVisible(false)}
-                footer={null}
-                width={800}
-            >
-                {selectedDocument && (
-                    <div>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Card title="Document Information" size="small">
-                                    <p><strong>Serial Number:</strong> {selectedDocument.serialNumber}</p>
-                                    <p><strong>Full Name:</strong> {selectedDocument.fullName}</p>
-                                    <p><strong>Type:</strong> {selectedDocument.documentType}</p>
-                                    <p><strong>Status:</strong>
-                                        <Tag color={getStatusColor(selectedDocument.status)}>
-                                            {selectedDocument.status}
-                                        </Tag>
-                                    </p>
-                                    <p><strong>Issue Date:</strong> {selectedDocument.issueDate ? dayjs(selectedDocument.issueDate).format('DD/MM/YYYY') : '-'}</p>
-                                    <p><strong>Expiry Date:</strong> {selectedDocument.expiryDate ? dayjs(selectedDocument.expiryDate).format('DD/MM/YYYY') : '-'}</p>
-                                    <p><strong>Place of Issue:</strong> {selectedDocument.placeOfIssue || '-'}</p>
-                                    <p><strong>Address:</strong> {selectedDocument.address || '-'}</p>
-                                    {selectedDocument.documentType === 'CCCD' && (
+                {/* Document Detail Modal */}
+                <Modal
+                    title="Document Details"
+                    visible={detailModalVisible}
+                    onCancel={() => setDetailModalVisible(false)}
+                    footer={null}
+                    width={800}
+                >
+                    {selectedDocument && (
+                        <div>
+                            <Row gutter={16}>
+                                <Col span={12}>
+                                    <Card title="Document Information" size="small">
+                                        <p><strong>Serial Number:</strong> {selectedDocument.serialNumber}</p>
+                                        <p><strong>Full Name:</strong> {selectedDocument.fullName}</p>
+                                        <p><strong>Type:</strong> {selectedDocument.documentType}</p>
+                                        <p><strong>Status:</strong>
+                                            <Tag color={getStatusColor(selectedDocument.status)}>
+                                                {selectedDocument.status}
+                                            </Tag>
+                                        </p>
+                                        <p><strong>Issue Date:</strong> {selectedDocument.issueDate ? dayjs(selectedDocument.issueDate).format('DD/MM/YYYY') : '-'}</p>
+                                        <p><strong>Expiry Date:</strong> {selectedDocument.expiryDate ? dayjs(selectedDocument.expiryDate).format('DD/MM/YYYY') : '-'}</p>
+                                        <p><strong>Place of Issue:</strong> {selectedDocument.placeOfIssue || '-'}</p>
+                                        <p><strong>Address:</strong> {selectedDocument.address || '-'}</p>
+                                        {selectedDocument.documentType === 'CCCD' && (
+                                            <>
+                                                <p><strong>Date of Birth:</strong> {selectedDocument.dateOfBirth ? dayjs(selectedDocument.dateOfBirth).format('DD/MM/YYYY') : '-'}</p>
+                                                <p><strong>Gender:</strong> {selectedDocument.gender || '-'}</p>
+                                            </>
+                                        )}
+                                        {selectedDocument.documentType === 'LICENSE' && (
+                                            <p><strong>License Class:</strong> {selectedDocument.rankLicense || '-'}</p>
+                                        )}
+                                    </Card>
+                                </Col>
+                                <Col span={12}>
+                                    <Card title="User Information" size="small">
+                                        <p><strong>Name:</strong> {selectedDocument.userName}</p>
+                                        <p><strong>Email:</strong> {selectedDocument.userEmail !== 'N/A' ? selectedDocument.userEmail : 'Email not available'}</p>
+                                        <p><strong>User ID:</strong> {selectedDocument.userId || 'Not available'}</p>
+                                        <p><strong>Address:</strong> {selectedDocument.address || 'Not available'}</p>
+                                        <p><strong>Active:</strong> {selectedDocument.active ? 'Yes' : 'No'}</p>
+                                    </Card>
+                                    {selectedDocument.reason && (
                                         <>
-                                            <p><strong>Date of Birth:</strong> {selectedDocument.dateOfBirth ? dayjs(selectedDocument.dateOfBirth).format('DD/MM/YYYY') : '-'}</p>
-                                            <p><strong>Gender:</strong> {selectedDocument.gender || '-'}</p>
+                                            <Divider />
+                                            <Card title="Reason" size="small">
+                                                <p>{selectedDocument.reason}</p>
+                                            </Card>
                                         </>
                                     )}
-                                    {selectedDocument.documentType === 'LICENSE' && (
-                                        <p><strong>License Class:</strong> {selectedDocument.rankLicense || '-'}</p>
-                                    )}
-                                </Card>
-                            </Col>
-                            <Col span={12}>
-                                <Card title="User Information" size="small">
-                                    <p><strong>Name:</strong> {selectedDocument.userName}</p>
-                                    <p><strong>Email:</strong> {selectedDocument.userEmail !== 'N/A' ? selectedDocument.userEmail : 'Email not available'}</p>
-                                    <p><strong>User ID:</strong> {selectedDocument.userId || 'Not available'}</p>
-                                    <p><strong>Address:</strong> {selectedDocument.address || 'Not available'}</p>
-                                    <p><strong>Active:</strong> {selectedDocument.active ? 'Yes' : 'No'}</p>
-                                </Card>
-                                {selectedDocument.reason && (
-                                    <>
-                                        <Divider />
-                                        <Card title="Reason" size="small">
-                                            <p>{selectedDocument.reason}</p>
-                                        </Card>
-                                    </>
-                                )}
-                            </Col>
-                        </Row>
+                                </Col>
+                            </Row>
 
-                        <Divider>Document Images</Divider>
-                        <Row gutter={16}>
-                            {selectedDocument.imageFront && (
-                                <Col span={12}>
-                                    <Card title="Front Image" size="small">
-                                        <Image
-                                            width="100%"
-                                            src={selectedDocument.imageFront}
-                                            alt="Front"
-                                        />
-                                    </Card>
-                                </Col>
-                            )}
-                            {selectedDocument.imageBack && (
-                                <Col span={12}>
-                                    <Card title="Back Image" size="small">
-                                        <Image
-                                            width="100%"
-                                            src={selectedDocument.imageBack}
-                                            alt="Back"
-                                        />
-                                    </Card>
-                                </Col>
-                            )}
-                        </Row>
-                    </div>
-                )}
-            </Modal>
+                            <Divider>Document Images</Divider>
+                            <Row gutter={16}>
+                                {selectedDocument.imageFront && (
+                                    <Col span={12}>
+                                        <Card title="Front Image" size="small">
+                                            <Image
+                                                width="100%"
+                                                src={selectedDocument.imageFront}
+                                                alt="Front"
+                                            />
+                                        </Card>
+                                    </Col>
+                                )}
+                                {selectedDocument.imageBack && (
+                                    <Col span={12}>
+                                        <Card title="Back Image" size="small">
+                                            <Image
+                                                width="100%"
+                                                src={selectedDocument.imageBack}
+                                                alt="Back"
+                                            />
+                                        </Card>
+                                    </Col>
+                                )}
+                            </Row>
+                        </div>
+                    )}
+                </Modal>
             </div>
         </>
     );

@@ -18,9 +18,11 @@ import {
   Popconfirm,
   Select,
   Tabs,
+  Space,
+  Collapse,
 } from "antd";
 
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, KeyOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, KeyOutlined, InfoCircleOutlined, SearchOutlined, ClearOutlined, FilterOutlined, UserOutlined, BugOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { userService } from "../../services/userService";
@@ -32,6 +34,7 @@ import Meta from "../../components/Meta";
 
 
 const { Title } = Typography;
+const { Panel } = Collapse;
 
 
 const getRoleDescription = (roleName) => {
@@ -121,8 +124,329 @@ function UserPage() {
   const [roles, setRoles] = useState([]);
   const [roleLoading, setRoleLoading] = useState(false);
 
+  // Search states
+  const [searchForm] = Form.useForm();
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchParams, setSearchParams] = useState(null);
+  const [showSearchPanel, setShowSearchPanel] = useState(false);
+
   const [createForm] = Form.useForm();
-  const [changePasswordForm] = Form.useForm(); const handleViewUser = (userId) => {
+  const [changePasswordForm] = Form.useForm();
+
+  // Search functionality
+  const handleSearch = async (values) => {
+    try {
+      setIsSearching(true);
+
+      // Filter out empty values
+      const searchParams = Object.fromEntries(
+        Object.entries(values).filter(([_, value]) =>
+          value !== undefined && value !== null && value !== ''
+        )
+      );
+
+      if (Object.keys(searchParams).length === 0) {
+        message.warning('Please enter at least one search criteria');
+        return;
+      }
+
+      setSearchParams(searchParams);
+
+      const result = await userService.advancedSearchUsers(
+        searchParams,
+        0,
+        pagination.pageSize,
+        ['email,asc']
+      );
+
+      if (result.status === 200) {
+        const userData = result.data.content.map((user, index) => ({
+          key: user.id.toString(),
+          user: (
+            <Avatar.Group>
+              <Avatar
+                className="shape-avatar"
+                shape="cricle"
+                size={40}
+                src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName || 'U'}+${user.lastName || 'ser'}&background=random`}
+              />
+              <div className="avatar-info">
+                <Title level={5}>
+                  {user.firstName && user.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : user.email.split('@')[0]
+                  }
+                </Title>
+                <p>{user.email}</p>
+              </div>
+            </Avatar.Group>
+          ),
+          contact: (
+            <div className="author-info">
+              <Title level={5}>{user.phone || 'No phone'}</Title>
+              <p>{user.address?.address || 'No address'}</p>
+            </div>
+          ),
+          roles: (
+            <div>
+              {user.roles && user.roles.length > 0 ? (
+                user.roles.map((role, idx) => (
+                  <Tag key={idx} color={role === 'admin' ? 'red' : role === 'driver' ? 'blue' : 'green'}>
+                    {role.toUpperCase()}
+                  </Tag>
+                ))
+              ) : (
+                <Tag color="default">USER</Tag>
+              )}
+            </div>
+          ),
+          status: (
+            <Popconfirm
+              title={`${user.active ? 'Deactivate' : 'Activate'} User`}
+              description={`Are you sure you want to ${user.active ? 'deactivate' : 'activate'} this user?`}
+              onConfirm={() => handleToggleUserStatus(
+                user.id,
+                user.active,
+                user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.email.split('@')[0],
+                user.email
+              )}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                type={user.active ? "primary" : "default"}
+                className={user.active ? "tag-primary" : "tag-badge"}
+                style={{ cursor: 'pointer' }}
+              >
+                {user.active ? 'ACTIVE' : 'INACTIVE'}
+              </Button>
+            </Popconfirm>
+          ),
+          created: (
+            <div className="ant-employed">
+              <span>{new Date(user.createdAt).toLocaleDateString()}</span>
+              <a href="#pablo" onClick={(e) => e.preventDefault()}>Edit</a>
+            </div>
+          ),
+          actions: (
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <Button
+                type="text"
+                icon={<InfoCircleOutlined />}
+                onClick={() => handleViewUser(user.id)}
+                title="View Details"
+                style={{ color: '#1890ff' }}
+                size="small"
+              />
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => handleEditUser(user.id)}
+                title="Edit User"
+                size="small"
+              />
+              <Button
+                type="text"
+                icon={<KeyOutlined />}
+                onClick={() => handleChangePassword(user)}
+                title="Change Password"
+                style={{ color: '#fa8c16' }}
+                size="small"
+              />
+              <Popconfirm
+                title="Delete User Account"
+                description={`Are you sure you want to permanently delete the account for "${user.firstName} ${user.lastName}"? This action cannot be undone.`}
+                onConfirm={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
+                okText="Yes, Delete"
+                cancelText="Cancel"
+                okType="danger"
+              >
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  title="Delete User"
+                  danger
+                  size="small"
+                />
+              </Popconfirm>
+            </div>
+          ),
+        }));
+
+        setUsers(userData);
+        setPagination({
+          current: result.data.number + 1,
+          pageSize: result.data.size,
+          total: result.data.totalElements,
+        });
+
+        message.success(`Found ${result.data.totalElements} users matching your search criteria`);
+      }
+    } catch (error) {
+      console.error('Error searching users:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to search users';
+      message.error(errorMessage);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    searchForm.resetFields();
+    setSearchParams(null);
+    setShowSearchPanel(false);
+    // Reload all users
+    fetchUsers(0, pagination.pageSize);
+  };
+
+  const handleSearchPagination = async (page, size) => {
+    if (searchParams) {
+      try {
+        setIsSearching(true);
+
+        const result = await userService.advancedSearchUsers(
+          searchParams,
+          page - 1,
+          size,
+          ['email,asc']
+        );
+
+        if (result.status === 200) {
+          const userData = result.data.content.map((user, index) => ({
+            // ...existing user mapping code...
+            key: user.id.toString(),
+            user: (
+              <Avatar.Group>
+                <Avatar
+                  className="shape-avatar"
+                  shape="cricle"
+                  size={40}
+                  src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName || 'U'}+${user.lastName || 'ser'}&background=random`}
+                />
+                <div className="avatar-info">
+                  <Title level={5}>
+                    {user.firstName && user.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : user.email.split('@')[0]
+                    }
+                  </Title>
+                  <p>{user.email}</p>
+                </div>
+              </Avatar.Group>
+            ),
+            contact: (
+              <div className="author-info">
+                <Title level={5}>{user.phone || 'No phone'}</Title>
+                <p>{user.address?.address || 'No address'}</p>
+              </div>
+            ),
+            roles: (
+              <div>
+                {user.roles && user.roles.length > 0 ? (
+                  user.roles.map((role, idx) => (
+                    <Tag key={idx} color={role === 'admin' ? 'red' : role === 'driver' ? 'blue' : 'green'}>
+                      {role.toUpperCase()}
+                    </Tag>
+                  ))
+                ) : (
+                  <Tag color="default">USER</Tag>
+                )}
+              </div>
+            ),
+            status: (
+              <Popconfirm
+                title={`${user.active ? 'Deactivate' : 'Activate'} User`}
+                description={`Are you sure you want to ${user.active ? 'deactivate' : 'activate'} this user?`}
+                onConfirm={() => handleToggleUserStatus(
+                  user.id,
+                  user.active,
+                  user.firstName && user.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : user.email.split('@')[0],
+                  user.email
+                )}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  type={user.active ? "primary" : "default"}
+                  className={user.active ? "tag-primary" : "tag-badge"}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {user.active ? 'ACTIVE' : 'INACTIVE'}
+                </Button>
+              </Popconfirm>
+            ),
+            created: (
+              <div className="ant-employed">
+                <span>{new Date(user.createdAt).toLocaleDateString()}</span>
+                <a href="#pablo" onClick={(e) => e.preventDefault()}>Edit</a>
+              </div>
+            ),
+            actions: (
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <Button
+                  type="text"
+                  icon={<InfoCircleOutlined />}
+                  onClick={() => handleViewUser(user.id)}
+                  title="View Details"
+                  style={{ color: '#1890ff' }}
+                  size="small"
+                />
+                <Button
+                  type="text"
+                  icon={<EditOutlined />}
+                  onClick={() => handleEditUser(user.id)}
+                  title="Edit User"
+                  size="small"
+                />
+                <Button
+                  type="text"
+                  icon={<KeyOutlined />}
+                  onClick={() => handleChangePassword(user)}
+                  title="Change Password"
+                  style={{ color: '#fa8c16' }}
+                  size="small"
+                />
+                <Popconfirm
+                  title="Delete User Account"
+                  description={`Are you sure you want to permanently delete the account for "${user.firstName} ${user.lastName}"? This action cannot be undone.`}
+                  onConfirm={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
+                  okText="Yes, Delete"
+                  cancelText="Cancel"
+                  okType="danger"
+                >
+                  <Button
+                    type="text"
+                    icon={<DeleteOutlined />}
+                    title="Delete User"
+                    danger
+                    size="small"
+                  />
+                </Popconfirm>
+              </div>
+            ),
+          }));
+
+          setUsers(userData);
+          setPagination({
+            current: result.data.number + 1,
+            pageSize: result.data.size,
+            total: result.data.totalElements,
+          });
+        }
+      } catch (error) {
+        console.error('Error in search pagination:', error);
+        message.error('Failed to load search results');
+      } finally {
+        setIsSearching(false);
+      }
+    } else {
+      fetchUsers(page - 1, size);
+    }
+  }; const handleViewUser = (userId) => {
     // Navigate to user detail page
     navigate(`/admin/users/${userId}`);
   };
@@ -297,19 +621,21 @@ function UserPage() {
               <span>{new Date(user.createdAt).toLocaleDateString()}</span>
               <a href="#pablo" onClick={(e) => e.preventDefault()}>Edit</a>
             </div>), actions: (
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '4px' }}>
                 <Button
                   type="text"
                   icon={<InfoCircleOutlined />}
                   onClick={() => handleViewUser(user.id)}
                   title="View Details"
                   style={{ color: '#1890ff' }}
+                  size="small"
                 />
                 <Button
                   type="text"
                   icon={<EditOutlined />}
                   onClick={() => handleEditUser(user.id)}
                   title="Edit User"
+                  size="small"
                 />
                 <Button
                   type="text"
@@ -317,6 +643,7 @@ function UserPage() {
                   onClick={() => handleChangePassword(user)}
                   title="Change Password"
                   style={{ color: '#fa8c16' }}
+                  size="small"
                 />
                 <Popconfirm
                   title="Delete User Account"
@@ -331,6 +658,7 @@ function UserPage() {
                     icon={<DeleteOutlined />}
                     title="Delete User"
                     danger
+                    size="small"
                   />
                 </Popconfirm>
               </div>
@@ -357,7 +685,11 @@ function UserPage() {
     fetchUsers();
   }, []);
   const handleTableChange = (pagination) => {
-    fetchUsers(pagination.current - 1, pagination.pageSize);
+    if (searchParams) {
+      handleSearchPagination(pagination.current, pagination.pageSize);
+    } else {
+      fetchUsers(pagination.current - 1, pagination.pageSize);
+    }
   };
   // Role management functions
   const fetchRoles = async () => {
@@ -434,8 +766,8 @@ function UserPage() {
 
   return (
     <>
-      <Meta 
-        title="Users Management - Admin Dashboard" 
+      <Meta
+        title="Users Management - Admin Dashboard"
         description="Manage user accounts, roles, permissions, and user access controls"
       />
       <div className="tabled">
@@ -452,21 +784,151 @@ function UserPage() {
                     <Card
                       variant={false}
                       className="criclebox tablespace mb-24"
-                      title="Users Table"
+                      title={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <UserOutlined style={{ marginRight: 8, fontSize: 20 }} />
+                          User Management
+                        </div>
+                      }
                       extra={
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <Button
+                            icon={<FilterOutlined />}
+                            onClick={() => setShowSearchPanel(!showSearchPanel)}
+                            type={showSearchPanel ? "primary" : "default"}
+                            size="small"
+                          >
+                            Search
+                          </Button>
                           <Button
                             type="primary"
                             icon={<PlusOutlined />}
                             onClick={() => setCreateModalVisible(true)}
+                            size="small"
                           >
-                            Create User
+                            Add User
                           </Button>
                         </div>
                       }
                     >
+                      {/* Search Panel */}
+                      {showSearchPanel && (
+                        <div
+                          style={{
+                            marginBottom: 16,
+                            padding: '12px 16px',
+                            backgroundColor: '#f5f5f5',
+                            borderRadius: '6px',
+                            border: '1px solid #d9d9d9'
+                          }}
+                        >
+                          <Form
+                            form={searchForm}
+                            layout="inline"
+                            onFinish={handleSearch}
+                            style={{ width: '100%' }}
+                          >
+                            <Row gutter={[8, 8]} style={{ width: '100%' }}>
+                              <Col xs={24} sm={12} md={4}>
+                                <Form.Item
+                                  name="firstName"
+                                  style={{ marginBottom: 8 }}
+                                >
+                                  <Input
+                                    placeholder="First Name"
+                                    allowClear
+                                    size="small"
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={12} md={4}>
+                                <Form.Item
+                                  name="lastName"
+                                  style={{ marginBottom: 8 }}
+                                >
+                                  <Input
+                                    placeholder="Last Name"
+                                    allowClear
+                                    size="small"
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={12} md={5}>
+                                <Form.Item
+                                  name="email"
+                                  style={{ marginBottom: 8 }}
+                                >
+                                  <Input
+                                    placeholder="Email"
+                                    allowClear
+                                    size="small"
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={12} md={4}>
+                                <Form.Item
+                                  name="phone"
+                                  style={{ marginBottom: 8 }}
+                                >
+                                  <Input
+                                    placeholder="Phone"
+                                    allowClear
+                                    size="small"
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={12} md={3}>
+                                <Form.Item
+                                  name="active"
+                                  style={{ marginBottom: 8 }}
+                                >
+                                  <Select
+                                    placeholder="Status"
+                                    allowClear
+                                    size="small"
+                                    options={[
+                                      { value: true, label: 'Active' },
+                                      { value: false, label: 'Inactive' }
+                                    ]}
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={12} md={4}>
+                                <Space size="small">
+                                  <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    icon={<SearchOutlined />}
+                                    loading={isSearching}
+                                    size="small"
+                                  >
+                                    Search
+                                  </Button>
+                                  <Button
+                                    onClick={handleClearSearch}
+                                    icon={<ClearOutlined />}
+                                    size="small"
+                                  >
+                                    Clear
+                                  </Button>
+                                </Space>
+                              </Col>
+                            </Row>
+                            {searchParams && (
+                              <Row style={{ marginTop: 4 }}>
+                                <Col span={24}>
+                                  <Tag color="blue" size="small">
+                                    {Object.keys(searchParams).length} filter(s) active
+                                  </Tag>
+                                </Col>
+                              </Row>
+                            )}
+                          </Form>
+                        </div>
+                      )}
+
                       <div className="table-responsive">
-                        <Spin spinning={loading}>
+                        <Spin spinning={loading || isSearching}>
                           <Table
                             columns={columns}
                             dataSource={users}
@@ -474,8 +936,11 @@ function UserPage() {
                               ...pagination,
                               showSizeChanger: true,
                               showQuickJumper: true,
-                              showTotal: (total, range) =>
-                                `${range[0]}-${range[1]} of ${total} users`,
+                              size: 'small',
+                              showTotal: (total, range) => {
+                                const searchText = searchParams ? ' (filtered)' : '';
+                                return `${range[0]}-${range[1]} of ${total}${searchText}`;
+                              },
                             }}
                             onChange={handleTableChange}
                             className="ant-border-space"
@@ -492,7 +957,12 @@ function UserPage() {
                     <Card
                       variant={false}
                       className="criclebox tablespace mb-24"
-                      title="Roles Table"
+                      title={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <BugOutlined style={{ marginRight: 8, fontSize: 20 }} />
+                          Role Management
+                        </div>
+                      }
                     >
                       <div className="table-responsive">
                         <Spin spinning={roleLoading}>
