@@ -257,7 +257,7 @@ public class BookingController {
 
     @PreAuthorize("hasRole('user')")
     @PostMapping("/{id}/checkin")
-    public ResponseEntity<ResponseData<?>> createCheckin(@PathVariable long id){
+    public ResponseEntity<ResponseData<?>> createCheckin(HttpServletRequest request,@PathVariable long id){
         if (!carConditionCheckService.isCarConditionCheckExists(id)) {
             return new ResponseEntity<>(ResponseData.builder()
                     .status(HttpStatus.BAD_REQUEST.value())
@@ -267,7 +267,7 @@ public class BookingController {
         ResponseData<?> response = ResponseData.builder()
                 .status(HttpStatus.OK.value())
                 .message("Check-in created successfully")
-                .data(bookingService.createCheckin(id))
+                .data(bookingService.createCheckin(request,id))
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

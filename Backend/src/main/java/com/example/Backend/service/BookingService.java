@@ -109,7 +109,7 @@ public class BookingService {
                 .paymentUrl(paymentUrl)
                 .build();
     }
-    public RentalFeeResponse createCheckin(long bookingId) {
+    public RentalFeeResponse createCheckin(HttpServletRequest request, long bookingId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
         Payment paymentRental = paymentService.addPayment(booking.getId(), PaymentRequest.builder()
                 .amount(booking.getRentalPrice())
@@ -123,7 +123,7 @@ public class BookingService {
 
         emailService.sendMailCheckIn(booking);
 
-        String paymentUrl = vnpayService.generatePayUrl(null, paymentRental.getAmount().add(paymentDeposit.getAmount()), paymentRental.getExternalRef());
+        String paymentUrl = vnpayService.generatePayUrl(request, paymentRental.getAmount().add(paymentDeposit.getAmount()), paymentRental.getExternalRef());
 
         return RentalFeeResponse.builder()
                 .rentalFee(paymentRental.getAmount())
