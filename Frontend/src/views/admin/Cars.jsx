@@ -718,8 +718,8 @@ const Cars = () => {
                                 className="criclebox tablespace mb-24"
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <CarOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-                                        <Title level={4} style={{ margin: 0 }}>Car Management</Title>
+                                        <CarOutlined style={{ marginRight: 8, fontSize: 20 }} />
+                                        Car Management
                                     </div>
                                 }
                                 extra={
@@ -815,8 +815,8 @@ const Cars = () => {
                                         name="carBrandId"
                                         rules={[{ required: true, message: 'Please select car brand' }]}
                                     >
-                                        <Select 
-                                            virtual={false} 
+                                        <Select
+                                            virtual={false}
                                             placeholder="Select car brand"
                                             showSearch
                                             filterOption={(input, option) =>
@@ -1161,8 +1161,8 @@ const Cars = () => {
                                 className="criclebox tablespace mb-24"
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <SettingOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-                                        <Title level={4} style={{ margin: 0 }}>Car Features Management</Title>
+                                        <SettingOutlined style={{ marginRight: 8, fontSize: 20 }} />
+                                        Car Features Management
                                     </div>
                                 }
                                 extra={

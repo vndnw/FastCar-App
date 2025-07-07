@@ -65,8 +65,6 @@ const Bookings = () => {
         cancelled: 0,
         revenue: 0,
     });
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [bulkActionLoading, setBulkActionLoading] = useState(false);
 
     // Pagination state
     const [pagination, setPagination] = useState({
@@ -266,13 +264,13 @@ const Bookings = () => {
 
     const getStatusText = (status) => {
         const statusTexts = {
-            'PENDING': 'Chờ xác nhận',
-            'CONFIRMED': 'Đã xác nhận',
-            'USE_IN': 'Đang sử dụng',
-            'WAITING_REFUND': 'Chờ hoàn tiền',
-            'WAITING_EXTRA_CHARGE': 'Chờ thu phí phụ',
-            'CANCELLED': 'Đã hủy',
-            'COMPLETED': 'Hoàn thành',
+            'PENDING': 'Pending',
+            'CONFIRMED': 'Confirmed',
+            'USE_IN': 'In Use',
+            'WAITING_REFUND': 'Waiting Refund',
+            'WAITING_EXTRA_CHARGE': 'Waiting Extra Charge',
+            'CANCELLED': 'Cancelled',
+            'COMPLETED': 'Completed',
         };
         return statusTexts[status] || status;
     };
@@ -357,77 +355,17 @@ const Bookings = () => {
             link.click();
             document.body.removeChild(link);
 
-            message.success('Dữ liệu đã được xuất thành Excel thành công');
+            message.success('Data exported to Excel successfully');
         } catch (error) {
             console.error('Export error:', error);
-            message.error(error.response?.data?.message || 'Lỗi khi xuất dữ liệu Excel');
+            message.error(error.response?.data?.message || 'Error exporting Excel data');
         }
     };
 
     // Refresh data
     const handleRefresh = () => {
         fetchBookings(pagination.current, pagination.pageSize, statusFilter);
-        message.success('Dữ liệu đã được làm mới');
-    };
-
-    // Bulk actions
-    const handleBulkConfirm = async () => {
-        if (selectedRowKeys.length === 0) {
-            message.warning('Vui lòng chọn ít nhất một đặt xe');
-            return;
-        }
-
-        setBulkActionLoading(true);
-        try {
-            const promises = selectedRowKeys.map(id =>
-                bookingService.updateBookingStatus(id, 'CONFIRMED')
-            );
-
-            await Promise.all(promises);
-            message.success(`Đã xác nhận ${selectedRowKeys.length} đặt xe`);
-            setSelectedRowKeys([]);
-            fetchBookings(pagination.current, pagination.pageSize, statusFilter);
-        } catch (error) {
-            console.error('Bulk confirm error:', error);
-            const errorMessage = error.response?.data?.message || error.message || 'Lỗi khi xác nhận đặt xe';
-            message.error(errorMessage);
-        } finally {
-            setBulkActionLoading(false);
-        }
-    };
-
-    const handleBulkCancel = async () => {
-        if (selectedRowKeys.length === 0) {
-            message.warning('Vui lòng chọn ít nhất một đặt xe');
-            return;
-        }
-
-        setBulkActionLoading(true);
-        try {
-            const promises = selectedRowKeys.map(id =>
-                bookingService.cancelBooking(id, 'Hủy hàng loạt bởi admin')
-            );
-
-            await Promise.all(promises);
-            message.success(`Đã hủy ${selectedRowKeys.length} đặt xe`);
-            setSelectedRowKeys([]);
-            fetchBookings(pagination.current, pagination.pageSize, statusFilter);
-        } catch (error) {
-            console.error('Bulk cancel error:', error);
-            const errorMessage = error.response?.data?.message || error.message || 'Lỗi khi hủy đặt xe';
-            message.error(errorMessage);
-        } finally {
-            setBulkActionLoading(false);
-        }
-    };
-
-    // Row selection config
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: setSelectedRowKeys,
-        getCheckboxProps: (record) => ({
-            disabled: record.status === 'COMPLETED' || record.status === 'CANCELLED',
-        }),
+        message.success('Data refreshed successfully');
     };
 
     const columns = [
@@ -439,7 +377,7 @@ const Bookings = () => {
             render: (id) => <Text code>#{id}</Text>,
         },
         {
-            title: 'Mã đặt xe',
+            title: 'Booking Code',
             dataIndex: 'bookingCode',
             key: 'bookingCode',
             width: '200px',
@@ -450,7 +388,7 @@ const Bookings = () => {
             ),
         },
         {
-            title: 'Khách hàng',
+            title: 'Customer',
             dataIndex: 'user',
             key: 'user',
             width: '200px',
@@ -466,7 +404,7 @@ const Bookings = () => {
             ),
         },
         {
-            title: 'Xe',
+            title: 'Car',
             dataIndex: 'car',
             key: 'car',
             width: '250px',
@@ -503,24 +441,24 @@ const Bookings = () => {
             ),
         },
         {
-            title: 'Thời gian',
+            title: 'Time',
             key: 'datetime',
             width: '200px',
             render: (_, record) => (
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                         <CalendarOutlined style={{ color: '#52c41a', fontSize: 12 }} />
-                        <Text style={{ fontSize: 12 }}>Nhận: {formatDate(record.pickupTime)}</Text>
+                        <Text style={{ fontSize: 12 }}>Pickup: {formatDate(record.pickupTime)}</Text>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                         <CalendarOutlined style={{ color: '#f5222d', fontSize: 12 }} />
-                        <Text style={{ fontSize: 12 }}>Trả: {formatDate(record.returnTime)}</Text>
+                        <Text style={{ fontSize: 12 }}>Return: {formatDate(record.returnTime)}</Text>
                     </div>
                 </div>
             ),
         },
         {
-            title: 'Trạng thái',
+            title: 'Status',
             dataIndex: 'status',
             key: 'status',
             width: '130px',
@@ -531,7 +469,7 @@ const Bookings = () => {
             ),
         },
         {
-            title: 'Tổng tiền',
+            title: 'Total Amount',
             dataIndex: 'rentalPrice',
             key: 'rentalPrice',
             width: '120px',
@@ -545,12 +483,12 @@ const Bookings = () => {
             ),
         },
         {
-            title: 'Hành động',
+            title: 'Actions',
             key: 'actions',
             width: '200px',
             render: (_, record) => (
                 <Space size="small">
-                    <Tooltip title="Xem chi tiết">
+                    <Tooltip title="View Details">
                         <Button
                             type="text"
                             icon={<EyeOutlined />}
@@ -562,12 +500,12 @@ const Bookings = () => {
                     {record.status === 'PENDING' && (
                         <>
                             <Popconfirm
-                                title="Xác nhận đặt xe này?"
+                                title="Confirm this booking?"
                                 onConfirm={() => handleConfirmBooking(record.id)}
-                                okText="Có"
-                                cancelText="Không"
+                                okText="Yes"
+                                cancelText="No"
                             >
-                                <Tooltip title="Xác nhận">
+                                <Tooltip title="Confirm">
                                     <Button
                                         type="text"
                                         icon={<CheckOutlined />}
@@ -578,12 +516,12 @@ const Bookings = () => {
                             </Popconfirm>
 
                             <Popconfirm
-                                title="Hủy đặt xe này?"
+                                title="Cancel this booking?"
                                 onConfirm={() => handleCancelBooking(record.id)}
-                                okText="Có"
-                                cancelText="Không"
+                                okText="Yes"
+                                cancelText="No"
                             >
-                                <Tooltip title="Hủy">
+                                <Tooltip title="Cancel">
                                     <Button
                                         type="text"
                                         icon={<CloseOutlined />}
@@ -597,12 +535,12 @@ const Bookings = () => {
 
                     {record.status === 'CONFIRMED' && (
                         <Popconfirm
-                            title="Bắt đầu sử dụng xe?"
+                            title="Start using the car?"
                             onConfirm={() => handleStartUsing(record.id)}
-                            okText="Có"
-                            cancelText="Không"
+                            okText="Yes"
+                            cancelText="No"
                         >
-                            <Tooltip title="Bắt đầu sử dụng">
+                            <Tooltip title="Start Using">
                                 <Button
                                     type="text"
                                     icon={<CarOutlined />}
@@ -615,12 +553,12 @@ const Bookings = () => {
 
                     {record.status === 'USE_IN' && (
                         <Popconfirm
-                            title="Hoàn thành đặt xe này?"
+                            title="Complete this booking?"
                             onConfirm={() => handleCompleteBooking(record.id)}
-                            okText="Có"
-                            cancelText="Không"
+                            okText="Yes"
+                            cancelText="No"
                         >
-                            <Tooltip title="Hoàn thành">
+                            <Tooltip title="Complete">
                                 <Button
                                     type="text"
                                     icon={<CheckOutlined />}
@@ -633,12 +571,12 @@ const Bookings = () => {
 
                     {record.status === 'WAITING_REFUND' && (
                         <Popconfirm
-                            title="Xử lý hoàn tiền?"
+                            title="Process refund?"
                             onConfirm={() => handleProcessRefund(record.id)}
-                            okText="Có"
-                            cancelText="Không"
+                            okText="Yes"
+                            cancelText="No"
                         >
-                            <Tooltip title="Xử lý hoàn tiền">
+                            <Tooltip title="Process Refund">
                                 <Button
                                     type="text"
                                     icon={<DollarOutlined />}
@@ -651,12 +589,12 @@ const Bookings = () => {
 
                     {record.status === 'WAITING_EXTRA_CHARGE' && (
                         <Popconfirm
-                            title="Thu phí phát sinh?"
+                            title="Apply extra charge?"
                             onConfirm={() => handleApplyExtraCharge(record.id)}
-                            okText="Có"
-                            cancelText="Không"
+                            okText="Yes"
+                            cancelText="No"
                         >
-                            <Tooltip title="Thu phí phát sinh">
+                            <Tooltip title="Apply Extra Charge">
                                 <Button
                                     type="text"
                                     icon={<DollarOutlined />}
@@ -684,8 +622,8 @@ const Bookings = () => {
 
     return (
         <>
-            <Meta 
-                title="Bookings Management - Admin Dashboard" 
+            <Meta
+                title="Bookings Management - Admin Dashboard"
                 description="Manage and monitor all car booking requests, approvals, and customer reservations"
             />
             {/* Statistics Cards */}
@@ -765,14 +703,14 @@ const Bookings = () => {
                             className="criclebox tablespace mb-24"
                             title={
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <CalendarOutlined style={{ color: '#1890ff' }} />
-                                    <span>Quản lý đặt xe</span>
+                                    <CalendarOutlined style={{ marginRight: 8, fontSize: 20 }} />
+                                    <span>Booking Management</span>
                                 </div>
                             }
                             extra={
                                 <Space wrap>
                                     <Search
-                                        placeholder="Tìm kiếm khách hàng, xe, mã đặt xe..."
+                                        placeholder="Search by name, email, car name, or booking code"
                                         allowClear
                                         style={{ width: 280 }}
                                         value={searchText}
@@ -786,23 +724,23 @@ const Bookings = () => {
                                         onChange={handleStatusFilterChange}
                                         suffixIcon={<FilterOutlined />}
                                     >
-                                        <Option value="all">Tất cả</Option>
-                                        <Option value="PENDING">Chờ xác nhận</Option>
-                                        <Option value="CONFIRMED">Đã xác nhận</Option>
-                                        <Option value="USE_IN">Đang sử dụng</Option>
-                                        <Option value="WAITING_REFUND">Chờ hoàn tiền</Option>
-                                        <Option value="WAITING_EXTRA_CHARGE">Chờ thu phí phụ</Option>
-                                        <Option value="CANCELLED">Đã hủy</Option>
-                                        <Option value="COMPLETED">Hoàn thành</Option>
+                                        <Option value="all">All</Option>
+                                        <Option value="PENDING">Pending</Option>
+                                        <Option value="CONFIRMED">Confirmed</Option>
+                                        <Option value="USE_IN">In Use</Option>
+                                        <Option value="WAITING_REFUND">Waiting Refund</Option>
+                                        <Option value="WAITING_EXTRA_CHARGE">Waiting Extra Charge</Option>
+                                        <Option value="CANCELLED">Cancelled</Option>
+                                        <Option value="COMPLETED">Completed</Option>
                                     </Select>
-                                    <Tooltip title="Làm mới dữ liệu">
+                                    <Tooltip title="Refresh Data">
                                         <Button
                                             icon={<ReloadOutlined />}
                                             onClick={handleRefresh}
                                             disabled={loading}
                                         />
                                     </Tooltip>
-                                    <Tooltip title="Xuất dữ liệu Excel">
+                                    <Tooltip title="Export Excel Data">
                                         <Button
                                             icon={<FileExcelOutlined />}
                                             onClick={handleExportData}
@@ -812,66 +750,11 @@ const Bookings = () => {
                                 </Space>
                             }
                         >
-                            {/* Bulk Actions */}
-                            {selectedRowKeys.length > 0 && (
-                                <div style={{ marginBottom: 16, padding: 16, backgroundColor: '#f0f9ff', borderRadius: 8 }}>
-                                    <Space>
-                                        <Text strong>
-                                            Đã chọn {selectedRowKeys.length} đặt xe
-                                        </Text>
-                                        <Divider type="vertical" />
-                                        <Popconfirm
-                                            title="Xác nhận tất cả đặt xe đã chọn?"
-                                            onConfirm={handleBulkConfirm}
-                                            okText="Có"
-                                            cancelText="Không"
-                                        >
-                                            <Button
-                                                type="primary"
-                                                icon={<CheckOutlined />}
-                                                loading={bulkActionLoading}
-                                                disabled={!selectedRowKeys.some(id => {
-                                                    const booking = bookings.find(b => b.id === id);
-                                                    return booking?.status === 'PENDING';
-                                                })}
-                                            >
-                                                Xác nhận hàng loạt
-                                            </Button>
-                                        </Popconfirm>
-                                        <Popconfirm
-                                            title="Hủy tất cả đặt xe đã chọn?"
-                                            onConfirm={handleBulkCancel}
-                                            okText="Có"
-                                            cancelText="Không"
-                                        >
-                                            <Button
-                                                danger
-                                                icon={<CloseOutlined />}
-                                                loading={bulkActionLoading}
-                                                disabled={!selectedRowKeys.some(id => {
-                                                    const booking = bookings.find(b => b.id === id);
-                                                    return booking?.status === 'PENDING' || booking?.status === 'CONFIRMED';
-                                                })}
-                                            >
-                                                Hủy hàng loạt
-                                            </Button>
-                                        </Popconfirm>
-                                        <Button
-                                            onClick={() => setSelectedRowKeys([])}
-                                            disabled={bulkActionLoading}
-                                        >
-                                            Bỏ chọn tất cả
-                                        </Button>
-                                    </Space>
-                                </div>
-                            )}
-
                             <div className="table-responsive">
                                 <Spin spinning={loading}>
                                     <Table
                                         columns={columns}
                                         dataSource={filteredData}
-                                        rowSelection={rowSelection}
                                         pagination={{
                                             ...pagination,
                                             showSizeChanger: true,

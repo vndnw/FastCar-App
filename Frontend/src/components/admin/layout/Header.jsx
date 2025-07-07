@@ -285,10 +285,10 @@ function Header({
             className="btn-home"
             onClick={() => navigate('/')}
             style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-            title="Về trang chủ"
+            title="Go to Home"
           >
             <HomeOutlined />
-            <span>Trang chủ</span>
+            <span>Home</span>
           </Button>
           {isAuthenticated ? (
             <Button

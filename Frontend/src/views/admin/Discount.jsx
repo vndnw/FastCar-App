@@ -352,8 +352,8 @@ const Discount = () => {
 
     return (
         <>
-            <Meta 
-                title="Discounts Management - Admin Dashboard" 
+            <Meta
+                title="Discounts Management - Admin Dashboard"
                 description="Manage promotional codes, discount rates, and special offers for car bookings"
             />
             <div className="tabled">
@@ -377,7 +377,8 @@ const Discount = () => {
                                     Create Discount
                                 </Button>
                             }
-                        >                            <div className="table-responsive">
+                        >
+                            <div className="table-responsive">
                                 <Table
                                     columns={columns}
                                     dataSource={discounts}
