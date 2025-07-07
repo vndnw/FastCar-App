@@ -15,10 +15,17 @@ public class UserSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (StringUtils.hasText(criteria.getName())) {
+            if (StringUtils.hasText(criteria.getFistName())) {
                 predicates.add(criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("name")),
-                    "%" + criteria.getName().toLowerCase() + "%"
+                    criteriaBuilder.lower(root.get("fistName")),
+                    "%" + criteria.getFistName().toLowerCase() + "%"
+                ));
+            }
+
+            if (StringUtils.hasText(criteria.getLastName())) {
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("lastName")),
+                    "%" + criteria.getLastName().toLowerCase() + "%"
                 ));
             }
 
@@ -29,24 +36,17 @@ public class UserSpecification {
                 ));
             }
 
-            if (StringUtils.hasText(criteria.getPhoneNumber())) {
+            if (StringUtils.hasText(criteria.getPhone())) {
                 predicates.add(criteriaBuilder.like(
-                    root.get("phoneNumber"),
-                    "%" + criteria.getPhoneNumber() + "%"
+                    root.get("phone"),
+                    "%" + criteria.getPhone() + "%"
                 ));
             }
 
-            if (StringUtils.hasText(criteria.getRole())) {
+            if (criteria.getActive() != null) {
                 predicates.add(criteriaBuilder.equal(
-                    root.get("role"),
-                    criteria.getRole().toUpperCase()
-                ));
-            }
-
-            if (criteria.getIsActive() != null) {
-                predicates.add(criteriaBuilder.equal(
-                    root.get("isActive"),
-                    criteria.getIsActive()
+                    root.get("active"),
+                    criteria.getActive()
                 ));
             }
 
