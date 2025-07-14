@@ -754,7 +754,7 @@ const CarListing = () => {
             </div>
 
             {/* Cars Grid */}
-            <div className="cars-grid-section">
+            <div className="cars-grid-section" style={{ paddingTop: '50px' }}>
                 <div className="cars-container">
                     {/* Active Filters Summary */}
                     {(activeAdvancedFiltersCount > 0 || activeFilters.some(f => f !== 'all')) && (

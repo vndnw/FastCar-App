@@ -292,11 +292,27 @@
 
 @media (max-width: 768px) {
     .hero-section {
-        height: 70vh;
-        min-height: 500px;
+        height: 100vh;
+        /* Full height cho mobile */
+        min-height: 100vh;
+        /* Đảm bảo full height */
         padding: 40px 0;
         padding-left: 5%;
     }
+
+    /* QUAN TRỌNG: Thay đổi background-size cho mobile */
+    .hero-slide {
+        background-size: cover;
+        /* Giữ cover nhưng sẽ crop theo tỷ lệ portrait */
+        background-position: center center;
+        /* Hoặc có thể dùng background-size: 100% 100% để stretch full */
+    }
+
+    /* Alternative: Nếu muốn stretch hoàn toàn không crop */
+    /* .hero-slide {
+        background-size: 100% 100%;
+        background-position: center center;
+    } */
 
     .hero-title.ant-typography,
     .hero-subtitle.ant-typography {
@@ -312,7 +328,8 @@
     .hero-dots {
         left: 50%;
         transform: translateX(-50%);
-        bottom: 25px;
+        bottom: 15px;
+        /* Giảm xuống để tránh bị che bởi slogan */
         gap: 10px;
     }
 
@@ -325,11 +342,12 @@
     .hero-text-left,
     .hero-text-right,
     .hero-text-left-top {
-        position: relative !important;
-        left: auto !important;
+        position: absolute !important;
+        left: 50% !important;
         right: auto !important;
-        top: auto !important;
-        transform: none !important;
+        top: 70% !important;
+        /* Đặt ở 70% từ trên xuống để tránh searchbar */
+        transform: translateX(-50%) !important;
         text-align: center !important;
         width: 100% !important;
     }
@@ -338,6 +356,16 @@
 @media (max-width: 576px) {
     .hero-section {
         padding-left: 20px;
+        height: 100vh;
+        /* Đảm bảo full height */
+        min-height: 100vh;
+    }
+
+    /* Cho mobile nhỏ hơn - có thể adjust background position */
+    .hero-slide {
+        background-size: cover;
+        background-position: center top;
+        /* Ưu tiên phần trên của ảnh */
     }
 
     .hero-title.ant-typography,
@@ -346,7 +374,8 @@
     }
 
     .hero-dots {
-        bottom: 20px;
+        bottom: 10px;
+        /* Giảm thêm cho mobile nhỏ */
         gap: 8px;
     }
 

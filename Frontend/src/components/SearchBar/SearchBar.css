@@ -32,7 +32,6 @@
     padding: 12px 24px !important;
 }
 
-/* Row và Column Layout */
 .search-row {
     margin: 0 !important;
     align-items: center !important;
@@ -46,7 +45,6 @@
     border-right: 1px solid #f0f0f0;
 }
 
-/* Search Field Container */
 .search-field {
     display: flex;
     flex-direction: column;
@@ -69,7 +67,6 @@
     min-height: auto !important;
 }
 
-/* Input Styling */
 .field-select .ant-select-selector,
 .field-input,
 .field-input .ant-picker-input input {
@@ -102,7 +99,6 @@
     display: none !important;
 }
 
-/* Hover effects */
 .search-field:hover {
     background-color: rgba(0, 0, 0, 0.02);
     border-radius: 6px;
@@ -120,7 +116,6 @@
     box-shadow: none !important;
 }
 
-/* Button Styling */
 .button-item {
     margin-bottom: 0 !important;
     padding: 8px 0;
@@ -150,7 +145,6 @@
     border-color: #52c41a !important;
 }
 
-/* Dropdown Styling */
 .ant-select-dropdown {
     border-radius: 8px !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
@@ -165,7 +159,6 @@
     background-color: rgba(82, 196, 26, 0.05) !important;
 }
 
-/* DatePicker và TimePicker Dropdown */
 .ant-picker-dropdown {
     border-radius: 8px !important;
 }
@@ -183,7 +176,6 @@
     background-color: rgba(82, 196, 26, 0.1) !important;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
     .search-bar-wrapper {
         padding: 0 15px;
@@ -196,47 +188,51 @@
 }
 
 @media (max-width: 768px) {
-    .search-bar-card .ant-card-body {
-        padding: 16px !important;
-    }
-
     .search-row {
-        flex-direction: column !important;
-        gap: 8px !important;
+        display: none !important;
     }
 
-    .search-col {
-        padding: 0 !important;
-        border-right: none !important;
-        border-bottom: 1px solid #f0f0f0;
-        width: 100% !important;
-        flex: none !important;
+    .mobile-summary {
+        display: block;
+        padding: 16px;
     }
 
-    .search-col:last-child {
-        border-bottom: none !important;
-        margin-top: 8px;
+    .summary-item {
+        margin-bottom: 12px;
     }
 
-    .search-field {
-        padding: 12px 16px;
-    }
-
-    .button-item {
-        padding: 12px 16px;
+    .summary-box {
+        background: #fff;
+        border: 1px solid #e8e8e8;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 500;
     }
 
     .search-button.ant-btn {
         height: 48px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
     }
-}
 
-@media (max-width: 576px) {
+    .search-bar-card {
+        border-radius: 12px !important;
+        overflow: hidden;
+    }
+
     .search-bar-wrapper {
         padding: 0 10px;
     }
 
-    .search-bar-card .ant-card-body {
-        padding: 12px !important;
+    .search-bar-container {
+        top: 120px;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-summary {
+        display: none;
     }
 }
