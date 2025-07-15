@@ -147,3 +147,41 @@
   border-color: #3ea98a !important;
   color: #3ea98a !important;
 }
+
+
+/* Responsive ẩn/hiện theo màn hình */
+.desktop-only {
+  display: flex;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .mobile-menu-icon {
+    font-size: 24px;
+    cursor: pointer;
+  }
+}
+
+.drawer-link {
+  font-size: 18px;
+  color: #333;
+  text-decoration: none;
+  text-align: center;
+  width: 100%;
+  transition: color 0.3s;
+}
+
+.drawer-link:hover {
+  color: #31c3a1;
+}

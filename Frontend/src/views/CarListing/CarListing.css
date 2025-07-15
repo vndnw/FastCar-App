@@ -52,6 +52,7 @@
 
 /* Filter Section - Fixed positioning */
 .filter-section-new {
+    margin-top: 10px;
     background: white;
     padding: 16px 0;
     border-bottom: 1px solid #f0f0f0;
@@ -689,4 +690,31 @@
 .price-range-display .price-value {
     font-weight: 500;
     color: #52c41a;
+}
+
+
+/* Thêm vào cuối file CarListing.css */
+@media (max-width: 768px) {
+    .search-section-dark {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .cars-grid-section {
+        padding-top: 100px;
+        /* chỉ áp dụng cho mobile */
+    }
+
+    .filter-section-new {
+        margin-top: 40px;
+        /* cách header một khoảng, nếu cần */
+    }
+}
+
+@media (max-width: 768px) {
+    .search-info-display {
+        margin-top: 150px;
+        /* hoặc 60px tùy bạn, miễn là đủ tránh bị che */
+    }
 }
